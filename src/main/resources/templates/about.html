@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>ORIOLA - Sobre Nosotros</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand text-primary" href="/">ORIOLA</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/catalog">Catálogo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contacto</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/about">Sobre ORIOLA</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-4">Sobre ORIOLA</h1>
+            <p class="lead">Conoce nuestra historia y pasión por la indumentaria</p>
+        </div>
+    </section>
+
+    <!-- About Content -->
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <h2 class="text-center mb-5">Nuestra Historia</h2>
+                <p class="lead text-center mb-5">
+                    ORIOLA nace de la pasión por crear indumentaria de calidad que combine estilo, comodidad y durabilidad.
+                </p>
+                
+                <div class="row mb-5">
+                    <div class="col-md-6">
+                        <h4><i class="bi bi-heart text-primary me-2"></i>Nuestra Misión</h4>
+                        <p>Ofrecer productos de indumentaria que reflejen la personalidad única de cada persona, manteniendo siempre los más altos estándares de calidad y diseño.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h4><i class="bi bi-eye text-primary me-2"></i>Nuestra Visión</h4>
+                        <p>Ser reconocidos como una marca líder en indumentaria, conocida por nuestra innovación, calidad y compromiso con nuestros clientes.</p>
+                    </div>
+                </div>
+
+                <div class="row mb-5">
+                    <div class="col-md-6">
+                        <h4><i class="bi bi-star text-primary me-2"></i>Nuestros Valores</h4>
+                        <ul>
+                            <li>Calidad en cada producto</li>
+                            <li>Innovación constante</li>
+                            <li>Compromiso con el cliente</li>
+                            <li>Sostenibilidad</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h4><i class="bi bi-person text-primary me-2"></i>Fundador</h4>
+                        <p><strong>Alberto Seres</strong><br>
+                        Fundador y director creativo de ORIOLA, con años de experiencia en el mundo de la moda y la indumentaria.</p>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <a href="/catalog" class="btn btn-primary btn-lg me-3">Ver Productos</a>
+                    <a href="/contact" class="btn btn-outline-primary btn-lg">Contactar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p>&copy; 2025 ORIOLA. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

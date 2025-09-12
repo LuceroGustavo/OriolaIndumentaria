@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>ORIOLA - Manual de Usuario</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin: 0.2rem 0;
+        }
+        .sidebar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .help-content {
+            max-width: 800px;
+        }
+        .help-section {
+            margin-bottom: 3rem;
+        }
+        .help-section h2 {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        .help-section h3 {
+            color: #764ba2;
+            margin-top: 2rem;
+        }
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+        }
+        .search-box {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar p-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Manual de Usuario</h4>
+                        <small class="text-white-50">ORIOLA Admin</small>
+                    </div>
+                    
+                    <!-- Buscador -->
+                    <div class="search-box mb-4">
+                        <input type="text" class="form-control" placeholder="Buscar en el manual..." id="searchInput">
+                    </div>
+                    
+                    <!-- Navegación -->
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="#inicio">🏠 Inicio</a>
+                        <a class="nav-link" href="#productos">📦 Gestión de Productos</a>
+                        <a class="nav-link" href="#imagenes">🖼️ Subida de Imágenes</a>
+                        <a class="nav-link" href="#consultas">📧 Gestión de Consultas</a>
+                        <a class="nav-link" href="#configuracion">⚙️ Configuración</a>
+                        <a class="nav-link" href="#perfil">👤 Perfil de Usuario</a>
+                        <a class="nav-link" href="#troubleshooting">🔧 Solución de Problemas</a>
+                        <a class="nav-link" href="#soporte">📞 Soporte Técnico</a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Contenido Principal -->
+            <div class="col-md-9 col-lg-10 p-4">
+                <div class="help-content">
+                    
+                    <!-- Sección Inicio -->
+                    <div id="inicio" class="help-section">
+                        <h2>Bienvenido al Manual de ORIOLA</h2>
+                        <p class="lead">Este manual te guiará paso a paso para administrar tu sitio web de ORIOLA Indumentaria.</p>
+                        
+                        <div class="alert alert-info">
+                            <h5><i class="bi bi-info-circle me-2"></i>Información Importante</h5>
+                            <p>Este manual está diseñado para ser interactivo. Puedes usar el buscador en la barra lateral para encontrar información específica rápidamente.</p>
+                        </div>
+                        
+                        <h3>¿Qué puedes hacer con este panel?</h3>
+                        <ul>
+                            <li><strong>Gestionar productos:</strong> Agregar, editar y eliminar productos de tu catálogo</li>
+                            <li><strong>Subir imágenes:</strong> Cargar y optimizar automáticamente las fotos de tus productos</li>
+                            <li><strong>Responder consultas:</strong> Gestionar las consultas de tus clientes</li>
+                            <li><strong>Configurar el sitio:</strong> Personalizar la información de tu marca</li>
+                            <li><strong>Ver estadísticas:</strong> Analizar el rendimiento de tu sitio</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Sección Productos -->
+                    <div id="productos" class="help-section">
+                        <h2>📦 Gestión de Productos</h2>
+                        <p>Aquí aprenderás a administrar tu catálogo de productos de manera eficiente.</p>
+                        
+                        <h3>Agregar un Nuevo Producto</h3>
+                        <ol>
+                            <li>Ve a <strong>Productos</strong> en el menú lateral</li>
+                            <li>Haz clic en <strong>"Nuevo Producto"</strong></li>
+                            <li>Completa los campos obligatorios:
+                                <ul>
+                                    <li><strong>Nombre:</strong> Nombre descriptivo del producto</li>
+                                    <li><strong>Precio:</strong> Precio en pesos argentinos</li>
+                                    <li><strong>Cantidad:</strong> Stock disponible</li>
+                                </ul>
+                            </li>
+                            <li>Haz clic en <strong>"Guardar"</strong></li>
+                        </ol>
+                        
+                        <div class="alert alert-warning">
+                            <h6><i class="bi bi-exclamation-triangle me-2"></i>Consejo</h6>
+                            <p>Usa nombres descriptivos para tus productos. Esto ayudará a tus clientes a encontrarlos más fácilmente.</p>
+                        </div>
+                        
+                        <h3>Editar un Producto Existente</h3>
+                        <ol>
+                            <li>En la lista de productos, haz clic en <strong>"Editar"</strong></li>
+                            <li>Modifica los campos que necesites</li>
+                            <li>Guarda los cambios</li>
+                        </ol>
+                        
+                        <h3>Eliminar un Producto</h3>
+                        <ol>
+                            <li>Haz clic en <strong>"Eliminar"</strong> junto al producto</li>
+                            <li>Confirma la eliminación en el diálogo</li>
+                        </ol>
+                        
+                        <div class="alert alert-danger">
+                            <h6><i class="bi bi-exclamation-triangle me-2"></i>Advertencia</h6>
+                            <p>La eliminación de productos es permanente. Asegúrate de que realmente quieres eliminar el producto antes de confirmar.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Sección Imágenes -->
+                    <div id="imagenes" class="help-section">
+                        <h2>🖼️ Subida de Imágenes</h2>
+                        <p>El sistema procesa automáticamente las imágenes para optimizar la carga de tu sitio.</p>
+                        
+                        <h3>Formatos Soportados</h3>
+                        <ul>
+                            <li><strong>JPG/JPEG:</strong> Imágenes fotográficas</li>
+                            <li><strong>PNG:</strong> Imágenes con transparencia</li>
+                        </ul>
+                        
+                        <h3>Especificaciones Técnicas</h3>
+                        <div class="code-block">
+                            <strong>Tamaño máximo:</strong> 2MB por imagen<br>
+                            <strong>Resolución recomendada:</strong> 1920x1080px<br>
+                            <strong>Formato de salida:</strong> WebP (conversión automática)<br>
+                            <strong>Thumbnail:</strong> 300x300px (generado automáticamente)
+                        </div>
+                        
+                        <h3>Proceso de Subida</h3>
+                        <ol>
+                            <li>Selecciona las imágenes desde tu computadora</li>
+                            <li>El sistema las convierte automáticamente a WebP</li>
+                            <li>Se generan thumbnails para vista previa</li>
+                            <li>Las imágenes se optimizan para carga rápida</li>
+                        </ol>
+                    </div>
+                    
+                    <!-- Sección Consultas -->
+                    <div id="consultas" class="help-section">
+                        <h2>📧 Gestión de Consultas</h2>
+                        <p>Administra las consultas que reciben tus clientes desde el formulario de contacto.</p>
+                        
+                        <h3>Ver Consultas Recibidas</h3>
+                        <ol>
+                            <li>Ve a <strong>Consultas</strong> en el menú lateral</li>
+                            <li>Verás una lista de todas las consultas</li>
+                            <li>Las consultas no leídas aparecen destacadas</li>
+                        </ol>
+                        
+                        <h3>Responder a una Consulta</h3>
+                        <ol>
+                            <li>Haz clic en la consulta que quieres responder</li>
+                            <li>Lee los detalles del cliente</li>
+                            <li>Usa el botón <strong>"Responder"</strong> para enviar un email</li>
+                            <li>Marca como <strong>"Leída"</strong> cuando hayas respondido</li>
+                        </ol>
+                    </div>
+                    
+                    <!-- Sección Configuración -->
+                    <div id="configuracion" class="help-section">
+                        <h2>⚙️ Configuración del Sitio</h2>
+                        <p>Personaliza la información de tu marca y configuración general.</p>
+                        
+                        <h3>Información de la Empresa</h3>
+                        <ul>
+                            <li>Nombre de la marca</li>
+                            <li>Descripción de la empresa</li>
+                            <li>Información de contacto</li>
+                            <li>Enlaces a redes sociales</li>
+                        </ul>
+                        
+                        <h3>Configuración de Idiomas</h3>
+                        <p>Puedes activar/desactivar el soporte para inglés en tu sitio.</p>
+                    </div>
+                    
+                    <!-- Sección Perfil -->
+                    <div id="perfil" class="help-section">
+                        <h2>👤 Perfil de Usuario</h2>
+                        <p>Gestiona tu información personal y seguridad.</p>
+                        
+                        <h3>Cambiar Contraseña</h3>
+                        <ol>
+                            <li>Ve a <strong>Perfil</strong> en el menú lateral</li>
+                            <li>Ingresa tu contraseña actual</li>
+                            <li>Ingresa la nueva contraseña</li>
+                            <li>Confirma la nueva contraseña</li>
+                            <li>Haz clic en <strong>"Cambiar Contraseña"</strong></li>
+                        </ol>
+                        
+                        <div class="alert alert-info">
+                            <h6><i class="bi bi-shield-check me-2"></i>Seguridad</h6>
+                            <p>Usa una contraseña segura con al menos 8 caracteres, incluyendo mayúsculas, minúsculas y números.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Sección Troubleshooting -->
+                    <div id="troubleshooting" class="help-section">
+                        <h2>🔧 Solución de Problemas</h2>
+                        
+                        <h3>Problemas Comunes</h3>
+                        
+                        <h4>No puedo subir imágenes</h4>
+                        <ul>
+                            <li>Verifica que el archivo sea JPG o PNG</li>
+                            <li>Comprueba que el tamaño sea menor a 2MB</li>
+                            <li>Intenta con una imagen diferente</li>
+                        </ul>
+                        
+                        <h4>El sitio no carga correctamente</h4>
+                        <ul>
+                            <li>Verifica tu conexión a internet</li>
+                            <li>Limpia la caché de tu navegador</li>
+                            <li>Intenta con otro navegador</li>
+                        </ul>
+                        
+                        <h4>No recibo notificaciones de consultas</h4>
+                        <ul>
+                            <li>Verifica la configuración de email</li>
+                            <li>Revisa la carpeta de spam</li>
+                            <li>Contacta al soporte técnico</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Sección Soporte -->
+                    <div id="soporte" class="help-section">
+                        <h2>📞 Soporte Técnico</h2>
+                        <p>¿Necesitas ayuda adicional? Estamos aquí para ayudarte.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="bi bi-envelope me-2"></i>Email de Soporte</h5>
+                                        <p class="card-text">soporte@oriola.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="bi bi-whatsapp me-2"></i>WhatsApp</h5>
+                                        <p class="card-text">+54 9 11 1234-5678</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h3>Información para el Soporte</h3>
+                        <p>Cuando contactes al soporte, incluye:</p>
+                        <ul>
+                            <li>Descripción detallada del problema</li>
+                            <li>Pasos que seguiste antes del error</li>
+                            <li>Captura de pantalla si es posible</li>
+                            <li>Navegador y versión que estás usando</li>
+                        </ul>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Funcionalidad de búsqueda
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const sections = document.querySelectorAll('.help-section');
+            
+            sections.forEach(section => {
+                const content = section.textContent.toLowerCase();
+                if (content.includes(searchTerm)) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        });
+        
+        // Navegación suave
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

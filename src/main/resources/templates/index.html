@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>ORIOLA - Indumentaria</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+        }
+        .product-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand text-primary" href="/">ORIOLA</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/catalog">Catálogo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contacto</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">Sobre ORIOLA</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/login">Admin</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-4">ORIOLA</h1>
+            <p class="lead mb-4">Indumentaria con estilo y calidad</p>
+            <a href="/catalog" class="btn btn-light btn-lg">Ver Catálogo</a>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Productos Destacados</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4" th:each="product : ${featuredProducts}">
+                    <div class="card product-card h-100">
+                        <div class="card-body text-center">
+                            <h5 class="card-title" th:text="${product.name}">Producto</h5>
+                            <div class="mb-2">
+                                <span th:if="${product.categoria}" class="badge bg-info me-1" th:text="${product.categoria}"></span>
+                                <span th:if="${product.talle}" class="badge bg-secondary me-1" th:text="${product.talle}"></span>
+                            </div>
+                            <p class="text-muted mb-2">$<span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}">0</span></p>
+                            <p th:if="${product.color}" class="small text-muted mb-3">Color: <span th:text="${product.color}"></span></p>
+                            <div class="mb-3">
+                                <span th:if="${product.qty > 0}" class="badge bg-success">En stock</span>
+                                <span th:if="${product.qty == 0}" class="badge bg-danger">Sin stock</span>
+                            </div>
+                            <a th:href="@{/product/{id}(id=${product.pId})}" class="btn btn-primary">Ver Detalle</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <a href="/catalog" class="btn btn-outline-primary">Ver Todos los Productos</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>¿Necesitas ayuda?</h3>
+                    <p>Contáctanos para cualquier consulta sobre nuestros productos.</p>
+                    <a href="/contact" class="btn btn-primary">Contactar</a>
+                </div>
+                <div class="col-md-6 text-end">
+                    <h5>Síguenos en redes sociales</h5>
+                    <a href="#" class="btn btn-outline-primary me-2">
+                        <i class="bi bi-instagram"></i> Instagram
+                    </a>
+                    <a href="#" class="btn btn-outline-success">
+                        <i class="bi bi-whatsapp"></i> WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p>&copy; 2025 ORIOLA. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
