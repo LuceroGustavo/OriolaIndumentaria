@@ -107,11 +107,12 @@ body {
 /* Hero Section */
 .hero-oriola {
     background: var(--gradient-primary);
-    min-height: 80vh;
+    min-height: 50vh;
     display: flex;
     align-items: center;
     position: relative;
     overflow: hidden;
+    padding: 4rem 0;
 }
 
 .hero-oriola::before {
