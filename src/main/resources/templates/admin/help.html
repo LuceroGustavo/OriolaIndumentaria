@@ -117,17 +117,55 @@
                             <li>Completa los campos obligatorios:
                                 <ul>
                                     <li><strong>Nombre:</strong> Nombre descriptivo del producto</li>
+                                    <li><strong>Categoría:</strong> Selecciona de la lista (Remeras, Buzos, Camisas, etc.)</li>
                                     <li><strong>Precio:</strong> Precio en pesos argentinos</li>
                                     <li><strong>Cantidad:</strong> Stock disponible</li>
                                 </ul>
                             </li>
-                            <li>Haz clic en <strong>"Guardar"</strong></li>
+                            <li>Completa los campos opcionales:
+                                <ul>
+                                    <li><strong>Talle:</strong> Selecciona de la lista (XS, S, M, L, XL, etc.)</li>
+                                    <li><strong>Género:</strong> Hombre, Mujer, Unisex, Niño, Niña</li>
+                                    <li><strong>Temporada:</strong> Verano, Invierno, Primavera, Otoño, Todo el año</li>
+                                    <li><strong>Material:</strong> Tipo de material del producto</li>
+                                    <li><strong>Descripción:</strong> Descripción detallada del producto</li>
+                                </ul>
+                            </li>
+                            <li>Haz clic en <strong>"Crear Producto"</strong></li>
                         </ol>
                         
                         <div class="alert alert-warning">
                             <h6><i class="bi bi-exclamation-triangle me-2"></i>Consejo</h6>
                             <p>Usa nombres descriptivos para tus productos. Esto ayudará a tus clientes a encontrarlos más fácilmente.</p>
                         </div>
+                        
+                        <h3>Campos Específicos para Indumentaria</h3>
+                        <p>El sistema incluye campos especializados para productos de indumentaria:</p>
+                        
+                        <h4>Información Básica</h4>
+                        <ul>
+                            <li><strong>Talle:</strong> XS, S, M, L, XL, XXL, XXXL, Único</li>
+                            <li><strong>Color:</strong> Color principal del producto</li>
+                            <li><strong>Género:</strong> Hombre, Mujer, Unisex, Niño, Niña</li>
+                            <li><strong>Temporada:</strong> Verano, Invierno, Primavera, Otoño, Todo el año</li>
+                        </ul>
+                        
+                        <h4>Detalles Técnicos</h4>
+                        <ul>
+                            <li><strong>Material:</strong> Tipo de material (Algodón, Poliéster, etc.)</li>
+                            <li><strong>Cuidados:</strong> Instrucciones de lavado y cuidado</li>
+                            <li><strong>Edad Recomendada:</strong> Rango de edad para el producto</li>
+                            <li><strong>Tallas Disponibles:</strong> Lista de tallas separadas por coma</li>
+                            <li><strong>Colores Disponibles:</strong> Lista de colores separados por coma</li>
+                        </ul>
+                        
+                        <h4>Opciones de Marketing</h4>
+                        <ul>
+                            <li><strong>Producto Destacado:</strong> Aparece en la página principal</li>
+                            <li><strong>Producto Nuevo:</strong> Se marca como novedad</li>
+                            <li><strong>Descuento:</strong> Porcentaje de descuento (0-100%)</li>
+                            <li><strong>Precio Original:</strong> Precio antes del descuento</li>
+                        </ul>
                         
                         <h3>Editar un Producto Existente</h3>
                         <ol>
@@ -157,23 +195,48 @@
                         <ul>
                             <li><strong>JPG/JPEG:</strong> Imágenes fotográficas</li>
                             <li><strong>PNG:</strong> Imágenes con transparencia</li>
+                            <li><strong>WebP:</strong> Formato moderno y optimizado</li>
                         </ul>
                         
                         <h3>Especificaciones Técnicas</h3>
                         <div class="code-block">
-                            <strong>Tamaño máximo:</strong> 2MB por imagen<br>
+                            <strong>Tamaño máximo por imagen:</strong> 5MB<br>
+                            <strong>Tamaño máximo por request:</strong> 25MB<br>
+                            <strong>Máximo de imágenes por producto:</strong> 15<br>
                             <strong>Resolución recomendada:</strong> 1920x1080px<br>
-                            <strong>Formato de salida:</strong> WebP (conversión automática)<br>
+                            <strong>Formato de salida:</strong> PNG (conversión automática)<br>
                             <strong>Thumbnail:</strong> 300x300px (generado automáticamente)
+                        </div>
+                        
+                        <h3>Límites de Imágenes por Producto</h3>
+                        <div class="alert alert-info">
+                            <h6><i class="bi bi-info-circle me-2"></i>Información Importante</h6>
+                            <p>Cada producto puede tener <strong>máximo 15 imágenes</strong>. El sistema validará automáticamente este límite antes de permitir la subida.</p>
                         </div>
                         
                         <h3>Proceso de Subida</h3>
                         <ol>
                             <li>Selecciona las imágenes desde tu computadora</li>
-                            <li>El sistema las convierte automáticamente a WebP</li>
+                            <li>El sistema valida el tamaño y cantidad de imágenes</li>
+                            <li>Las imágenes se convierten automáticamente a PNG</li>
                             <li>Se generan thumbnails para vista previa</li>
                             <li>Las imágenes se optimizan para carga rápida</li>
                         </ol>
+                        
+                        <h3>Subida Individual vs Múltiple</h3>
+                        <ul>
+                            <li><strong>Subida individual:</strong> 1 imagen por vez (máximo 5MB)</li>
+                            <li><strong>Subida múltiple:</strong> Hasta 5 imágenes por vez (si cada una es de 5MB)</li>
+                            <li><strong>Imagen principal:</strong> La primera imagen subida se marca automáticamente como principal</li>
+                        </ul>
+                        
+                        <h3>Recomendaciones de Uso</h3>
+                        <ul>
+                            <li><strong>Imagen principal:</strong> 1 (la que se muestra en el catálogo)</li>
+                            <li><strong>Imágenes adicionales:</strong> 4-8 (diferentes ángulos, detalles)</li>
+                            <li><strong>Total recomendado:</strong> 5-10 imágenes por producto</li>
+                            <li><strong>Tamaño óptimo:</strong> 1-2MB por imagen para mejor rendimiento</li>
+                        </ul>
                     </div>
                     
                     <!-- Sección Consultas -->
@@ -242,8 +305,9 @@
                         
                         <h4>No puedo subir imágenes</h4>
                         <ul>
-                            <li>Verifica que el archivo sea JPG o PNG</li>
-                            <li>Comprueba que el tamaño sea menor a 2MB</li>
+                            <li>Verifica que el archivo sea JPG, PNG o WebP</li>
+                            <li>Comprueba que el tamaño sea menor a 5MB</li>
+                            <li>Verifica que no hayas excedido el límite de 15 imágenes por producto</li>
                             <li>Intenta con una imagen diferente</li>
                         </ul>
                         

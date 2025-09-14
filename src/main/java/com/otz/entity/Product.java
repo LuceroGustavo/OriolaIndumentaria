@@ -1,5 +1,9 @@
 package com.otz.entity;
 
+import com.otz.enums.Categoria;
+import com.otz.enums.Genero;
+import com.otz.enums.Talle;
+import com.otz.enums.Temporada;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -17,15 +21,16 @@ import java.util.List;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "p_id")
     private Integer pId;
 
     @NotBlank(message = "El nombre del producto es requerido")
     @Column(name = "name", nullable = false)
     private String name;
 
-    @NotBlank(message = "El talle es requerido")
-    @Column(name = "talle", nullable = false)
-    private String talle;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "talle")
+    private Talle talle;
 
     @NotBlank(message = "Las medidas son requeridas")
     @Column(name = "medidas", nullable = false)
@@ -46,9 +51,9 @@ public class Product {
     @Column(name = "descripcion", columnDefinition = "TEXT")
     private String descripcion;
 
-    @NotBlank(message = "La categoría es requerida")
+    @Enumerated(EnumType.STRING)
     @Column(name = "categoria", nullable = false)
-    private String categoria;
+    private Categoria categoria;
 
     // Campos adicionales para indumentaria
     @Column(name = "material")
@@ -57,11 +62,13 @@ public class Product {
     @Column(name = "cuidados", columnDefinition = "TEXT")
     private String cuidados;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "temporada")
-    private String temporada; // Verano, Invierno, Todo el año
+    private Temporada temporada;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "genero")
-    private String genero; // Hombre, Mujer, Unisex, Niño, Niña
+    private Genero genero;
 
     @Column(name = "edad_recomendada")
     private String edadRecomendada;
@@ -108,7 +115,7 @@ public class Product {
     // Método para obtener la URL de la imagen principal
     public String getImagenPrincipalUrl() {
         ProductImage imagenPrincipal = getImagenPrincipal();
-        return imagenPrincipal != null ? imagenPrincipal.getImageUrl() : "/images/no-image.png";
+        return imagenPrincipal != null ? imagenPrincipal.getImageUrl() : "/images/no-image.svg";
     }
 
     // Método para obtener el precio con descuento
@@ -143,8 +150,8 @@ public class Product {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     
-    public String getTalle() { return talle; }
-    public void setTalle(String talle) { this.talle = talle; }
+    public Talle getTalle() { return talle; }
+    public void setTalle(Talle talle) { this.talle = talle; }
     
     public String getMedidas() { return medidas; }
     public void setMedidas(String medidas) { this.medidas = medidas; }
@@ -161,8 +168,8 @@ public class Product {
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
     
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
+    public Categoria getCategoria() { return categoria; }
+    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
     
     public Boolean getActivo() { return activo; }
     public void setActivo(Boolean activo) { this.activo = activo; }
@@ -173,11 +180,11 @@ public class Product {
     public String getCuidados() { return cuidados; }
     public void setCuidados(String cuidados) { this.cuidados = cuidados; }
     
-    public String getTemporada() { return temporada; }
-    public void setTemporada(String temporada) { this.temporada = temporada; }
+    public Temporada getTemporada() { return temporada; }
+    public void setTemporada(Temporada temporada) { this.temporada = temporada; }
     
-    public String getGenero() { return genero; }
-    public void setGenero(String genero) { this.genero = genero; }
+    public Genero getGenero() { return genero; }
+    public void setGenero(Genero genero) { this.genero = genero; }
     
     public String getEdadRecomendada() { return edadRecomendada; }
     public void setEdadRecomendada(String edadRecomendada) { this.edadRecomendada = edadRecomendada; }

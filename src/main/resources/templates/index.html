@@ -44,7 +44,7 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero-oriola">
+    <section class="hero-oriola" style="min-height: 50vh;">
         <div class="container">
             <div class="hero-content">
                 <h1 class="hero-title">ORIOLA</h1>
@@ -104,8 +104,8 @@
                 <div class="col-lg-4 col-md-6 mb-4" th:each="product : ${featuredProducts}">
                     <div class="product-card-oriola h-100">
                         <div class="product-image">
-                            <i class="bi bi-image" th:if="${product.imagenUrl == null or product.imagenUrl == ''}"></i>
-                            <img th:if="${product.imagenUrl != null and product.imagenUrl != ''}" th:src="${product.imagenUrl}" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
+                            <i class="bi bi-image" th:if="${product.getImagenPrincipal() == null}"></i>
+                            <img th:if="${product.getImagenPrincipal() != null}" th:src="${product.getImagenPrincipalUrl()}" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <div class="product-info">
                             <h5 class="product-title" th:text="${product.name}">Producto</h5>

@@ -44,6 +44,16 @@ public class FileUploadController {
                 return ResponseEntity.badRequest().body(response);
             }
             
+            // Verificar límite de imágenes (máximo 15 por producto)
+            int currentImageCount = product.getImages().size();
+            int maxImages = 15;
+            
+            if (currentImageCount >= maxImages) {
+                response.put("success", false);
+                response.put("message", "Límite de imágenes excedido. Máximo " + maxImages + " imágenes por producto. Actualmente tiene " + currentImageCount + " imágenes.");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
             // Procesar y guardar la imagen
             ProductImage productImage = imageProcessingService.processAndSaveImage(file, productId, isPrimary);
             
@@ -90,6 +100,16 @@ public class FileUploadController {
             if (product == null) {
                 response.put("success", false);
                 response.put("message", "Producto no encontrado");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Verificar límite de imágenes (máximo 15 por producto)
+            int currentImageCount = product.getImages().size();
+            int maxImages = 15;
+            
+            if (currentImageCount + files.length > maxImages) {
+                response.put("success", false);
+                response.put("message", "Límite de imágenes excedido. Máximo " + maxImages + " imágenes por producto. Actualmente tiene " + currentImageCount + " imágenes.");
                 return ResponseEntity.badRequest().body(response);
             }
             

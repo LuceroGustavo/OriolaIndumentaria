@@ -23,17 +23,21 @@ public class ProductController {
     }
 
     @GetMapping("/new")
-    public String showForm(Product product) {
+    public String showForm(Model model) {
+        model.addAttribute("product", new Product());
         return "admin/product-form";
     }
 
-    @PostMapping
+    @PostMapping("/save")
     public String addProduct(@Valid Product product, BindingResult result, Model model) {
         if (result.hasErrors()) {
+            model.addAttribute("product", product);
             return "admin/product-form";
         }
-        productRepository.save(product);
-        return "redirect:/admin/products";
+        product.setFechaCreacion(java.time.LocalDateTime.now());
+        product.setFechaActualizacion(java.time.LocalDateTime.now());
+        Product savedProduct = productRepository.save(product);
+        return "redirect:/admin/products/" + savedProduct.getPId() + "/images";
     }
 
     @GetMapping("/edit/{pId}")
@@ -44,10 +48,30 @@ public class ProductController {
         return "admin/product-form";
     }
 
+    @PostMapping("/edit/{pId}")
+    public String updateProduct(@PathVariable Integer pId, @Valid Product product, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("product", product);
+            return "admin/product-form";
+        }
+        product.setPId(pId);
+        product.setFechaActualizacion(java.time.LocalDateTime.now());
+        productRepository.save(product);
+        return "redirect:/admin/products";
+    }
+
     @GetMapping("/delete/{pId}")
     public String deleteProduct(@PathVariable Integer pId) {
         productRepository.deleteById(pId);
         return "redirect:/admin/products";
+    }
+
+    @GetMapping("/{pId}/images")
+    public String manageImages(@PathVariable Integer pId, Model model) {
+        Product product = productRepository.findById(pId)
+            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        model.addAttribute("product", product);
+        return "admin/product-images";
     }
 }
 
