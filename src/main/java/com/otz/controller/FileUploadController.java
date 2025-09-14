@@ -2,6 +2,7 @@ package com.otz.controller;
 
 import com.otz.entity.Product;
 import com.otz.entity.ProductImage;
+import com.otz.repo.ProductImageRepository;
 import com.otz.service.ImageProcessingService;
 import com.otz.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/admin")
@@ -22,6 +24,9 @@ public class FileUploadController {
     
     @Autowired
     private ProductService productService;
+    
+    @Autowired
+    private ProductImageRepository productImageRepository;
 
     /**
      * Sube una imagen para un producto específico
@@ -44,9 +49,9 @@ public class FileUploadController {
                 return ResponseEntity.badRequest().body(response);
             }
             
-            // Verificar límite de imágenes (máximo 15 por producto)
+            // Verificar límite de imágenes (máximo 5 por producto)
             int currentImageCount = product.getImages().size();
-            int maxImages = 15;
+            int maxImages = 5;
             
             if (currentImageCount >= maxImages) {
                 response.put("success", false);
@@ -103,9 +108,9 @@ public class FileUploadController {
                 return ResponseEntity.badRequest().body(response);
             }
             
-            // Verificar límite de imágenes (máximo 15 por producto)
+            // Verificar límite de imágenes (máximo 5 por producto)
             int currentImageCount = product.getImages().size();
-            int maxImages = 15;
+            int maxImages = 5;
             
             if (currentImageCount + files.length > maxImages) {
                 response.put("success", false);
@@ -156,8 +161,35 @@ public class FileUploadController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            // Aquí necesitarías implementar el método para encontrar y eliminar la imagen
-            // Por ahora retornamos un mensaje de éxito
+            // Buscar la imagen por ID
+            Optional<ProductImage> imageOpt = productImageRepository.findById(imageId);
+            if (!imageOpt.isPresent()) {
+                response.put("success", false);
+                response.put("message", "Imagen no encontrada");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            ProductImage image = imageOpt.get();
+            Product product = image.getProduct();
+            
+            // Eliminar archivo del sistema de archivos
+            imageProcessingService.deleteImage(image.getImagePath());
+            
+            // Eliminar de la base de datos
+            productImageRepository.delete(image);
+            
+            // Si era la imagen principal, marcar otra como principal
+            if (image.getIsPrimary() && product != null) {
+                Optional<ProductImage> firstImage = product.getImages().stream()
+                    .filter(img -> !img.getId().equals(imageId))
+                    .findFirst();
+                
+                if (firstImage.isPresent()) {
+                    firstImage.get().setIsPrimary(true);
+                    productImageRepository.save(firstImage.get());
+                }
+            }
+            
             response.put("success", true);
             response.put("message", "Imagen eliminada correctamente");
             
@@ -179,9 +211,37 @@ public class FileUploadController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            // Aquí necesitarías implementar la lógica para marcar como principal
+            // Buscar la imagen por ID
+            Optional<ProductImage> imageOpt = productImageRepository.findById(imageId);
+            if (!imageOpt.isPresent()) {
+                response.put("success", false);
+                response.put("message", "Imagen no encontrada");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            ProductImage image = imageOpt.get();
+            Product product = image.getProduct();
+            
+            if (product == null) {
+                response.put("success", false);
+                response.put("message", "Producto no encontrado");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Marcar todas las imágenes del producto como no principales
+            product.getImages().forEach(img -> {
+                if (!img.getId().equals(imageId)) {
+                    img.setIsPrimary(false);
+                    productImageRepository.save(img);
+                }
+            });
+            
+            // Marcar la imagen seleccionada como principal
+            image.setIsPrimary(true);
+            productImageRepository.save(image);
+            
             response.put("success", true);
-            response.put("message", "Imagen marcada como principal");
+            response.put("message", "Imagen marcada como principal correctamente");
             
             return ResponseEntity.ok(response);
             

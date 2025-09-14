@@ -158,46 +158,65 @@ body {
     animation: fadeInUp 1s ease 0.2s both;
 }
 
-/* Cards de productos */
+/* Cards de productos - NUEVO DISEÑO HÍBRIDO */
 .product-card-oriola {
     background: white;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
     overflow: hidden;
-    border: none;
-    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .product-card-oriola:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
 }
 
-.product-card-oriola::before {
-    content: '';
+.product-image {
+    height: 280px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px 20px 0 0;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-image i {
+    font-size: 3rem;
+    color: #ccc;
+}
+
+.product-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 5px;
-    background: var(--gradient-primary);
-}
-
-.product-image {
-    height: 250px;
-    background: var(--gradient-secondary);
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 3rem;
-    position: relative;
-    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
 }
 
-/* Patrón de cuadrícula para placeholder */
-.product-image::before {
+.product-card-oriola:hover .product-overlay {
+    opacity: 1;
+}
+
+/* Patrón de cuadrícula para placeholder - SOLO cuando NO hay imagen */
+.product-image:not(:has(img))::before {
     content: '';
     position: absolute;
     top: 0;
@@ -213,39 +232,46 @@ body {
     z-index: 1;
 }
 
-/* Estilos para cuando hay imagen */
+/* Estilos para cuando hay imagen - ARREGLADO */
 .product-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain; /* Cambiado de 'cover' a 'contain' para mostrar imagen completa */
     object-position: center;
     position: relative;
     z-index: 2;
+    background: white; /* Fondo blanco para que se vea bien */
 }
 
 .product-info {
-    padding: 1.5rem;
+    padding: 20px;
+    background: white;
+    border-radius: 0 0 20px 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .product-title {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: var(--dark-color);
-    margin-bottom: 0.5rem;
-}
-
-.product-price {
-    font-size: 1.8rem;
-    font-weight: 900;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
+    margin-bottom: 10px;
 }
 
 .product-badges {
+    margin-bottom: 15px;
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
     flex-wrap: wrap;
+    gap: 5px;
+}
+
+.product-price {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 15px;
 }
 
 .badge-oriola {
@@ -257,9 +283,40 @@ body {
     letter-spacing: 0.5px;
 }
 
+/* Badges específicos para productos */
+.badge {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+    margin-right: 5px;
+    border-radius: 15px;
+}
+
 .badge-category {
-    background: var(--gradient-secondary);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
+}
+
+.badge-size {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.badge-stock {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+}
+
+.badge-color {
+    background: transparent;
+    border: 2px solid #ddd;
+    color: #333;
+}
+
+.badge-color .bi-palette {
+    background: linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ffff00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .badge-size {

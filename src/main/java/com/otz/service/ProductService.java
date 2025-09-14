@@ -14,6 +14,9 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
     
+    @Autowired
+    private ImageProcessingService imageProcessingService;
+    
     public List<Product> findAll() {
         return productRepository.findAll();
     }
@@ -27,7 +30,17 @@ public class ProductService {
     }
     
     public void deleteById(Integer id) {
-        productRepository.deleteById(id);
+        // Buscar el producto antes de eliminarlo
+        Product product = findById(id);
+        if (product != null) {
+            // Eliminar todas las imágenes del sistema de archivos
+            product.getImages().forEach(image -> {
+                imageProcessingService.deleteImage(image.getImagePath());
+            });
+            
+            // Eliminar el producto (las imágenes se eliminan en cascada)
+            productRepository.deleteById(id);
+        }
     }
     
     public List<Product> findByCategoria(String categoria) {

@@ -72,7 +72,7 @@
                                 <div class="text-center py-5">
                                     <i class="bi bi-cloud-upload" style="font-size: 3rem; color: var(--primary-color);"></i>
                                     <h5 class="mt-3">Arrastra y suelta las imágenes aquí</h5>
-                                    <p class="text-muted">o haz clic para seleccionar archivos (máximo 5 imágenes)</p>
+                                    <p class="text-muted">o haz clic para seleccionar archivos (máximo 5 imágenes por producto)</p>
                                     <input type="file" id="fileInput" multiple accept="image/*" style="display: none;" max="5">
                                     <button class="btn btn-oriola" onclick="document.getElementById('fileInput').click()">
                                         <i class="bi bi-plus-circle me-2"></i>SELECCIONAR IMÁGENES
@@ -200,13 +200,25 @@
         fileInput.addEventListener('change', function(e) {
             const files = Array.from(e.target.files);
             if (validateFiles(files)) {
+                // Obtener número de imágenes existentes del producto
+                const existingImages = document.querySelectorAll('.image-card').length;
+                const maxTotalImages = 5;
+                
+                // Calcular cuántas imágenes se pueden agregar
+                const availableSlots = maxTotalImages - existingImages;
+                
+                if (files.length > availableSlots) {
+                    showMessage('error', `Solo puedes agregar ${availableSlots} imagen(es) más. El producto ya tiene ${existingImages} imágenes de un máximo de ${maxTotalImages}.`);
+                    return;
+                }
+                
                 // Agregar archivos a la lista existente en lugar de reemplazar
                 selectedFiles = selectedFiles.concat(files);
                 
-                // Verificar que no exceda el límite de 5
-                if (selectedFiles.length > 5) {
-                    selectedFiles = selectedFiles.slice(0, 5);
-                    showMessage('warning', 'Solo se pueden seleccionar máximo 5 imágenes. Se tomaron las primeras 5.');
+                // Verificar que no exceda el límite total
+                if (selectedFiles.length > availableSlots) {
+                    selectedFiles = selectedFiles.slice(0, availableSlots);
+                    showMessage('warning', `Solo se pueden agregar ${availableSlots} imagen(es) más. Se tomaron las primeras ${availableSlots}.`);
                 }
                 
                 displaySelectedFiles();
@@ -356,22 +368,25 @@
 
         // Funciones para gestionar imágenes existentes
         function setPrimary(imageId) {
-            fetch(`/admin/products/${productId}/images/${imageId}/set-primary`, {
-                method: 'POST'
+            fetch(`/admin/image/${imageId}/set-primary`, {
+                method: 'PUT'
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     location.reload();
                 } else {
-                    showMessage('error', 'Error al establecer imagen principal');
+                    showMessage('error', data.message || 'Error al establecer imagen principal');
                 }
+            })
+            .catch(error => {
+                showMessage('error', 'Error al establecer imagen principal: ' + error.message);
             });
         }
 
         function deleteImage(imageId) {
             if (confirm('¿Estás seguro de que quieres eliminar esta imagen?')) {
-                fetch(`/admin/products/${productId}/images/${imageId}`, {
+                fetch(`/admin/image/${imageId}`, {
                     method: 'DELETE'
                 })
                 .then(response => response.json())
@@ -379,8 +394,11 @@
                     if (data.success) {
                         location.reload();
                     } else {
-                        showMessage('error', 'Error al eliminar imagen');
+                        showMessage('error', data.message || 'Error al eliminar imagen');
                     }
+                })
+                .catch(error => {
+                    showMessage('error', 'Error al eliminar imagen: ' + error.message);
                 });
             }
         }

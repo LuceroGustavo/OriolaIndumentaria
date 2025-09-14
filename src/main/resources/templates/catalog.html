@@ -104,13 +104,10 @@
                                 <span th:if="${product.talle}" class="badge badge-size" th:text="${product.talle}"></span>
                                 <span th:if="${product.qty > 0}" class="badge badge-stock">En Stock</span>
                                 <span th:if="${product.qty == 0}" class="badge badge-no-stock">Sin Stock</span>
+                                <span th:if="${product.color}" class="badge badge-color">
+                                    <i class="bi bi-palette me-1"></i><span th:text="${product.color}"></span>
+                                </span>
                             </div>
-                            <p th:if="${product.color}" class="text-muted mb-2">
-                                <i class="bi bi-palette me-1"></i>Color: <strong th:text="${product.color}"></strong>
-                            </p>
-                            <p th:if="${product.medidas}" class="text-muted mb-2">
-                                <i class="bi bi-rulers me-1"></i>Medidas: <strong th:text="${product.medidas}"></strong>
-                            </p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="product-price">$<span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}">0</span></span>
                                 <div class="product-actions">

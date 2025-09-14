@@ -63,25 +63,40 @@
                 <!-- Imagen del Producto -->
                 <div class="col-lg-6 mb-4">
                     <div class="product-gallery">
+                        <!-- Imagen Principal (ALTA CALIDAD) -->
                         <div class="main-image mb-3">
-                            <div class="product-image-large" style="height: 500px; background: var(--gradient-secondary); border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 4rem; position: relative; overflow: hidden;">
-                                <i class="bi bi-image" th:if="${product.getImagenPrincipal() == null}"></i>
-                                <img th:if="${product.getImagenPrincipal() != null}" th:src="${product.getImagenPrincipalUrl()}" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover; border-radius: 20px;">
+                            <div class="product-image-large" id="mainImageContainer" style="height: 500px; background: var(--gradient-secondary); border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 4rem; position: relative; overflow: hidden; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal">
+                                <i class="bi bi-image" th:if="${product.images == null or product.images.isEmpty()}"></i>
+                                <img th:if="${product.images != null and !product.images.isEmpty()}" 
+                                     th:src="${product.images[0].getImageUrl()}" 
+                                     id="mainImage" 
+                                     class="img-fluid" 
+                                     style="width: 100%; height: 100%; object-fit: contain; border-radius: 20px; background: white;">
                                 <div class="image-overlay">
-                                    <button class="btn btn-oriola" data-bs-toggle="modal" data-bs-target="#imageModal">
+                                    <button class="btn btn-oriola">
                                         <i class="bi bi-zoom-in me-1"></i>Ampliar
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="thumbnail-images d-flex gap-2">
+                        
+                        <!-- Thumbnails Interactivos -->
+                        <div class="thumbnail-images d-flex gap-2 flex-wrap" th:if="${product.images != null and product.images.size() > 1}">
+                            <div th:each="image, iterStat : ${product.images}" 
+                                 th:class="${iterStat.first} ? 'thumbnail active' : 'thumbnail'"
+                                 th:data-image-url="${image.getImageUrl()}"
+                                 th:data-image-id="${image.id}"
+                                 class="thumbnail" 
+                                 style="width: 80px; height: 80px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; overflow: hidden; border: 2px solid transparent; transition: all 0.3s ease;">
+                                <img th:src="${image.getThumbnailUrl()}" 
+                                     class="img-fluid" 
+                                     style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        </div>
+                        
+                        <!-- Placeholder si no hay imágenes -->
+                        <div class="thumbnail-images d-flex gap-2" th:if="${product.images == null or product.images.isEmpty()}">
                             <div class="thumbnail active" style="width: 80px; height: 80px; background: var(--gradient-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer;">
-                                <i class="bi bi-image"></i>
-                            </div>
-                            <div class="thumbnail" style="width: 80px; height: 80px; background: var(--gradient-accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer;">
-                                <i class="bi bi-image"></i>
-                            </div>
-                            <div class="thumbnail" style="width: 80px; height: 80px; background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer;">
                                 <i class="bi bi-image"></i>
                             </div>
                         </div>
@@ -253,17 +268,20 @@
 
     <!-- Modal para imagen ampliada -->
     <div class="modal fade" id="imageModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" th:text="${product.name}">Imagen del Producto</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content" style="background: transparent; border: none;">
+                <div class="modal-header" style="border: none; padding: 0; position: absolute; top: 10px; right: 10px; z-index: 1050;">
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="background: rgba(0,0,0,0.5); border-radius: 50%; padding: 10px;"></button>
                 </div>
-                <div class="modal-body text-center">
-                    <img th:if="${product.getImagenPrincipal() != null}" th:src="${product.getImagenPrincipalUrl()}" class="img-fluid" style="max-height: 500px;">
-                    <div th:if="${product.getImagenPrincipal() == null}" class="text-center py-5">
-                        <i class="bi bi-image" style="font-size: 5rem; color: var(--primary-color);"></i>
-                        <p class="text-muted mt-3">Imagen no disponible</p>
+                <div class="modal-body text-center" style="padding: 0;">
+                    <img id="modalImage" 
+                         th:if="${product.images != null and !product.images.isEmpty()}" 
+                         th:src="${product.images[0].getImageUrl()}" 
+                         class="img-fluid" 
+                         style="max-height: 90vh; max-width: 100%; object-fit: contain; background: white; border-radius: 10px;">
+                    <div th:if="${product.images == null or product.images.isEmpty()}" class="text-center py-5">
+                        <i class="bi bi-image" style="font-size: 5rem; color: white;"></i>
+                        <p class="text-white mt-3">Imagen no disponible</p>
                     </div>
                 </div>
             </div>
@@ -338,11 +356,43 @@
             }
         });
 
-        // Cambio de thumbnails
+        // Cambio de thumbnails interactivos
         document.querySelectorAll('.thumbnail').forEach(thumb => {
             thumb.addEventListener('click', function() {
+                // Remover clase active de todos los thumbnails
                 document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                // Agregar clase active al thumbnail clickeado
                 this.classList.add('active');
+                
+                // Obtener URL de la imagen de alta calidad
+                const imageUrl = this.getAttribute('data-image-url');
+                if (imageUrl) {
+                    // Cambiar imagen principal
+                    const mainImage = document.getElementById('mainImage');
+                    const modalImage = document.getElementById('modalImage');
+                    
+                    if (mainImage) {
+                        mainImage.src = imageUrl;
+                    }
+                    if (modalImage) {
+                        modalImage.src = imageUrl;
+                    }
+                }
+            });
+            
+            // Efecto hover
+            thumb.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('active')) {
+                    this.style.transform = 'scale(1.05)';
+                    this.style.borderColor = 'var(--primary-color)';
+                }
+            });
+            
+            thumb.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('active')) {
+                    this.style.transform = 'scale(1)';
+                    this.style.borderColor = 'transparent';
+                }
             });
         });
     </script>
@@ -380,14 +430,52 @@
 
         .thumbnail {
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .thumbnail:hover {
-            transform: scale(1.1);
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .thumbnail.active {
             border: 3px solid var(--primary-color);
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .thumbnail img {
+            transition: all 0.3s ease;
+        }
+
+        .thumbnail:hover img {
+            transform: scale(1.1);
+        }
+
+        .product-image-large {
+            transition: all 0.3s ease;
+        }
+
+        .product-image-large:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Modal mejorado */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            box-shadow: none;
+        }
+
+        #modalImage {
+            transition: all 0.3s ease;
+        }
+
+        #modalImage:hover {
+            transform: scale(1.02);
         }
 
         .spec-item {
