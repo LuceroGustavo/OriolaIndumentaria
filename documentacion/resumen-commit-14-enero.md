@@ -119,7 +119,22 @@ Estado: 🚀 Listo para producción
 
 ---
 
+## 🌐 **CONFIGURACIÓN DE DOMINIO Y HOSTING**
+
+### **Dominio Confirmado por Cliente:**
+- **Dominio**: `orioladenim.com.ar` ✅
+- **Plataforma de hosting**: Railway.app
+- **Costo estimado**: $75-85 USD/año (hosting + dominio)
+- **Documentación completa**: `configuracion-railway-dominio.md`
+
+### **Archivos de Configuración Creados:**
+- `railway.json` - Configuración de Railway
+- `Dockerfile` - Contenedor de la aplicación
+- `application-prod.properties` - Configuración de producción
+
+---
+
 **Desarrollado por:** Equipo de Desarrollo ORIOLA  
 **Fecha:** 14 de enero de 2025  
-**Versión:** 1.2  
+**Versión:** 1.3  
 **Estado:** Listo para commit y push

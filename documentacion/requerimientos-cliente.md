@@ -56,6 +56,14 @@
 - ✅ Multilenguaje (Español / Inglés) - **ACTUALIZADO**
 - ❌ Botón de pago directo (opcional a futuro)
 
+## 🌐 Dominio y Hosting
+
+- **Dominio personalizado**: `orioladenim.com.ar` - **CONFIRMADO POR CLIENTE**
+- **Plataforma de hosting**: Railway.app
+- **Configuración SSL**: Automática con Railway
+- **Base de datos**: MySQL incluida en Railway
+- **Costo estimado**: $75-265 USD/año (hosting + dominio)
+
 ## 🛠️ Stack Tecnológico
 
 - **Backend:** Java 17, Spring Boot 3.4.4, Spring Security

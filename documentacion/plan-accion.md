@@ -226,17 +226,69 @@
 
 ## 🚀 Fase 12: Despliegue y Producción
 
-### 12.1 Configuración de Producción
-- [ ] Configuración de base de datos de producción
-- [ ] Variables de entorno
-- [ ] Configuración de servidor web
-- [ ] SSL/HTTPS
+### 12.1 Configuración de Railway
+- [ ] Crear cuenta en Railway.app
+- [ ] Conectar repositorio GitHub
+- [ ] Configurar variables de entorno para producción
+- [ ] Configurar base de datos MySQL en Railway
+- [ ] Configurar archivos estáticos (uploads)
+- [ ] Configurar perfil de producción (application-prod.properties)
 
-### 12.2 Monitoreo
+### 12.2 Configuración de Dominio Personalizado
+- [ ] Registrar dominio `orioladenim.com.ar`
+- [ ] Configurar DNS para apuntar a Railway
+- [ ] Configurar subdominios si es necesario
+- [ ] Verificar configuración SSL automática
+- [ ] Testing del dominio en producción
+
+### 12.3 Configuración de Producción
+- [ ] Variables de entorno específicas para Railway
+- [ ] Configuración de base de datos de producción
+- [ ] Configuración de archivos estáticos
+- [ ] SSL/HTTPS automático con Railway
+
+### 12.4 Monitoreo
 - [ ] Logs de aplicación
 - [ ] Monitoreo de errores
 - [ ] Métricas de rendimiento
 - [ ] Backup de base de datos
+
+## 🌐 Configuración Específica para Railway y Dominio
+
+### **Dominio Confirmado por Cliente:**
+- **Dominio**: `orioladenim.com.ar`
+- **Registrador**: Cualquier registrador argentino (.com.ar)
+- **Costo estimado**: $15-25 USD/año
+
+### **Configuración Railway:**
+- **Plataforma**: Railway.app
+- **Ventajas**: 
+  - Despliegue automático desde GitHub
+  - Base de datos MySQL incluida
+  - SSL automático
+  - Escalabilidad fácil
+- **Costo estimado**: $5-20 USD/mes según uso
+
+### **Variables de Entorno para Railway:**
+```properties
+# Base de datos
+SPRING_DATASOURCE_URL=jdbc:mysql://railway-prod:3306/oriola_denim
+SPRING_DATASOURCE_USERNAME=railway
+SPRING_DATASOURCE_PASSWORD=[generated]
+
+# Archivos estáticos
+UPLOAD_PATH=/app/uploads
+UPLOAD_THUMBNAIL_PATH=/app/uploads/thumbnails
+
+# Configuración de producción
+SPRING_PROFILES_ACTIVE=prod
+SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+```
+
+### **Archivos de Configuración Requeridos:**
+- `railway.json` - Configuración de Railway
+- `Dockerfile` - Contenedor de la aplicación
+- `application-prod.properties` - Configuración de producción
 
 ## 📋 Cronograma Estimado
 
@@ -253,9 +305,9 @@
 | Fase 9: Gestión de Usuario Admin | 2-3 días | Alta |
 | Fase 10: Manual de Usuario | 2-3 días | Baja |
 | Fase 11: Testing y Optimización | 2-3 días | Media |
-| Fase 12: Despliegue | 1-2 días | Alta |
+| Fase 12: Despliegue Railway + Dominio | 2-3 días | Alta |
 
-**Total estimado:** 30-42 días de desarrollo
+**Total estimado:** 32-44 días de desarrollo
 
 ## 🎯 Entregables por Fase
 

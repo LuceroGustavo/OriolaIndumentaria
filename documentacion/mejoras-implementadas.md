@@ -409,11 +409,7 @@ Este documento detalla todas las mejoras implementadas en el proyecto ORIOLA Ind
   - Configuración de archivos estáticos
 
 #### **2. Configuración de Dominio Personalizado** 🌐
-- **Dominio sugerido**: `oriolaindumentaria.com.ar`
-- **Alternativas**:
-  - `oriola-indumentaria.com.ar`
-  - `oriolashop.com.ar`
-  - `oriolaindumentaria.com`
+- **Dominio confirmado por cliente**: `orioladenim.com.ar` ✅
 - **Registro**: En cualquier registrador argentino (.com.ar)
 - **Costo estimado**: $15-25 USD/año
 - **Configuración DNS**:

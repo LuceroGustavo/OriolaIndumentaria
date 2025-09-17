@@ -8,11 +8,11 @@
 		<version>3.4.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.otz</groupId>
-	<artifactId>ProductManagementTymeleafApp</artifactId>
+	<groupId>com.orioladenim</groupId>
+	<artifactId>oriola-denim</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ProductManagementTymeleafApp</name>
-	<description>Demo project for Spring Boot</description>
+	<name>Oriola Denim</name>
+	<description>Catálogo online de indumentaria ORIOLA</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -27,7 +27,9 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 	</properties>
 	<dependencies>
 		<dependency>

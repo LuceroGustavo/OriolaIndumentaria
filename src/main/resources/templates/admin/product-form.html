@@ -121,7 +121,7 @@
                                             <label for="categoria" class="form-label">Categoría *</label>
                                             <select class="form-select" id="categoria" th:field="*{categoria}" th:class="${#fields.hasErrors('categoria')} ? 'form-select is-invalid' : 'form-select'" required>
                                                 <option value="">Seleccionar categoría</option>
-                                                <option th:each="cat : ${T(com.otz.enums.Categoria).values()}" 
+                                                <option th:each="cat : ${T(com.orioladenim.enums.Categoria).values()}" 
                                                         th:value="${cat}" 
                                                         th:text="${cat.displayName}"></option>
                                             </select>
@@ -151,7 +151,7 @@
                                             <label for="talle" class="form-label">Talle</label>
                                             <select class="form-select" id="talle" th:field="*{talle}">
                                                 <option value="">Seleccionar talle</option>
-                                                <option th:each="talle : ${T(com.otz.enums.Talle).values()}" 
+                                                <option th:each="talle : ${T(com.orioladenim.enums.Talle).values()}" 
                                                         th:value="${talle}" 
                                                         th:text="${talle.displayName}"></option>
                                             </select>
@@ -176,7 +176,7 @@
                                             <label for="genero" class="form-label">Género</label>
                                             <select class="form-select" id="genero" th:field="*{genero}">
                                                 <option value="">Seleccionar</option>
-                                                <option th:each="genero : ${T(com.otz.enums.Genero).values()}" 
+                                                <option th:each="genero : ${T(com.orioladenim.enums.Genero).values()}" 
                                                         th:value="${genero}" 
                                                         th:text="${genero.displayName}"></option>
                                             </select>
@@ -185,7 +185,7 @@
                                             <label for="temporada" class="form-label">Temporada</label>
                                             <select class="form-select" id="temporada" th:field="*{temporada}">
                                                 <option value="">Seleccionar</option>
-                                                <option th:each="temporada : ${T(com.otz.enums.Temporada).values()}" 
+                                                <option th:each="temporada : ${T(com.orioladenim.enums.Temporada).values()}" 
                                                         th:value="${temporada}" 
                                                         th:text="${temporada.displayName}"></option>
                                             </select>
