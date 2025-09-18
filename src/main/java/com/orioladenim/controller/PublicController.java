@@ -35,10 +35,6 @@ public class PublicController {
         return "product-detail";
     }
     
-    @GetMapping("/contact")
-    public String contact() {
-        return "contact";
-    }
     
     @GetMapping("/about")
     public String about() {

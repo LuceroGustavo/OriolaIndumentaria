@@ -1,20 +1,19 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Contacto - ORIOLA</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <title>Contacto - ORIOLA Denim</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-oriola fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-oriola sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="bi bi-heart-fill me-2"></i>ORIOLA
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-shop me-2"></i>ORIOLA Denim
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -28,26 +27,10 @@
                         <a class="nav-link" href="/catalog">Catálogo</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/about">Sobre Nosotros</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link active" href="/contact">Contacto</a>
                     </li>
-                    <!-- Redes Sociales -->
                     <li class="nav-item">
-                        <a class="nav-link" href="https://www.facebook.com/oriolaindumentaria" target="_blank" title="Síguenos en Facebook">
-                            <i class="bi bi-facebook"></i>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://www.instagram.com/oriolaindumentaria" target="_blank" title="Síguenos en Instagram">
-                            <i class="bi bi-instagram"></i>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/login">
-                            <i class="bi bi-gear me-1"></i>Admin
-                        </a>
+                        <a class="nav-link" href="/about">Sobre ORIOLA</a>
                     </li>
                 </ul>
             </div>
@@ -55,241 +38,175 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero-oriola" style="min-height: 40vh;">
+    <section class="hero-section bg-gradient-oriola text-white py-5">
         <div class="container">
-            <div class="hero-content">
-                <h1 class="hero-title">Contáctanos</h1>
-                <p class="hero-subtitle">Estamos aquí para ayudarte con cualquier consulta</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="section-oriola" style="background: white;">
-        <div class="container">
-            <div class="row">
-                <!-- Formulario de Contacto -->
-                <div class="col-lg-8 mb-5">
-                    <div class="contact-form-card p-5 rounded-4" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
-                        <h2 class="mb-4">
-                            <i class="bi bi-envelope-heart me-2 text-primary"></i>
-                            Envíanos un Mensaje
-                        </h2>
-                        <p class="text-muted mb-4">Completa el formulario y nos pondremos en contacto contigo lo antes posible.</p>
-                        
-                        <form>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="nombre" class="form-label fw-bold">Nombre Completo</label>
-                                    <input type="text" class="form-control form-control-lg" id="nombre" placeholder="Tu nombre completo" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="email" class="form-label fw-bold">Email</label>
-                                    <input type="email" class="form-control form-control-lg" id="email" placeholder="tu@email.com" required>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="telefono" class="form-label fw-bold">Teléfono</label>
-                                    <input type="tel" class="form-control form-control-lg" id="telefono" placeholder="+54 9 11 1234-5678">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="asunto" class="form-label fw-bold">Asunto</label>
-                                    <select class="form-select form-select-lg" id="asunto">
-                                        <option>Consulta general</option>
-                                        <option>Información de productos</option>
-                                        <option>Pedido personalizado</option>
-                                        <option>Soporte técnico</option>
-                                        <option>Otro</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="mensaje" class="form-label fw-bold">Mensaje</label>
-                                <textarea class="form-control form-control-lg" id="mensaje" rows="5" placeholder="Cuéntanos en qué podemos ayudarte..." required></textarea>
-                            </div>
-                            
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="newsletter">
-                                <label class="form-check-label" for="newsletter">
-                                    Quiero recibir ofertas exclusivas por email
-                                </label>
-                            </div>
-                            
-                            <div class="text-center">
-                                <button type="submit" class="btn btn-oriola btn-lg px-5">
-                                    <i class="bi bi-send me-2"></i>Enviar Mensaje
-                                </button>
-                            </div>
-                        </form>
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">
+                        <i class="bi bi-chat-dots me-3"></i>Contáctanos
+                    </h1>
+                    <p class="lead mb-4">
+                        ¿Tienes alguna consulta sobre nuestros productos? 
+                        ¡Estamos aquí para ayudarte! Envíanos un mensaje y te responderemos pronto.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="https://wa.me/5491112345678" class="btn btn-success btn-lg" target="_blank">
+                            <i class="bi bi-whatsapp me-2"></i>WhatsApp
+                        </a>
+                        <a href="mailto:info@orioladenim.com.ar" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-envelope me-2"></i>Email
+                        </a>
                     </div>
                 </div>
-
-                <!-- Información de Contacto -->
-                <div class="col-lg-4">
-                    <div class="contact-info">
-                        <h3 class="mb-4">
-                            <i class="bi bi-info-circle me-2 text-primary"></i>
-                            Información de Contacto
-                        </h3>
-                        
-                        <div class="contact-item mb-4">
-                            <div class="contact-icon">
-                                <i class="bi bi-geo-alt-fill"></i>
-                            </div>
-                            <div class="contact-details">
-                                <h5>Ubicación</h5>
-                                <p class="text-muted">Buenos Aires, Argentina<br>Zona Norte</p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-item mb-4">
-                            <div class="contact-icon">
-                                <i class="bi bi-telephone-fill"></i>
-                            </div>
-                            <div class="contact-details">
-                                <h5>Teléfono</h5>
-                                <p class="text-muted">+54 9 11 1234-5678<br>Lunes a Viernes 9:00 - 18:00</p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-item mb-4">
-                            <div class="contact-icon">
-                                <i class="bi bi-envelope-fill"></i>
-                            </div>
-                            <div class="contact-details">
-                                <h5>Email</h5>
-                                <p class="text-muted">info@oriola.com<br>ventas@oriola.com</p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-item mb-4">
-                            <div class="contact-icon">
-                                <i class="bi bi-whatsapp"></i>
-                            </div>
-                            <div class="contact-details">
-                                <h5>WhatsApp</h5>
-                                <p class="text-muted">+54 9 11 1234-5678<br>Respuesta inmediata</p>
-                            </div>
-                        </div>
+                <div class="col-lg-6">
+                    <div class="text-center">
+                        <i class="bi bi-headset display-1 opacity-75"></i>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Redes Sociales -->
-    <section class="py-5" style="background: var(--gradient-primary); color: white;">
+    <!-- Formulario de Contacto -->
+    <section class="contact-form-section">
         <div class="container">
-            <div class="row text-center">
-                <div class="col-12 mb-4">
-                    <h2 class="mb-3">Síguenos en Redes Sociales</h2>
-                    <p class="lead">Mantente al día con nuestras últimas novedades y ofertas especiales</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <a href="#" class="social-link">
-                        <div class="social-card p-4 rounded-4 glass-effect">
-                            <i class="bi bi-instagram fs-1 mb-3"></i>
-                            <h5>Instagram</h5>
-                            <p class="mb-0">@oriola_indumentaria</p>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-header bg-oriola text-white">
+                            <h3 class="card-title mb-0">
+                                <i class="bi bi-pencil-square me-2"></i>Envíanos tu consulta
+                            </h3>
                         </div>
-                    </a>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <a href="#" class="social-link">
-                        <div class="social-card p-4 rounded-4 glass-effect">
-                            <i class="bi bi-facebook fs-1 mb-3"></i>
-                            <h5>Facebook</h5>
-                            <p class="mb-0">ORIOLA Indumentaria</p>
+                        <div class="card-body p-4">
+                            <!-- Mensajes de éxito/error -->
+                            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="bi bi-check-circle me-2"></i>
+                                <span th:text="${success}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            
+                            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <span th:text="${error}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+
+                            <form th:action="@{/contact}" th:object="${contact}" method="post" novalidate>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="nombre" class="form-label">
+                                            <i class="bi bi-person me-1"></i>Nombre completo *
+                                        </label>
+                                        <input type="text" class="form-control" id="nombre" th:field="*{nombre}" 
+                                               placeholder="Tu nombre completo" required>
+                                        <div class="invalid-feedback">
+                                            Por favor, ingresa tu nombre completo.
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="email" class="form-label">
+                                            <i class="bi bi-envelope me-1"></i>Email *
+                                        </label>
+                                        <input type="email" class="form-control" id="email" th:field="*{email}" 
+                                               placeholder="tu@email.com" required>
+                                        <div class="invalid-feedback">
+                                            Por favor, ingresa un email válido.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="telefono" class="form-label">
+                                            <i class="bi bi-telephone me-1"></i>Teléfono
+                                        </label>
+                                        <input type="tel" class="form-control" id="telefono" th:field="*{telefono}" 
+                                               placeholder="+54 9 11 1234-5678">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="asunto" class="form-label">
+                                            <i class="bi bi-tag me-1"></i>Asunto
+                                        </label>
+                                        <input type="text" class="form-control" id="asunto" th:field="*{asunto}" 
+                                               placeholder="¿Sobre qué quieres consultar?">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="productoInteres" class="form-label">
+                                        <i class="bi bi-bag me-1"></i>Producto de interés
+                                    </label>
+                                    <input type="text" class="form-control" id="productoInteres" th:field="*{productoInteres}" 
+                                           placeholder="¿Hay algún producto específico que te interese?">
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="mensaje" class="form-label">
+                                        <i class="bi bi-chat-text me-1"></i>Mensaje *
+                                    </label>
+                                    <textarea class="form-control" id="mensaje" th:field="*{mensaje}" 
+                                              rows="5" placeholder="Cuéntanos qué necesitas saber..." required></textarea>
+                                    <div class="invalid-feedback">
+                                        Por favor, escribe tu mensaje.
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="reset" class="btn btn-clear me-md-2">
+                                        <i class="bi bi-arrow-clockwise me-1"></i>Limpiar
+                                    </button>
+                                    <button type="submit" class="btn btn-submit">
+                                        <i class="bi bi-send me-1"></i>Enviar consulta
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                    </a>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <a href="#" class="social-link">
-                        <div class="social-card p-4 rounded-4 glass-effect">
-                            <i class="bi bi-whatsapp fs-1 mb-3"></i>
-                            <h5>WhatsApp</h5>
-                            <p class="mb-0">+54 9 11 1234-5678</p>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <a href="#" class="social-link">
-                        <div class="social-card p-4 rounded-4 glass-effect">
-                            <i class="bi bi-envelope fs-1 mb-3"></i>
-                            <h5>Email</h5>
-                            <p class="mb-0">info@oriola.com</p>
-                        </div>
-                    </a>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FAQ Section -->
-    <section class="section-oriola" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+    <!-- Información de Contacto -->
+    <section class="py-5 bg-light">
         <div class="container">
-            <h2 class="section-title">Preguntas Frecuentes</h2>
             <div class="row">
-                <div class="col-lg-8 mx-auto">
-                    <div class="accordion" id="faqAccordion">
-                        <div class="accordion-item mb-3 rounded-4" style="border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                    <i class="bi bi-question-circle me-2 text-primary"></i>
-                                    ¿Cómo puedo realizar un pedido?
-                                </button>
-                            </h2>
-                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Puedes realizar tu pedido contactándonos por WhatsApp, email o completando el formulario de contacto. Te responderemos con toda la información necesaria.
-                                </div>
-                            </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="text-center">
+                        <div class="bg-oriola text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 80px; height: 80px;">
+                            <i class="bi bi-whatsapp fs-2"></i>
                         </div>
-                        
-                        <div class="accordion-item mb-3 rounded-4" style="border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                    <i class="bi bi-truck me-2 text-primary"></i>
-                                    ¿Realizan envíos a todo el país?
-                                </button>
-                            </h2>
-                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Sí, realizamos envíos a todo el país. Los costos y tiempos de entrega varían según la ubicación. Consultanos para más detalles.
-                                </div>
-                            </div>
+                        <h5 class="fw-bold">WhatsApp</h5>
+                        <p class="text-muted mb-2">Respuesta rápida</p>
+                        <a href="https://wa.me/5491112345678" class="btn btn-success" target="_blank">
+                            <i class="bi bi-whatsapp me-1"></i>+54 9 11 1234-5678
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="text-center">
+                        <div class="bg-oriola text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 80px; height: 80px;">
+                            <i class="bi bi-envelope fs-2"></i>
                         </div>
-                        
-                        <div class="accordion-item mb-3 rounded-4" style="border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    <i class="bi bi-arrow-clockwise me-2 text-primary"></i>
-                                    ¿Cuál es la política de cambios?
-                                </button>
-                            </h2>
-                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Aceptamos cambios hasta 7 días después de recibir el producto, siempre que esté en perfecto estado y con la etiqueta original.
-                                </div>
-                            </div>
+                        <h5 class="fw-bold">Email</h5>
+                        <p class="text-muted mb-2">Respuesta en 24hs</p>
+                        <a href="mailto:info@orioladenim.com.ar" class="btn btn-outline-oriola">
+                            <i class="bi bi-envelope me-1"></i>info@orioladenim.com.ar
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="text-center">
+                        <div class="bg-oriola text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 80px; height: 80px;">
+                            <i class="bi bi-clock fs-2"></i>
                         </div>
-                        
-                        <div class="accordion-item mb-3 rounded-4" style="border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
-                                    <i class="bi bi-credit-card me-2 text-primary"></i>
-                                    ¿Qué métodos de pago aceptan?
-                                </button>
-                            </h2>
-                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Aceptamos transferencia bancaria, MercadoPago, efectivo y tarjetas de crédito/débito. Consultanos por las opciones disponibles.
-                                </div>
-                            </div>
-                        </div>
+                        <h5 class="fw-bold">Horarios</h5>
+                        <p class="text-muted mb-2">Lunes a Viernes</p>
+                        <p class="fw-bold text-oriola">9:00 - 18:00 hs</p>
                     </div>
                 </div>
             </div>
@@ -297,166 +214,103 @@
     </section>
 
     <!-- Footer -->
-    <footer class="footer-oriola">
+    <footer class="bg-dark text-white py-4">
         <div class="container">
             <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5><i class="bi bi-heart-fill me-2"></i>ORIOLA</h5>
-                    <p>Indumentaria con estilo y personalidad. Cada prenda está diseñada para que te sientas único y cómodo.</p>
-                    <div class="social-links">
-                        <a href="#" class="me-3"><i class="bi bi-instagram fs-4"></i></a>
-                        <a href="#" class="me-3"><i class="bi bi-facebook fs-4"></i></a>
-                        <a href="#" class="me-3"><i class="bi bi-whatsapp fs-4"></i></a>
-                        <a href="#"><i class="bi bi-envelope fs-4"></i></a>
+                <div class="col-md-6">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-shop me-2"></i>ORIOLA Denim
+                    </h5>
+                    <p class="mb-3">Tu tienda de indumentaria favorita. Calidad, estilo y comodidad en cada prenda.</p>
+                    <div class="d-flex gap-3">
+                        <a href="https://wa.me/5491112345678" class="text-success" target="_blank">
+                            <i class="bi bi-whatsapp fs-4"></i>
+                        </a>
+                        <a href="https://instagram.com/orioladenim" class="text-danger" target="_blank">
+                            <i class="bi bi-instagram fs-4"></i>
+                        </a>
+                        <a href="https://facebook.com/orioladenim" class="text-primary" target="_blank">
+                            <i class="bi bi-facebook fs-4"></i>
+                        </a>
                     </div>
                 </div>
-                <div class="col-md-2 mb-4">
-                    <h5>Enlaces</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="/">Inicio</a></li>
-                        <li><a href="/catalog">Catálogo</a></li>
-                        <li><a href="/about">Sobre Nosotros</a></li>
-                        <li><a href="/contact">Contacto</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Contacto</h5>
-                    <ul class="list-unstyled">
-                        <li><i class="bi bi-geo-alt me-2"></i>Buenos Aires, Argentina</li>
-                        <li><i class="bi bi-telephone me-2"></i>+54 9 11 1234-5678</li>
-                        <li><i class="bi bi-envelope me-2"></i>info@oriola.com</li>
-                    </ul>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Newsletter</h5>
-                    <p>Suscríbete para recibir ofertas exclusivas</p>
-                    <div class="input-group">
-                        <input type="email" class="form-control" placeholder="Tu email">
-                        <button class="btn btn-oriola" type="button">
-                            <i class="bi bi-send"></i>
-                        </button>
+                <div class="col-md-6">
+                    <h6 class="fw-bold mb-3">Enlaces rápidos</h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <ul class="list-unstyled">
+                                <li><a href="/" class="text-white-50 text-decoration-none">Inicio</a></li>
+                                <li><a href="/catalog" class="text-white-50 text-decoration-none">Catálogo</a></li>
+                                <li><a href="/about" class="text-white-50 text-decoration-none">Sobre ORIOLA</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-6">
+                            <ul class="list-unstyled">
+                                <li><a href="/contact" class="text-white-50 text-decoration-none">Contacto</a></li>
+                                <li><a href="https://wa.me/5491112345678" class="text-white-50 text-decoration-none" target="_blank">WhatsApp</a></li>
+                                <li><a href="mailto:info@orioladenim.com.ar" class="text-white-50 text-decoration-none">Email</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
             <hr class="my-4">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; 2025 ORIOLA. Todos los derechos reservados.</p>
-                </div>
-                <div class="col-md-6 text-end">
-                    <small>Hecho con <i class="bi bi-heart-fill text-danger"></i> en Argentina</small>
-                </div>
+            <div class="text-center">
+                <p class="mb-0 text-white-50">
+                    &copy; 2025 ORIOLA Denim. Todos los derechos reservados.
+                </p>
             </div>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/whatsapp.js"></script>
+    
+    <!-- Validación del formulario -->
     <script>
-        // Efecto de scroll en navbar
-        window.addEventListener('scroll', function() {
-            const navbar = document.querySelector('.navbar-oriola');
-            if (window.scrollY > 50) {
-                navbar.style.background = 'rgba(255, 107, 107, 0.95)';
-                navbar.style.backdropFilter = 'blur(10px)';
-            } else {
-                navbar.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%)';
-                navbar.style.backdropFilter = 'none';
-            }
-        });
-
-        // Animación de entrada para las cards
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
+        (function() {
+            'use strict';
+            
+            // Obtener formulario
+            const form = document.querySelector('form');
+            
+            // Validar en tiempo real
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            });
+            
+            // Validación personalizada para email
+            const emailInput = document.getElementById('email');
+            emailInput.addEventListener('input', function() {
+                const email = this.value;
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                
+                if (email && !emailRegex.test(email)) {
+                    this.setCustomValidity('Por favor, ingresa un email válido');
+                } else {
+                    this.setCustomValidity('');
                 }
             });
-        }, observerOptions);
-
-        document.querySelectorAll('.contact-item, .social-card, .accordion-item').forEach(card => {
-            observer.observe(card);
-        });
+            
+            // Validación personalizada para teléfono
+            const telefonoInput = document.getElementById('telefono');
+            telefonoInput.addEventListener('input', function() {
+                const telefono = this.value;
+                const telefonoRegex = /^[\+]?[0-9\s\-\(\)]+$/;
+                
+                if (telefono && !telefonoRegex.test(telefono)) {
+                    this.setCustomValidity('Por favor, ingresa un teléfono válido');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+        })();
     </script>
-
-    <style>
-        .contact-item {
-            display: flex;
-            align-items: flex-start;
-            padding: 1rem 0;
-        }
-
-        .contact-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--gradient-primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            margin-right: 1rem;
-            flex-shrink: 0;
-        }
-
-        .contact-details h5 {
-            color: var(--dark-color);
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .social-link {
-            text-decoration: none;
-            color: inherit;
-            display: block;
-            transition: transform 0.3s ease;
-        }
-
-        .social-link:hover {
-            color: inherit;
-            transform: translateY(-5px);
-        }
-
-        .social-card {
-            transition: all 0.3s ease;
-            height: 100%;
-        }
-
-        .social-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
-        }
-
-        .form-control, .form-select {
-            border: 2px solid #e9ecef;
-            border-radius: 15px;
-            padding: 15px 20px;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25);
-        }
-
-        .accordion-button {
-            border-radius: 15px !important;
-            font-weight: 600;
-        }
-
-        .accordion-button:not(.collapsed) {
-            background: var(--gradient-primary);
-            color: white;
-        }
-
-        .accordion-button:focus {
-            box-shadow: 0 0 0 0.25rem rgba(255, 107, 107, 0.25);
-        }
-    </style>
 </body>
 </html>
