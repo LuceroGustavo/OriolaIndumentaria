@@ -7,6 +7,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class DataInitializer implements CommandLineRunner {
     
@@ -18,21 +20,50 @@ public class DataInitializer implements CommandLineRunner {
     
     @Override
     public void run(String... args) throws Exception {
-        // Verificar si ya existe un usuario administrador
+        // Crear usuario administrador por defecto
         if (userRepository.findByUsername("admin").isEmpty()) {
-            // Crear usuario administrador por defecto
-            User admin = new User();
-            admin.username = "admin";
-            admin.email = "admin@orioladenim.com.ar";
-            admin.password = passwordEncoder.encode("admin");
-            admin.fullName = "Administrador ORIOLA";
-            admin.isActive = true;
-            admin.role = User.Role.ADMIN;
+            User admin = new User("admin", "admin@orioladenim.com.ar", "admin", "Administrador ORIOLA");
+            admin.setPassword(passwordEncoder.encode("admin"));
+            admin.setIsActive(true);
+            admin.setRole(User.Role.ADMIN);
+            admin.setPhone("+54 9 11 1234-5678");
+            admin.setCity("Buenos Aires");
+            admin.setCountry("Argentina");
             
             userRepository.save(admin);
             System.out.println("✅ Usuario administrador creado: admin/admin");
         } else {
             System.out.println("ℹ️ Usuario administrador ya existe");
+        }
+        
+        // Crear o actualizar usuario desarrollador por defecto
+        Optional<User> existingDev = userRepository.findByUsername("dev");
+        if (existingDev.isEmpty()) {
+            // Crear nuevo usuario desarrollador
+            User dev = new User("dev", "dev@orioladenim.com.ar", "Dev2024#", "Desarrollador Sistema");
+            dev.setPassword(passwordEncoder.encode("Dev2024#"));
+            dev.setIsActive(true);
+            dev.setRole(User.Role.SUPER_ADMIN);
+            dev.setPhone("+54 9 11 5929-3920");
+            dev.setCity("Buenos Aires");
+            dev.setCountry("Argentina");
+            dev.setAddress("Desarrollo Local");
+            
+            userRepository.save(dev);
+            System.out.println("✅ Usuario desarrollador creado: dev/Dev2024#");
+        } else {
+            // Actualizar contraseña del usuario existente
+            User dev = existingDev.get();
+            dev.setPassword(passwordEncoder.encode("Dev2024#"));
+            dev.setRole(User.Role.SUPER_ADMIN);
+            dev.setIsActive(true);
+            dev.setPhone("+54 9 11 5929-3920");
+            dev.setCity("Buenos Aires");
+            dev.setCountry("Argentina");
+            dev.setAddress("Desarrollo Local");
+            
+            userRepository.save(dev);
+            System.out.println("✅ Usuario desarrollador actualizado: dev/Dev2024#");
         }
     }
 }

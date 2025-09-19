@@ -25,10 +25,18 @@ public class GeolocationService {
      */
     public String getLocationFromIP(String ipAddress) {
         try {
+            // Log para debugging
+            System.out.println("🔍 Geolocalización - IP recibida: " + ipAddress);
+            
             // IPs locales o de desarrollo
             if (isLocalIP(ipAddress)) {
-                return "Desarrollo Local";
+                System.out.println("📍 IP local detectada, usando fallback");
+                // Para pruebas: puedes descomentar la siguiente línea para forzar la consulta
+                // return getLocationFromPublicAPI(ipAddress);
+                return "Prueba Local (IP: " + ipAddress + ")";
             }
+            
+            System.out.println("🌍 Consultando API de geolocalización para IP: " + ipAddress);
 
             // Llamada a la API de geolocalización
             Map<String, Object> response = webClient
@@ -59,12 +67,43 @@ public class GeolocationService {
      * Verifica si la IP es local o de desarrollo
      */
     private boolean isLocalIP(String ipAddress) {
-        return ipAddress == null || 
-               ipAddress.startsWith("127.") || 
-               ipAddress.startsWith("192.168.") || 
-               ipAddress.startsWith("10.") || 
-               ipAddress.equals("0:0:0:0:0:0:0:1") ||
-               ipAddress.equals("::1");
+        if (ipAddress == null || ipAddress.isEmpty()) {
+            return true;
+        }
+        
+        // IPv4 locales
+        if (ipAddress.startsWith("127.") || 
+            ipAddress.startsWith("192.168.") || 
+            ipAddress.startsWith("10.") ||
+            ipAddress.startsWith("172.16.") ||
+            ipAddress.startsWith("172.17.") ||
+            ipAddress.startsWith("172.18.") ||
+            ipAddress.startsWith("172.19.") ||
+            ipAddress.startsWith("172.20.") ||
+            ipAddress.startsWith("172.21.") ||
+            ipAddress.startsWith("172.22.") ||
+            ipAddress.startsWith("172.23.") ||
+            ipAddress.startsWith("172.24.") ||
+            ipAddress.startsWith("172.25.") ||
+            ipAddress.startsWith("172.26.") ||
+            ipAddress.startsWith("172.27.") ||
+            ipAddress.startsWith("172.28.") ||
+            ipAddress.startsWith("172.29.") ||
+            ipAddress.startsWith("172.30.") ||
+            ipAddress.startsWith("172.31.")) {
+            return true;
+        }
+        
+        // IPv6 locales
+        if (ipAddress.equals("0:0:0:0:0:0:0:1") ||
+            ipAddress.equals("::1") ||
+            ipAddress.startsWith("::ffff:127.") ||
+            ipAddress.startsWith("::ffff:192.168.") ||
+            ipAddress.startsWith("::ffff:10.")) {
+            return true;
+        }
+        
+        return false;
     }
 
     /**

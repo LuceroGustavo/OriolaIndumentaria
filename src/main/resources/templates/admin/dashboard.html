@@ -58,6 +58,12 @@
                         <a class="nav-link" href="/admin/contacts">
                             <i class="bi bi-envelope me-2"></i>Consultas
                         </a>
+                        <a class="nav-link" href="/admin/users/change-password">
+                            <i class="bi bi-key me-2"></i>Cambiar Contraseña
+                        </a>
+                        <a class="nav-link" href="/admin/users" th:if="${user.role == T(com.orioladenim.entity.User$Role).SUPER_ADMIN}">
+                            <i class="bi bi-people me-2"></i>Gestión de Usuarios
+                        </a>
                         <a class="nav-link" href="/admin/settings">
                             <i class="bi bi-gear me-2"></i>Configuración
                         </a>

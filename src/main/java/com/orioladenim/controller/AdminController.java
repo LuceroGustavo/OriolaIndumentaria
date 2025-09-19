@@ -1,7 +1,9 @@
 package com.orioladenim.controller;
 
 import com.orioladenim.entity.Product;
+import com.orioladenim.entity.User;
 import com.orioladenim.repo.ProductRepository;
+import com.orioladenim.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,9 @@ public class AdminController {
     @Autowired
     private ProductRepository productRepository;
     
+    @Autowired
+    private UserService userService;
+    
     @GetMapping("/login")
     public String login() {
         return "admin/login";
@@ -26,8 +31,14 @@ public class AdminController {
         // Obtener estadísticas para el dashboard
         long totalProducts = productRepository.count();
         
+        // Obtener el usuario real de la base de datos
+        String username = authentication.getName();
+        User user = userService.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        
         model.addAttribute("totalProducts", totalProducts);
-        model.addAttribute("username", authentication.getName());
+        model.addAttribute("username", username);
+        model.addAttribute("user", user);
         
         return "admin/dashboard";
     }

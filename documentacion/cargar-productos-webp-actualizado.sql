@@ -1,18 +1,30 @@
--- Script SQL para cargar 10 productos de prueba
+-- Script SQL actualizado para cargar 10 productos de prueba
+-- Compatible con las nuevas entidades Category y Product
 -- Sin acentos y optimizado para WebP
 
 -- Limpiar productos existentes (opcional)
 -- DELETE FROM product_image WHERE product_id IN (SELECT p_id FROM product);
 -- DELETE FROM product;
 
--- Insertar 10 productos de prueba
+-- Verificar que las categorías existen
+-- Si no existen, crearlas primero:
+INSERT IGNORE INTO categories (name, description, color, icon, display_order, is_active, product_count, created_at, updated_at) VALUES
+('Remeras', 'Variedad de remeras para todas las temporadas', '#FF6B6B', 'fa-tshirt', 1, true, 0, NOW(), NOW()),
+('Buzos', 'Buzos cómodos y con estilo', '#4ECDC4', 'fa-hoodie', 2, true, 0, NOW(), NOW()),
+('Camisas', 'Camisas elegantes y casuales', '#45B7D1', 'fa-shirt', 3, true, 0, NOW(), NOW()),
+('Pantalones', 'Pantalones de moda y confortables', '#96CEB4', 'fa-pants', 4, true, 0, NOW(), NOW()),
+('Vestidos', 'Vestidos elegantes y casuales', '#FFEAA7', 'fa-dress', 5, true, 0, NOW(), NOW()),
+('Shorts', 'Shorts cómodos para el verano', '#DDA0DD', 'fa-shorts', 6, true, 0, NOW(), NOW()),
+('Chombas', 'Chombas polo clásicas', '#98D8C8', 'fa-polo', 7, true, 0, NOW(), NOW());
+
+-- Insertar 10 productos de prueba con category_id
 INSERT INTO product (
-    name, talle, medidas, color, price, qty, descripcion, categoria, 
+    name, talle, medidas, color, price, qty, descripcion, category_id, 
     material, cuidados, temporada, genero, edad_recomendada, 
     tallas_disponibles, colores_disponibles, es_destacado, es_nuevo, 
     descuento_porcentaje, precio_original, activo, fecha_creacion, fecha_actualizacion
 ) VALUES 
--- Producto 1: Remera basica
+-- Producto 1: Remera basica (category_id = 1 para Remeras)
 (
     'Remera Basica Algodon',
     'M',
@@ -21,7 +33,7 @@ INSERT INTO product (
     25.99,
     50,
     'Remera de algodon 100% comoda y fresca para el verano. Corte clasico y tela suave.',
-    'REMERAS',
+    1, -- Remeras
     'Algodon 100%',
     'Lavar en frio, no usar secadora, planchar a temperatura media',
     'VERANO',
@@ -38,7 +50,7 @@ INSERT INTO product (
     NOW()
 ),
 
--- Producto 2: Buzo con capucha
+-- Producto 2: Buzo con capucha (category_id = 2 para Buzos)
 (
     'Buzo Capucha Invierno',
     'L',
@@ -47,7 +59,7 @@ INSERT INTO product (
     45.99,
     30,
     'Buzo con capucha ideal para el invierno. Tela gruesa y calida.',
-    'BUZOS',
+    2, -- Buzos
     'Algodon 80%, Poliester 20%',
     'Lavar en frio, secar al aire, no planchar',
     'INVIERNO',
@@ -64,7 +76,7 @@ INSERT INTO product (
     NOW()
 ),
 
--- Producto 3: Camisa formal
+-- Producto 3: Camisa formal (category_id = 3 para Camisas)
 (
     'Camisa Formal Hombre',
     'L',
@@ -73,7 +85,7 @@ INSERT INTO product (
     35.99,
     25,
     'Camisa formal de algodon para ocasiones especiales. Corte clasico y elegante.',
-    'CAMISAS',
+    3, -- Camisas
     'Algodon 100%',
     'Lavar en frio, planchar a temperatura alta',
     'TODO_EL_ANO',
@@ -90,7 +102,7 @@ INSERT INTO product (
     NOW()
 ),
 
--- Producto 4: Pantalon jean
+-- Producto 4: Pantalon jean (category_id = 4 para Pantalones)
 (
     'Jean Clasico Mujer',
     'M',
@@ -99,7 +111,7 @@ INSERT INTO product (
     55.99,
     40,
     'Jean clasico de mezclilla para mujer. Corte recto y comodo.',
-    'PANTALONES',
+    4, -- Pantalones
     'Mezclilla 98%, Elastano 2%',
     'Lavar en frio, no usar secadora, planchar al reves',
     'TODO_EL_ANO',
@@ -116,7 +128,7 @@ INSERT INTO product (
     NOW()
 ),
 
--- Producto 5: Vestido verano
+-- Producto 5: Vestido verano (category_id = 5 para Vestidos)
 (
     'Vestido Floral Verano',
     'M',
@@ -125,7 +137,7 @@ INSERT INTO product (
     42.99,
     20,
     'Vestido floral perfecto para el verano. Tela liviana y fresca.',
-    'VESTIDOS',
+    5, -- Vestidos
     'Viscosa 100%',
     'Lavar a mano, no usar secadora, planchar a temperatura baja',
     'VERANO',
@@ -142,7 +154,7 @@ INSERT INTO product (
     NOW()
 ),
 
--- Producto 6: Short deportivo
+-- Producto 6: Short deportivo (category_id = 6 para Shorts)
 (
     'Short Deportivo Unisex',
     'M',
@@ -151,7 +163,7 @@ INSERT INTO product (
     28.99,
     35,
     'Short deportivo comodo para gimnasio o deportes. Tela elastica.',
-    'SHORTS',
+    6, -- Shorts
     'Poliester 85%, Elastano 15%',
     'Lavar en frio, secar al aire, no planchar',
     'VERANO',
@@ -168,7 +180,7 @@ INSERT INTO product (
     NOW()
 ),
 
--- Producto 7: Chomba polo
+-- Producto 7: Chomba polo (category_id = 7 para Chombas)
 (
     'Chomba Polo Clasica',
     'L',
@@ -177,7 +189,7 @@ INSERT INTO product (
     32.99,
     30,
     'Chomba polo clasica de algodon. Perfecta para el verano.',
-    'CHOMBAS',
+    7, -- Chombas
     'Algodon 100%',
     'Lavar en frio, planchar a temperatura media',
     'VERANO',
@@ -194,7 +206,7 @@ INSERT INTO product (
     NOW()
 ),
 
--- Producto 8: Buzo nino
+-- Producto 8: Buzo nino (category_id = 2 para Buzos)
 (
     'Buzo Nino Invierno',
     'M',
@@ -203,7 +215,7 @@ INSERT INTO product (
     38.99,
     25,
     'Buzo calido para nino. Tela suave y resistente.',
-    'BUZOS',
+    2, -- Buzos
     'Algodon 70%, Poliester 30%',
     'Lavar en frio, secar al aire, no planchar',
     'INVIERNO',
@@ -220,7 +232,7 @@ INSERT INTO product (
     NOW()
 ),
 
--- Producto 9: Vestido nina
+-- Producto 9: Vestido nina (category_id = 5 para Vestidos)
 (
     'Vestido Nina Primavera',
     'S',
@@ -229,7 +241,7 @@ INSERT INTO product (
     29.99,
     20,
     'Vestido lindo para nina. Tela suave y comoda.',
-    'VESTIDOS',
+    5, -- Vestidos
     'Algodon 100%',
     'Lavar en frio, secar al aire, planchar a temperatura baja',
     'PRIMAVERA',
@@ -246,7 +258,7 @@ INSERT INTO product (
     NOW()
 ),
 
--- Producto 10: Pantalon nino
+-- Producto 10: Pantalon nino (category_id = 4 para Pantalones)
 (
     'Pantalon Nino Deportivo',
     'M',
@@ -255,7 +267,7 @@ INSERT INTO product (
     24.99,
     30,
     'Pantalon deportivo para nino. Comodo y resistente.',
-    'PANTALONES',
+    4, -- Pantalones
     'Algodon 60%, Poliester 40%',
     'Lavar en frio, secar al aire, no planchar',
     'TODO_EL_ANO',
@@ -272,16 +284,31 @@ INSERT INTO product (
     NOW()
 );
 
+-- Actualizar contadores de productos en categorías
+UPDATE categories SET product_count = (
+    SELECT COUNT(*) FROM product WHERE category_id = categories.id
+);
+
 -- Verificar que se insertaron correctamente
 SELECT 
-    p_id, 
-    name, 
-    categoria, 
-    genero, 
-    talle, 
-    price, 
-    es_destacado, 
-    es_nuevo,
-    descuento_porcentaje
-FROM product 
-ORDER BY p_id;
+    p.p_id, 
+    p.name, 
+    c.name as categoria,
+    p.genero, 
+    p.talle, 
+    p.price, 
+    p.es_destacado, 
+    p.es_nuevo,
+    p.descuento_porcentaje
+FROM product p
+LEFT JOIN categories c ON p.category_id = c.id
+ORDER BY p.p_id;
+
+-- Verificar contadores de categorías
+SELECT 
+    c.name as categoria,
+    c.product_count,
+    c.color,
+    c.icon
+FROM categories c
+ORDER BY c.display_order;

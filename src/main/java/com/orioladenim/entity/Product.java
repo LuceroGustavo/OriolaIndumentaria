@@ -103,6 +103,11 @@ public class Product {
     // Relación con imágenes
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ProductImage> images = new ArrayList<>();
+    
+    // Relación con categoría (Many-to-One)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     // Método para obtener la imagen principal
     public ProductImage getImagenPrincipal() {
@@ -215,5 +220,8 @@ public class Product {
     
     public List<ProductImage> getImages() { return images; }
     public void setImages(List<ProductImage> images) { this.images = images; }
+    
+    public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
 }
 
