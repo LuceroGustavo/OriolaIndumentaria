@@ -2,6 +2,8 @@ package com.orioladenim.controller;
 
 import com.orioladenim.entity.Product;
 import com.orioladenim.repo.ProductRepository;
+import com.orioladenim.service.CategoryService;
+import com.orioladenim.service.ColorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,6 +17,12 @@ public class ProductController {
     
     @Autowired
     private ProductRepository productRepository;
+    
+    @Autowired
+    private CategoryService categoryService;
+    
+    @Autowired
+    private ColorService colorService;
 
     @GetMapping
     public String listProducts(Model model) {
@@ -25,6 +33,8 @@ public class ProductController {
     @GetMapping("/new")
     public String showForm(Model model) {
         model.addAttribute("product", new Product());
+        model.addAttribute("categories", categoryService.getActiveCategories());
+        model.addAttribute("colors", colorService.getActiveColors());
         return "admin/product-form";
     }
 
@@ -32,6 +42,8 @@ public class ProductController {
     public String addProduct(@Valid Product product, BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("product", product);
+            model.addAttribute("categories", categoryService.getActiveCategories());
+            model.addAttribute("colors", colorService.getActiveColors());
             return "admin/product-form";
         }
         product.setFechaCreacion(java.time.LocalDateTime.now());
@@ -45,6 +57,8 @@ public class ProductController {
         Product product = productRepository.findById(pId)
             .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
         model.addAttribute("product", product);
+        model.addAttribute("categories", categoryService.getActiveCategories());
+        model.addAttribute("colors", colorService.getActiveColors());
         return "admin/product-form";
     }
 
@@ -52,6 +66,8 @@ public class ProductController {
     public String updateProduct(@PathVariable Integer pId, @Valid Product product, BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("product", product);
+            model.addAttribute("categories", categoryService.getActiveCategories());
+            model.addAttribute("colors", colorService.getActiveColors());
             return "admin/product-form";
         }
         product.setPId(pId);

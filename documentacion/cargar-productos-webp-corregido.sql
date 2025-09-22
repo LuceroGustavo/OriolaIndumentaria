@@ -1,3 +1,9 @@
+-- Seleccionar la base de datos
+USE oriola_indumentaria;
+
+-- Deshabilitar safe update mode temporalmente
+SET SQL_SAFE_UPDATES = 0;
+
 -- Script SQL CORREGIDO para cargar 10 productos de prueba
 -- Compatible con las entidades Category y Product actuales
 -- Sin acentos y optimizado para WebP
@@ -323,3 +329,6 @@ SELECT
     c.icon_name
 FROM categories c
 ORDER BY c.display_order;
+
+-- Rehabilitar safe update mode
+SET SQL_SAFE_UPDATES = 1;

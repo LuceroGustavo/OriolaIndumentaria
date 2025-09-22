@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Categorías - ORIOLA Denim</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{admin/layout :: header}"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <div th:replace="~{admin/layout :: sidebar}"></div>
+            
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="bi bi-tags me-2"></i>Gestión de Categorías
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <a th:href="@{/admin/categories/new}" class="btn btn-oriola">
+                            <i class="bi bi-plus-circle me-1"></i>Nueva Categoría
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Alertas -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle me-2"></i>
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Filtros y búsqueda -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form method="get" class="row g-3">
+                            <div class="col-md-6">
+                                <label for="search" class="form-label">Buscar categorías</label>
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       th:value="${search}" placeholder="Nombre o descripción...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="sortBy" class="form-label">Ordenar por</label>
+                                <select class="form-select" id="sortBy" name="sortBy">
+                                    <option value="displayOrder" th:selected="${sortBy == 'displayOrder'}">Orden</option>
+                                    <option value="name" th:selected="${sortBy == 'name'}">Nombre</option>
+                                    <option value="productCount" th:selected="${sortBy == 'productCount'}">Productos</option>
+                                    <option value="createdAt" th:selected="${sortBy == 'createdAt'}">Fecha</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="sortDir" class="form-label">Dirección</label>
+                                <select class="form-select" id="sortDir" name="sortDir">
+                                    <option value="asc" th:selected="${sortDir == 'asc'}">Ascendente</option>
+                                    <option value="desc" th:selected="${sortDir == 'desc'}">Descendente</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-outline-oriola">
+                                    <i class="bi bi-search me-1"></i>Buscar
+                                </button>
+                                <a th:href="@{/admin/categories}" class="btn btn-outline-secondary ms-2">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>Limpiar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Estadísticas -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">Total Categorías</h6>
+                                        <h3 th:text="${totalItems}">0</h3>
+                                    </div>
+                                    <i class="bi bi-tags fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">Activas</h6>
+                                        <h3 th:text="${categories != null ? categories.content.size() : 0}">0</h3>
+                                    </div>
+                                    <i class="bi bi-check-circle fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">Con Productos</h6>
+                                        <h3 th:text="${categories != null ? categories.content.size() : 0}">0</h3>
+                                    </div>
+                                    <i class="bi bi-box fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">Páginas</h6>
+                                        <h3 th:text="${totalPages}">0</h3>
+                                    </div>
+                                    <i class="bi bi-file-text fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de categorías -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-list-ul me-2"></i>Lista de Categorías
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${categories != null and !categories.content.isEmpty()}" class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Orden</th>
+                                        <th>Nombre</th>
+                                        <th>Descripción</th>
+                                        <th>Color</th>
+                                        <th>Icono</th>
+                                        <th>Productos</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="category : ${categories.content}">
+                                        <td>
+                                            <span class="badge bg-secondary" th:text="${category.displayOrder}">1</span>
+                                        </td>
+                                        <td>
+                                            <strong th:text="${category.name}">Categoría</strong>
+                                        </td>
+                                        <td th:text="${category.description}">Descripción</td>
+                                        <td>
+                                            <span class="badge" 
+                                                  th:style="'background-color: ' + ${category.colorCode} + '; color: white;'"
+                                                  th:text="${category.colorCode}">#FF6B6B</span>
+                                        </td>
+                                        <td>
+                                            <i th:class="'bi bi-' + ${category.iconName}" 
+                                               th:title="${category.iconName}"></i>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info" th:text="${category.productCount}">0</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${category.isActive}" class="badge bg-success">Activa</span>
+                                            <span th:unless="${category.isActive}" class="badge bg-secondary">Inactiva</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a th:href="@{/admin/categories/view/{id}(id=${category.id})}" 
+                                                   class="btn btn-sm btn-outline-info" title="Ver">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a th:href="@{/admin/categories/edit/{id}(id=${category.id})}" 
+                                                   class="btn btn-sm btn-outline-primary" title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <form th:action="@{/admin/categories/toggle-status/{id}(id=${category.id})}" 
+                                                      method="post" class="d-inline">
+                                                    <button type="submit" 
+                                                            th:class="'btn btn-sm ' + (${category.isActive} ? 'btn-outline-warning' : 'btn-outline-success')"
+                                                            th:title="${category.isActive} ? 'Desactivar' : 'Activar'">
+                                                        <i th:class="'bi ' + (${category.isActive} ? 'bi-pause' : 'bi-play')"></i>
+                                                    </button>
+                                                </form>
+                                                <form th:action="@{/admin/categories/delete/{id}(id=${category.id})}" 
+                                                      method="post" class="d-inline"
+                                                      onsubmit="return confirm('¿Estás seguro de eliminar esta categoría?')">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div th:if="${searchResults != null and !searchResults.isEmpty()}" class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Orden</th>
+                                        <th>Nombre</th>
+                                        <th>Descripción</th>
+                                        <th>Color</th>
+                                        <th>Icono</th>
+                                        <th>Productos</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="category : ${searchResults}">
+                                        <td>
+                                            <span class="badge bg-secondary" th:text="${category.displayOrder}">1</span>
+                                        </td>
+                                        <td>
+                                            <strong th:text="${category.name}">Categoría</strong>
+                                        </td>
+                                        <td th:text="${category.description}">Descripción</td>
+                                        <td>
+                                            <span class="badge" 
+                                                  th:style="'background-color: ' + ${category.colorCode} + '; color: white;'"
+                                                  th:text="${category.colorCode}">#FF6B6B</span>
+                                        </td>
+                                        <td>
+                                            <i th:class="'bi bi-' + ${category.iconName}" 
+                                               th:title="${category.iconName}"></i>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info" th:text="${category.productCount}">0</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${category.isActive}" class="badge bg-success">Activa</span>
+                                            <span th:unless="${category.isActive}" class="badge bg-secondary">Inactiva</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a th:href="@{/admin/categories/view/{id}(id=${category.id})}" 
+                                                   class="btn btn-sm btn-outline-info" title="Ver">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a th:href="@{/admin/categories/edit/{id}(id=${category.id})}" 
+                                                   class="btn btn-sm btn-outline-primary" title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <form th:action="@{/admin/categories/toggle-status/{id}(id=${category.id})}" 
+                                                      method="post" class="d-inline">
+                                                    <button type="submit" 
+                                                            th:class="'btn btn-sm ' + (${category.isActive} ? 'btn-outline-warning' : 'btn-outline-success')"
+                                                            th:title="${category.isActive} ? 'Desactivar' : 'Activar'">
+                                                        <i th:class="'bi ' + (${category.isActive} ? 'bi-pause' : 'bi-play')"></i>
+                                                    </button>
+                                                </form>
+                                                <form th:action="@{/admin/categories/delete/{id}(id=${category.id})}" 
+                                                      method="post" class="d-inline"
+                                                      onsubmit="return confirm('¿Estás seguro de eliminar esta categoría?')">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div th:if="${categories != null and categories.content.isEmpty() and searchResults == null}" 
+                             class="text-center py-5">
+                            <i class="bi bi-tags fs-1 text-muted"></i>
+                            <h5 class="text-muted mt-3">No hay categorías registradas</h5>
+                            <p class="text-muted">Comienza creando tu primera categoría</p>
+                            <a th:href="@{/admin/categories/new}" class="btn btn-oriola">
+                                <i class="bi bi-plus-circle me-1"></i>Crear Primera Categoría
+                            </a>
+                        </div>
+                        
+                        <div th:if="${searchResults != null and searchResults.isEmpty()}" 
+                             class="text-center py-5">
+                            <i class="bi bi-search fs-1 text-muted"></i>
+                            <h5 class="text-muted mt-3">No se encontraron resultados</h5>
+                            <p class="text-muted">Intenta con otros términos de búsqueda</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paginación -->
+                <nav th:if="${categories != null and categories.totalPages > 1}" aria-label="Paginación de categorías">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/categories(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search})}">Anterior</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, categories.totalPages - 1)}" 
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link" th:href="@{/admin/categories(page=${i}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search})}" 
+                               th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == categories.totalPages - 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/categories(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search})}">Siguiente</a>
+                        </li>
+                    </ul>
+                </nav>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

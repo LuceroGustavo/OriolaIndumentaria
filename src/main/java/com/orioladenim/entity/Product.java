@@ -38,7 +38,12 @@ public class Product {
 
     @NotBlank(message = "El color es requerido")
     @Column(name = "color", nullable = false)
-    private String color;
+    private String color; // Campo legacy para compatibilidad
+    
+    // Relación con Color (Many-to-One)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "color_id")
+    private Color colorEntity;
 
     @Positive(message = "El precio debe ser positivo")
     @Column(name = "price", nullable = false)
@@ -147,6 +152,16 @@ public class Product {
         images.remove(imagen);
         imagen.setProduct(null);
     }
+    
+    // Método para obtener el color normalizado
+    public String getColorNormalizado() {
+        return colorEntity != null ? colorEntity.getName() : color;
+    }
+    
+    // Método para obtener el código hexadecimal del color
+    public String getColorHex() {
+        return colorEntity != null ? colorEntity.getHexCodeOrDefault() : "#6c757d";
+    }
 
     // Getters y Setters manuales (por si Lombok no funciona)
     public Integer getPId() { return pId; }
@@ -223,5 +238,8 @@ public class Product {
     
     public Category getCategory() { return category; }
     public void setCategory(Category category) { this.category = category; }
+    
+    public Color getColorEntity() { return colorEntity; }
+    public void setColorEntity(Color colorEntity) { this.colorEntity = colorEntity; }
 }
 

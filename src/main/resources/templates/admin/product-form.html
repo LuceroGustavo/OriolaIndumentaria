@@ -118,14 +118,20 @@
                                             <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback" th:errors="*{name}"></div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="categoria" class="form-label">Categoría *</label>
-                                            <select class="form-select" id="categoria" th:field="*{categoria}" th:class="${#fields.hasErrors('categoria')} ? 'form-select is-invalid' : 'form-select'" required>
+                                            <label for="category" class="form-label">Categoría *</label>
+                                            <select class="form-select" id="category" name="category.id" th:class="${#fields.hasErrors('category')} ? 'form-select is-invalid' : 'form-select'" required>
                                                 <option value="">Seleccionar categoría</option>
-                                                <option th:each="cat : ${T(com.orioladenim.enums.Categoria).values()}" 
-                                                        th:value="${cat}" 
-                                                        th:text="${cat.displayName}"></option>
+                                                <option th:each="cat : ${categories}" 
+                                                        th:value="${cat.id}" 
+                                                        th:selected="${product != null and product.category != null and product.category.id == cat.id}"
+                                                        th:text="${cat.name}"></option>
                                             </select>
-                                            <div th:if="${#fields.hasErrors('categoria')}" class="invalid-feedback" th:errors="*{categoria}"></div>
+                                            <div th:if="${#fields.hasErrors('category')}" class="invalid-feedback" th:errors="*{category}"></div>
+                                            <div class="form-text">
+                                                <a th:href="@{/admin/categories}" target="_blank" class="text-decoration-none">
+                                                    <i class="bi bi-plus-circle me-1"></i>Gestionar categorías
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -157,9 +163,20 @@
                                             </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="color" class="form-label">Color *</label>
-                                            <input type="text" class="form-control" id="color" th:field="*{color}" th:class="${#fields.hasErrors('color')} ? 'form-control is-invalid' : 'form-control'" placeholder="Azul, Rojo, Negro" required>
-                                            <div th:if="${#fields.hasErrors('color')}" class="invalid-feedback" th:errors="*{color}"></div>
+                                            <label for="colorEntity" class="form-label">Color *</label>
+                                            <select class="form-select" id="colorEntity" name="colorEntity.id" th:class="${#fields.hasErrors('colorEntity')} ? 'form-select is-invalid' : 'form-select'" required>
+                                                <option value="">Seleccionar color</option>
+                                                <option th:each="color : ${colors}" 
+                                                        th:value="${color.id}" 
+                                                        th:selected="${product != null and product.colorEntity != null and product.colorEntity.id == color.id}"
+                                                        th:text="${color.name}"></option>
+                                            </select>
+                                            <div th:if="${#fields.hasErrors('colorEntity')}" class="invalid-feedback" th:errors="*{colorEntity}"></div>
+                                            <div class="form-text">
+                                                <a th:href="@{/admin/colors}" target="_blank" class="text-decoration-none">
+                                                    <i class="bi bi-plus-circle me-1"></i>Gestionar colores
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -353,11 +370,12 @@
         // Validación de formulario
         document.querySelector('form').addEventListener('submit', function(e) {
             const name = document.getElementById('name').value;
-            const categoria = document.getElementById('categoria').value;
+            const category = document.getElementById('category').value;
+            const colorEntity = document.getElementById('colorEntity').value;
             const price = document.getElementById('price').value;
             const qty = document.getElementById('qty').value;
 
-            if (!name || !categoria || !price || !qty) {
+            if (!name || !category || !colorEntity || !price || !qty) {
                 e.preventDefault();
                 alert('Por favor completa todos los campos obligatorios');
                 return false;
