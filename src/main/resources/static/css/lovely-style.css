@@ -317,8 +317,8 @@ body {
 
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
@@ -344,7 +344,7 @@ body {
 .product-image-container {
     position: relative;
     width: 100%;
-    height: 350px;
+    height: 400px;
     overflow: hidden;
 }
 
@@ -492,6 +492,17 @@ body {
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+    
+    .product-image-container {
+        height: 350px;
+    }
+}
+
 @media (max-width: 768px) {
     .header-actions {
         gap: 10px;
@@ -512,8 +523,12 @@ body {
     }
     
     .products-grid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .product-image-container {
+        height: 300px;
     }
     
     .whatsapp-button {
