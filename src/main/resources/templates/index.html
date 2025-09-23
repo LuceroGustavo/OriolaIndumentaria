@@ -1,317 +1,215 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Orioladenim</title>
+    <title>Orioladenim - Indumentaria Premium</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/lovely-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-oriola fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="bi bi-heart-fill me-2"></i>ORIOLA
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/catalog">Catálogo</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/about">Sobre Nosotros</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/contact">Contacto</a>
-                    </li>
-                    <!-- Redes Sociales -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://www.facebook.com/oriolaindumentaria" target="_blank" title="Síguenos en Facebook">
-                            <i class="bi bi-facebook"></i>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://www.instagram.com/oriolaindumentaria" target="_blank" title="Síguenos en Instagram">
+    <!-- Header -->
+    <header class="header-container">
+        <div class="header-content">
+            <div class="header-top">
+                <a href="/" class="logo">Orioladenim</a>
+                
+                <div class="header-nav">
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="/" class="nav-link active">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog" class="nav-link">Catálogo</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a href="javascript:void(0)" class="nav-link dropdown-toggle">Categorías</a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-grid">
+                                    <div class="dropdown-column">
+                                        <div class="dropdown-column-title">Remeras</div>
+                                        <a href="/catalog?category=REMERAS" class="dropdown-item">Remeras</a>
+                                        <a href="/catalog?category=REMERAS" class="dropdown-item">Remeras Básicas</a>
+                                        <a href="/catalog?category=REMERAS" class="dropdown-item">Remeras Estampadas</a>
+                                    </div>
+                                    <div class="dropdown-column">
+                                        <div class="dropdown-column-title">Pantalones</div>
+                                        <a href="/catalog?category=PANTALONES" class="dropdown-item">Pantalones</a>
+                                        <a href="/catalog?category=PANTALONES" class="dropdown-item">Jeans</a>
+                                        <a href="/catalog?category=PANTALONES" class="dropdown-item">Pantalones de Vestir</a>
+                                    </div>
+                                    <div class="dropdown-column">
+                                        <div class="dropdown-column-title">Camisas</div>
+                                        <a href="/catalog?category=CAMISAS" class="dropdown-item">Camisas</a>
+                                        <a href="/catalog?category=CAMISAS" class="dropdown-item">Camisas de Vestir</a>
+                                        <a href="/catalog?category=CAMISAS" class="dropdown-item">Camisas Casuales</a>
+                                    </div>
+                                    <div class="dropdown-column">
+                                        <div class="dropdown-column-title">Otros</div>
+                                        <a href="/catalog?category=BUZOS" class="dropdown-item">Buzos</a>
+                                        <a href="/catalog?category=VESTIDOS" class="dropdown-item">Vestidos</a>
+                                        <a href="/catalog?category=SHORTS" class="dropdown-item">Shorts</a>
+                                        <a href="/catalog?category=CHOMBAS" class="dropdown-item">Chombas</a>
+                                        <a href="/catalog" class="dropdown-item special">Ver Todo</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="header-actions">
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="Buscar productos...">
+                    </div>
+                    <div class="header-icons">
+                        <a href="https://www.instagram.com/oriolaindumentaria" class="header-icon" title="Instagram" target="_blank">
                             <i class="bi bi-instagram"></i>
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/login">
-                            <i class="bi bi-gear me-1"></i>Admin
+                        <a href="https://www.facebook.com/oriolaindumentaria" class="header-icon" title="Facebook" target="_blank">
+                            <i class="bi bi-facebook"></i>
                         </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero-oriola" style="min-height: 50vh;">
-        <div class="container">
-            <div class="hero-content">
-                <h1 class="hero-title">ORIOLADENIM</h1>
-                <p class="hero-subtitle">Indumentaria con Estilo y Personalidad</p>
-                <div class="hero-buttons">
-                    <a href="/catalog" class="btn btn-oriola btn-lg me-3">
-                        <i class="bi bi-shop me-2"></i>Ver Catálogo
-                    </a>
-                    <a href="/contact" class="btn btn-oriola-secondary btn-lg">
-                        <i class="bi bi-whatsapp me-2"></i>Contactar
-                    </a>
+                        <a href="https://wa.me/5491159293920" class="header-icon" title="WhatsApp" target="_blank">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
+                        <a href="/admin/login" class="header-icon" title="Administración">
+                            <i class="bi bi-gear"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+    </header>
 
 
-    <!-- Productos Destacados -->
-    <section class="section-oriola" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+
+
+    <!-- Products Section -->
+    <section class="products-section">
         <div class="container">
-            <h2 class="section-title">Productos Destacados</h2>
-            <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4" th:each="product : ${featuredProducts}">
-                    <div class="product-card-oriola h-100">
-                        <div class="product-image">
-                            <i class="bi bi-image" th:if="${product.getImagenPrincipal() == null}"></i>
-                            <img th:if="${product.getImagenPrincipal() != null}" th:src="${product.getImagenPrincipalUrl()}" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
-                            <div class="product-overlay">
-                                <a th:href="@{/product/{id}(id=${product.pId})}" class="btn btn-oriola">
-                                    <i class="bi bi-eye me-1"></i>Ver Detalle
-                                </a>
-                            </div>
+            <h2 class="section-title">Novedades</h2>
+            <div class="products-grid">
+                <div th:each="product : ${products}" class="product-card">
+                    <a th:href="@{/product/{id}(id=${product.pId})}" class="text-decoration-none text-dark">
+                        <div class="product-image-container">
+                            <img th:src="${product.images != null and !product.images.empty ? '/uploads/' + product.images[0].imagePath : 'https://via.placeholder.com/350x350/f8f9fa/666666?text=ORIOLA'}" 
+                                 th:alt="${product.name}" class="product-image">
                         </div>
                         <div class="product-info">
-                            <h5 class="product-title" th:text="${product.name}">Producto</h5>
-                            <div class="product-badges">
-                                <span th:if="${product.categoria}" class="badge badge-category" th:text="${product.categoria}"></span>
-                                <span th:if="${product.talle}" class="badge badge-size" th:text="${product.talle}"></span>
-                                <span th:if="${product.qty > 0}" class="badge badge-stock">En Stock</span>
-                                <span th:if="${product.qty == 0}" class="badge badge-no-stock">Sin Stock</span>
-                                <span th:if="${product.color}" class="badge badge-color">
-                                    <i class="bi bi-palette me-1"></i><span th:text="${product.color}"></span>
-                                </span>
+                            <h3 class="product-name" th:text="${product.name}">Nombre del Producto</h3>
+                            <div class="product-price">
+                                <span th:if="${product.precioOriginal != null and product.precioOriginal > product.price}" 
+                                      class="product-price-original" th:text="'$' + ${#numbers.formatDecimal(product.precioOriginal, 0, 0)}">$0</span>
+                                <span th:text="'$' + ${#numbers.formatDecimal(product.price, 0, 0)}">$0</span>
+                                <span th:if="${product.descuentoPorcentaje != null and product.descuentoPorcentaje > 0}" 
+                                      class="product-discount" th:text="'-' + ${#numbers.formatDecimal(product.descuentoPorcentaje, 0, 0)} + '%'">-0%</span>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="product-price">$<span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}">0</span></span>
-                                <a th:href="@{/product/{id}(id=${product.pId})}" class="btn btn-oriola btn-sm">
-                                    <i class="bi bi-eye me-1"></i>Ver Detalle
-                                </a>
+                            <div class="product-colors" th:if="${product.coloresDisponibles != null and !#strings.isEmpty(product.coloresDisponibles)}">
+                                <div th:each="color : ${#strings.arraySplit(product.coloresDisponibles, ',')}" 
+                                     class="color-dot" 
+                                     th:style="'background-color: ' + ${color.trim()}" 
+                                     th:title="${color.trim()}"></div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center mt-5">
-                <a href="/catalog" class="btn btn-oriola btn-lg">
-                    <i class="bi bi-grid-3x3-gap me-2"></i>Ver Todos los Productos
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Categorías -->
-    <section class="section-oriola">
-        <div class="container">
-            <h2 class="section-title">Nuestras Categorías</h2>
-            <div class="row">
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="category-card text-center p-4 rounded-4" style="background: var(--gradient-primary); color: white;">
-                        <i class="bi bi-tshirt" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                        <h5>Remeras</h5>
-                        <p>Diseños únicos y cómodos</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="category-card text-center p-4 rounded-4" style="background: var(--gradient-secondary); color: white;">
-                        <i class="bi bi-thermometer-snow" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                        <h5>Buzos</h5>
-                        <p>Calidez y estilo</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="category-card text-center p-4 rounded-4" style="background: var(--gradient-accent); color: white;">
-                        <i class="bi bi-shop" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                        <h5>Camisas</h5>
-                        <p>Elegancia casual</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="category-card text-center p-4 rounded-4" style="background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%); color: white;">
-                        <i class="bi bi-gem" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                        <h5>Accesorios</h5>
-                        <p>Detalles que marcan la diferencia</p>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Testimonios -->
-    <section class="section-oriola" style="background: var(--gradient-primary); color: white;">
-        <div class="container">
-            <h2 class="section-title" style="color: white;">Lo que Dicen Nuestros Clientes</h2>
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial-card p-4 rounded-4 glass-effect">
-                        <div class="stars mb-3">
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                        </div>
-                        <p class="mb-3">"La calidad de las prendas es excepcional. Me encanta el diseño único de ORIOLA."</p>
-                        <div class="d-flex align-items-center">
-                            <div class="avatar me-3" style="width: 50px; height: 50px; background: var(--gradient-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                <i class="bi bi-person-fill"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0">María González</h6>
-                                <small>Cliente Satisfecha</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial-card p-4 rounded-4 glass-effect">
-                        <div class="stars mb-3">
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                        </div>
-                        <p class="mb-3">"Excelente atención al cliente y productos de muy buena calidad. Los recomiendo 100%."</p>
-                        <div class="d-flex align-items-center">
-                            <div class="avatar me-3" style="width: 50px; height: 50px; background: var(--gradient-accent); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                <i class="bi bi-person-fill"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0">Carlos Rodríguez</h6>
-                                <small>Cliente Frecuente</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial-card p-4 rounded-4 glass-effect">
-                        <div class="stars mb-3">
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                        </div>
-                        <p class="mb-3">"Los diseños son únicos y la comodidad es increíble. Definitivamente volveré a comprar."</p>
-                        <div class="d-flex align-items-center">
-                            <div class="avatar me-3" style="width: 50px; height: 50px; background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                <i class="bi bi-person-fill"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0">Ana Martínez</h6>
-                                <small>Nueva Cliente</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/5491159293920?text=Hola!%20Me%20interesa%20conocer%20más%20sobre%20sus%20productos" 
+       class="whatsapp-button" target="_blank">
+        <i class="bi bi-whatsapp"></i>
+    </a>
 
     <!-- Footer -->
-    <footer class="footer-oriola">
-        <div class="container">
+    <footer class="footer">
+        <div class="footer-content">
             <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5><i class="bi bi-heart-fill me-2"></i>ORIOLA</h5>
-                    <p>Indumentaria con estilo y personalidad. Cada prenda está diseñada para que te sientas único y cómodo.</p>
-                    <div class="social-links">
-                        <a href="#" class="me-3"><i class="bi bi-instagram fs-4"></i></a>
-                        <a href="#" class="me-3"><i class="bi bi-facebook fs-4"></i></a>
-                        <a href="#" class="me-3"><i class="bi bi-whatsapp fs-4"></i></a>
-                        <a href="#"><i class="bi bi-envelope fs-4"></i></a>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h3 class="footer-title">Orioladenim</h3>
+                        <p>Indumentaria premium con estilo único. Calidad y diseño en cada prenda.</p>
                     </div>
                 </div>
-                <div class="col-md-2 mb-4">
-                    <h5>Enlaces</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="/">Inicio</a></li>
-                        <li><a href="/catalog">Catálogo</a></li>
-                        <li><a href="/about">Sobre Nosotros</a></li>
-                        <li><a href="/contact">Contacto</a></li>
-                    </ul>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h3 class="footer-title">Enlaces</h3>
+                        <ul class="footer-links">
+                            <li><a href="/catalog">Catálogo</a></li>
+                            <li><a href="/about">Sobre Nosotros</a></li>
+                            <li><a href="/contact">Contacto</a></li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Contacto</h5>
-                    <ul class="list-unstyled">
-                        <li><i class="bi bi-geo-alt me-2"></i>Buenos Aires, Argentina</li>
-                        <li><i class="bi bi-telephone me-2"></i>+54 9 11 1234-5678</li>
-                        <li><i class="bi bi-envelope me-2"></i>info@oriola.com</li>
-                    </ul>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Newsletter</h5>
-                    <p>Suscríbete para recibir ofertas exclusivas</p>
-                    <div class="input-group">
-                        <input type="email" class="form-control" placeholder="Tu email">
-                        <button class="btn btn-oriola" type="button">
-                            <i class="bi bi-send"></i>
-                        </button>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h3 class="footer-title">Contacto</h3>
+                        <ul class="footer-links">
+                            <li><a href="https://wa.me/5491159293920">WhatsApp</a></li>
+                            <li><a href="mailto:info@orioladenim.com.ar">Email</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
-            <hr class="my-4">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; 2025 ORIOLA. Todos los derechos reservados.</p>
-                </div>
-                <div class="col-md-6 text-end">
-                    <small>Hecho con <i class="bi bi-heart-fill text-danger"></i> en Argentina</small>
-                </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Orioladenim. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/whatsapp.js"></script>
     <script>
-        // Efecto de scroll en navbar
-        window.addEventListener('scroll', function() {
-            const navbar = document.querySelector('.navbar-oriola');
-            if (window.scrollY > 50) {
-                navbar.style.background = 'rgba(255, 107, 107, 0.95)';
-                navbar.style.backdropFilter = 'blur(10px)';
+        // Dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('JavaScript cargado');
+            
+            const dropdown = document.querySelector('.dropdown');
+            const toggle = document.querySelector('.dropdown-toggle');
+            const menu = document.querySelector('.dropdown-menu');
+            
+            if (dropdown && toggle && menu) {
+                console.log('Elementos encontrados');
+                
+                // Hover events
+                dropdown.addEventListener('mouseenter', function() {
+                    console.log('Mouse enter en categorías');
+                    dropdown.classList.add('active');
+                    menu.style.display = 'block';
+                    menu.style.opacity = '1';
+                    menu.style.visibility = 'visible';
+                    menu.style.transform = 'translateX(-60%) translateY(0)';
+                });
+                
+                dropdown.addEventListener('mouseleave', function() {
+                    console.log('Mouse leave en categorías');
+                    dropdown.classList.remove('active');
+                    menu.style.opacity = '0';
+                    menu.style.visibility = 'hidden';
+                    menu.style.transform = 'translateX(-60%) translateY(-10px)';
+                    setTimeout(() => {
+                        menu.style.display = 'none';
+                    }, 300);
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!dropdown.contains(e.target)) {
+                        dropdown.classList.remove('active');
+                        menu.style.opacity = '0';
+                        menu.style.visibility = 'hidden';
+                        menu.style.transform = 'translateX(-50%) translateY(-10px)';
+                        setTimeout(() => {
+                            menu.style.display = 'none';
+                        }, 300);
+                    }
+                });
             } else {
-                navbar.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%)';
-                navbar.style.backdropFilter = 'none';
+                console.log('No se encontraron elementos del dropdown');
             }
-        });
-
-        // Animación de entrada para las cards
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.product-card-oriola, .feature-card, .category-card, .testimonial-card').forEach(card => {
-            observer.observe(card);
         });
     </script>
 </body>

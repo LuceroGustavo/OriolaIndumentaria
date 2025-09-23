@@ -30,6 +30,8 @@ public class AdminController {
     public String dashboard(Model model, Authentication authentication) {
         // Obtener estadísticas para el dashboard
         long totalProducts = productRepository.count();
+        long productosDestacados = productRepository.findByEsDestacadoTrueAndActivoTrue().size();
+        long productosActivos = productRepository.findByActivoTrue().size();
         
         // Obtener el usuario real de la base de datos
         String username = authentication.getName();
@@ -37,6 +39,8 @@ public class AdminController {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         
         model.addAttribute("totalProducts", totalProducts);
+        model.addAttribute("productosDestacados", productosDestacados);
+        model.addAttribute("productosActivos", productosActivos);
         model.addAttribute("username", username);
         model.addAttribute("user", user);
         

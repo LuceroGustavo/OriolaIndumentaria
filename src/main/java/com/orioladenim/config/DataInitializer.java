@@ -2,6 +2,8 @@ package com.orioladenim.config;
 
 import com.orioladenim.entity.User;
 import com.orioladenim.repo.UserRepository;
+import com.orioladenim.service.CategoryService;
+import com.orioladenim.service.ColorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +19,12 @@ public class DataInitializer implements CommandLineRunner {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private CategoryService categoryService;
+    
+    @Autowired
+    private ColorService colorService;
     
     @Override
     public void run(String... args) throws Exception {
@@ -64,6 +72,22 @@ public class DataInitializer implements CommandLineRunner {
             
             userRepository.save(dev);
             System.out.println("✅ Usuario desarrollador actualizado: dev/Dev2024#");
+        }
+        
+        // Crear categorías por defecto
+        try {
+            categoryService.createDefaultCategories();
+            System.out.println("✅ Categorías por defecto creadas");
+        } catch (Exception e) {
+            System.out.println("ℹ️ Categorías ya existen o error: " + e.getMessage());
+        }
+        
+        // Crear colores por defecto
+        try {
+            colorService.createDefaultColors();
+            System.out.println("✅ Colores por defecto creados");
+        } catch (Exception e) {
+            System.out.println("ℹ️ Colores ya existen o error: " + e.getMessage());
         }
     }
 }

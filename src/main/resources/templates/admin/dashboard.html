@@ -44,7 +44,7 @@
             <div class="col-md-3 col-lg-2 px-0">
                 <div class="sidebar p-3">
                     <div class="text-center mb-4">
-                        <h4 class="text-white">ORIOLA</h4>
+                        <h4 class="text-white">Orioladenim</h4>
                         <small class="text-white-50">Panel Admin</small>
                     </div>
                     
@@ -54,6 +54,12 @@
                         </a>
                         <a class="nav-link" href="/admin/products">
                             <i class="bi bi-box-seam me-2"></i>Productos
+                        </a>
+                        <a class="nav-link" href="/admin/categories">
+                            <i class="bi bi-tags me-2"></i>Categorías
+                        </a>
+                        <a class="nav-link" href="/admin/colors">
+                            <i class="bi bi-palette me-2"></i>Colores
                         </a>
                         <a class="nav-link" href="/admin/contacts">
                             <i class="bi bi-envelope me-2"></i>Consultas
@@ -97,7 +103,25 @@
                             <div class="card-body">
                                 <i class="bi bi-box-seam stat-icon text-primary"></i>
                                 <h3 class="mt-2" th:text="${totalProducts}">0</h3>
-                                <p class="text-muted mb-0">Productos</p>
+                                <p class="text-muted mb-0">Total Productos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card card-stat text-center">
+                            <div class="card-body">
+                                <i class="bi bi-star-fill stat-icon text-warning"></i>
+                                <h3 class="mt-2" th:text="${productosDestacados}">0</h3>
+                                <p class="text-muted mb-0">Destacados</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card card-stat text-center">
+                            <div class="card-body">
+                                <i class="bi bi-check-circle stat-icon text-success"></i>
+                                <h3 class="mt-2" th:text="${productosActivos}">0</h3>
+                                <p class="text-muted mb-0">Activos</p>
                             </div>
                         </div>
                     </div>
@@ -142,19 +166,24 @@
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-3 mb-3">
                                         <a href="/admin/products/new" class="btn btn-primary w-100">
                                             <i class="bi bi-plus-circle me-2"></i>Nuevo Producto
                                         </a>
                                     </div>
-                                    <div class="col-md-4 mb-3">
-                                        <a href="/admin/contacts" class="btn btn-success w-100">
-                                            <i class="bi bi-envelope me-2"></i>Ver Consultas
+                                    <div class="col-md-3 mb-3">
+                                        <a href="/admin/categories" class="btn btn-warning w-100">
+                                            <i class="bi bi-tags me-2"></i>Gestionar Categorías
                                         </a>
                                     </div>
-                                    <div class="col-md-4 mb-3">
-                                        <a href="/admin/settings" class="btn btn-info w-100">
-                                            <i class="bi bi-gear me-2"></i>Configuración
+                                    <div class="col-md-3 mb-3">
+                                        <a href="/admin/colors" class="btn btn-secondary w-100">
+                                            <i class="bi bi-palette me-2"></i>Gestionar Colores
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <a href="/admin/contacts" class="btn btn-success w-100">
+                                            <i class="bi bi-envelope me-2"></i>Ver Consultas
                                         </a>
                                     </div>
                                 </div>

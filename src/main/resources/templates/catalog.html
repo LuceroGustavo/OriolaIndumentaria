@@ -1,70 +1,77 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Catálogo de Productos - ORIOLA</title>
+    <title>Catálogo de Productos - Orioladenim</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/lovely-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-oriola fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="bi bi-heart-fill me-2"></i>ORIOLA
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/catalog">Catálogo</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/about">Sobre Nosotros</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/contact">Contacto</a>
-                    </li>
-                    <!-- Redes Sociales -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://www.facebook.com/oriolaindumentaria" target="_blank" title="Síguenos en Facebook">
-                            <i class="bi bi-facebook"></i>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://www.instagram.com/oriolaindumentaria" target="_blank" title="Síguenos en Instagram">
+    <!-- Header -->
+    <header class="header-container">
+        <div class="header-content">
+            <div class="header-top">
+                <a href="/" class="logo">Orioladenim</a>
+                
+                <div class="header-nav">
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="/" class="nav-link">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog" class="nav-link active">Catálogo</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a href="javascript:void(0)" class="nav-link dropdown-toggle">Categorías</a>
+                            <div class="dropdown-menu">
+                                <a href="/catalog?category=REMERAS" class="dropdown-item">Remeras</a>
+                                <a href="/catalog?category=PANTALONES" class="dropdown-item">Pantalones</a>
+                                <a href="/catalog?category=CAMISAS" class="dropdown-item">Camisas</a>
+                                <a href="/catalog?category=BUZOS" class="dropdown-item">Buzos</a>
+                                <a href="/catalog?category=VESTIDOS" class="dropdown-item">Vestidos</a>
+                                <a href="/catalog?category=SHORTS" class="dropdown-item">Shorts</a>
+                                <a href="/catalog?category=CHOMBAS" class="dropdown-item">Chombas</a>
+                                <a href="/catalog" class="dropdown-item">Ver Todo</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="header-actions">
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="Buscar productos...">
+                    </div>
+                    <div class="header-icons">
+                        <a href="https://www.instagram.com/oriolaindumentaria" class="header-icon" title="Instagram" target="_blank">
                             <i class="bi bi-instagram"></i>
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/login">
-                            <i class="bi bi-gear me-1"></i>Admin
+                        <a href="https://www.facebook.com/oriolaindumentaria" class="header-icon" title="Facebook" target="_blank">
+                            <i class="bi bi-facebook"></i>
                         </a>
-                    </li>
-                </ul>
+                        <a href="https://wa.me/5491159293920" class="header-icon" title="WhatsApp" target="_blank">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
+                        <a href="/admin/login" class="header-icon" title="Administración">
+                            <i class="bi bi-gear"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Header del Catálogo Moderno -->
-    <div class="catalog-header">
+    <!-- Título del Catálogo -->
+    <section class="catalog-title-section">
         <div class="container">
-            <h1>Nuestro Catálogo</h1>
-            <p>Descubre nuestra colección completa de indumentaria con estilo</p>
+            <h1 class="catalog-title">Catálogo</h1>
         </div>
-    </div>
+    </section>
 
     <!-- Filtros Modernos -->
-    <div class="container">
+        <div class="container">
         <div class="filters">
             <div class="filter-group">
                 <span style="font-weight: 600; margin-right: 10px;">Filtros:</span>
@@ -95,102 +102,50 @@
         </div>
     </div>
 
-    <!-- Productos Grid Moderno -->
-    <div class="container">
-        <div class="product-grid">
-            <div class="product-card" th:each="product : ${products}" th:data-category="${product.categoria}">
-                <div class="product-image-container">
-                    <img th:if="${product.getImagenPrincipal() != null}" 
-                         th:src="${product.getImagenPrincipalUrl()}" 
-                         th:alt="${product.name}"
-                         class="product-image">
-                    <div th:if="${product.getImagenPrincipal() == null}" class="product-image-placeholder">
-                        <i class="bi bi-image"></i>
-                    </div>
-                    
-                    <!-- Badges -->
-                    <div class="product-badge" th:if="${product.esNuevo}" th:classappend="'new'">Nuevo</div>
-                    <div class="product-badge" th:if="${product.tieneDescuento()}" th:classappend="'sale'">Oferta</div>
-                    <div class="product-badge" th:if="${product.esDestacado}" th:classappend="'trending'">Destacado</div>
-                    
-                    <!-- Acciones -->
-                    <div class="product-actions">
-                        <button class="action-btn" title="Favoritos" th:onclick="'toggleFavorite(' + ${product.pId} + ')'">
-                            <i class="far fa-heart"></i>
-                        </button>
-                        <button class="action-btn" title="Vista rápida" th:onclick="'quickView(' + ${product.pId} + ')'">
-                            <i class="far fa-eye"></i>
-                        </button>
-                        <a th:href="@{/product/{id}(id=${product.pId})}" class="action-btn" title="Ver detalle">
-                            <i class="fas fa-shopping-cart"></i>
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="product-info">
-                    <!-- Fila con marca y colores -->
-                    <div class="product-header">
-                        <div class="product-brand">ORIOLA</div>
-                        <!-- Colores disponibles -->
-                        <div class="product-colors" th:if="${product.coloresDisponibles != null and !#strings.isEmpty(product.coloresDisponibles)}">
-                            <div th:each="color, iterStat : ${#strings.arraySplit(product.coloresDisponibles, ',')}" 
-                                 th:classappend="${iterStat.first} ? 'active' : ''"
-                                 th:style="'background-color: ' + ${#strings.trim(color)} + ';'"
-                                 class="color-option"
-                                 th:title="${#strings.trim(color)}">
+    <!-- Products Section -->
+    <section class="products-section">
+        <div class="container">
+            <div class="products-grid">
+                <div th:each="product : ${products}" class="product-card">
+                    <a th:href="@{/product/{id}(id=${product.pId})}" class="text-decoration-none text-dark">
+                        <div class="product-image-container">
+                            <img th:src="${product.images != null and !product.images.empty ? '/uploads/' + product.images[0].imagePath : 'https://via.placeholder.com/350x350/f8f9fa/666666?text=Orioladenim'}" 
+                                 th:alt="${product.name}" class="product-image">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name" th:text="${product.name}">Nombre del Producto</h3>
+                            <div class="product-price">
+                                <span th:if="${product.precioOriginal != null and product.precioOriginal > product.price}" 
+                                      class="product-price-original" th:text="'$' + ${#numbers.formatDecimal(product.precioOriginal, 0, 0)}">$0</span>
+                                <span th:text="'$' + ${#numbers.formatDecimal(product.price, 0, 0)}">$0</span>
+                                <span th:if="${product.descuentoPorcentaje != null and product.descuentoPorcentaje > 0}" 
+                                      class="product-discount" th:text="'-' + ${#numbers.formatDecimal(product.descuentoPorcentaje, 0, 0)} + '%'">-0%</span>
+                            </div>
+                            <div class="product-colors" th:if="${product.coloresDisponibles != null and !#strings.isEmpty(product.coloresDisponibles)}">
+                                <div th:each="color : ${#strings.arraySplit(product.coloresDisponibles, ',')}" 
+                                     class="color-dot" 
+                                     th:style="'background-color: ' + ${color.trim()}" 
+                                     th:title="${color.trim()}"></div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <h3 class="product-title" th:text="${product.name}">Producto</h3>
-                    
-                    <div class="product-price">
-                        <span class="current-price" th:text="'$' + ${#numbers.formatDecimal(product.getPrecioFinal(), 0, 'COMMA', 2, 'POINT')}">$0</span>
-                        <span th:if="${product.tieneDescuento()}" 
-                              class="original-price" 
-                              th:text="'$' + ${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}">$0</span>
-                        <span th:if="${product.tieneDescuento()}" 
-                              class="discount-percent" 
-                              th:text="'-' + ${#numbers.formatDecimal(product.descuentoPorcentaje, 0, 'COMMA', 0, 'POINT')} + '%'">-0%</span>
-                    </div>
-                    
-                    <!-- Rating simulado -->
-                    <div class="product-rating">
-                        <div class="stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                        </div>
-                        <span class="rating-text">(4.2)</span>
-                    </div>
-                    
-                    <!-- Tags -->
-                    <div class="product-tags">
-                        <span th:if="${product.esNuevo}" class="tag new">Nuevo</span>
-                        <span th:if="${product.tieneDescuento()}" class="tag sale">Oferta</span>
-                        <span th:if="${product.esDestacado}" class="tag trending">Destacado</span>
-                        <span th:if="${product.qty > 0}" class="tag">En Stock</span>
-                        <span th:if="${product.qty == 0}" class="tag" style="background: #ff4757; color: white;">Sin Stock</span>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
             
-        <!-- Mensaje si no hay productos -->
-        <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
-            <div class="empty-state">
+            <!-- Mensaje si no hay productos -->
+            <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
+                <div class="empty-state">
                 <i class="bi bi-box-seam" style="font-size: 5rem; color: #667eea; margin-bottom: 2rem;"></i>
-                <h3>No hay productos disponibles</h3>
-                <p class="text-muted">Pronto agregaremos nuevos productos a nuestro catálogo.</p>
-                <a href="/" class="btn btn-oriola mt-3">
-                    <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
-                </a>
+                    <h3>No hay productos disponibles</h3>
+                    <p class="text-muted">Pronto agregaremos nuevos productos a nuestro catálogo.</p>
+                    <a href="/" class="btn btn-oriola mt-3">
+                        <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
 
     <!-- Paginación -->
     <section class="py-4" style="background: white;">
@@ -237,62 +192,84 @@
         </div>
     </section>
 
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/5491159293920?text=Hola!%20Me%20interesa%20conocer%20más%20sobre%20sus%20productos" 
+       class="whatsapp-button" target="_blank">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+
     <!-- Footer -->
-    <footer class="footer-oriola">
-        <div class="container">
+    <footer class="footer">
+        <div class="footer-content">
             <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5><i class="bi bi-heart-fill me-2"></i>ORIOLA</h5>
-                    <p>Indumentaria con estilo y personalidad. Cada prenda está diseñada para que te sientas único y cómodo.</p>
-                    <div class="social-links">
-                        <a href="#" class="me-3"><i class="bi bi-instagram fs-4"></i></a>
-                        <a href="#" class="me-3"><i class="bi bi-facebook fs-4"></i></a>
-                        <a href="#" class="me-3"><i class="bi bi-whatsapp fs-4"></i></a>
-                        <a href="#"><i class="bi bi-envelope fs-4"></i></a>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h3 class="footer-title">Orioladenim</h3>
+                        <p>Indumentaria premium con estilo único. Calidad y diseño en cada prenda.</p>
                     </div>
                 </div>
-                <div class="col-md-2 mb-4">
-                    <h5>Enlaces</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="/">Inicio</a></li>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h3 class="footer-title">Enlaces</h3>
+                        <ul class="footer-links">
                         <li><a href="/catalog">Catálogo</a></li>
                         <li><a href="/about">Sobre Nosotros</a></li>
                         <li><a href="/contact">Contacto</a></li>
                     </ul>
                 </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Contacto</h5>
-                    <ul class="list-unstyled">
-                        <li><i class="bi bi-geo-alt me-2"></i>Buenos Aires, Argentina</li>
-                        <li><i class="bi bi-telephone me-2"></i>+54 9 11 1234-5678</li>
-                        <li><i class="bi bi-envelope me-2"></i>info@oriola.com</li>
-                    </ul>
                 </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Newsletter</h5>
-                    <p>Suscríbete para recibir ofertas exclusivas</p>
-                    <div class="input-group">
-                        <input type="email" class="form-control" placeholder="Tu email">
-                        <button class="btn btn-oriola" type="button">
-                            <i class="bi bi-send"></i>
-                        </button>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h3 class="footer-title">Contacto</h3>
+                        <ul class="footer-links">
+                            <li><a href="https://wa.me/5491159293920">WhatsApp</a></li>
+                            <li><a href="mailto:info@orioladenim.com.ar">Email</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
-            <hr class="my-4">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; 2025 ORIOLA. Todos los derechos reservados.</p>
-                </div>
-                <div class="col-md-6 text-end">
-                    <small>Hecho con <i class="bi bi-heart-fill text-danger"></i> en Argentina</small>
-                </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Orioladenim. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/whatsapp.js"></script>
+    <script>
+        // Dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdowns = document.querySelectorAll('.dropdown');
+            
+            dropdowns.forEach(dropdown => {
+                const toggle = dropdown.querySelector('.dropdown-toggle');
+                
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Close other dropdowns
+                    dropdowns.forEach(otherDropdown => {
+                        if (otherDropdown !== dropdown) {
+                            otherDropdown.classList.remove('active');
+                        }
+                    });
+                    
+                    // Toggle current dropdown
+                    dropdown.classList.toggle('active');
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown')) {
+                    dropdowns.forEach(dropdown => {
+                        dropdown.classList.remove('active');
+                    });
+                }
+            });
+        });
+    </script>
     <script>
         // Efecto de scroll en navbar
         window.addEventListener('scroll', function() {

@@ -9,19 +9,66 @@
     <link th:href="@{/css/style.css}" rel="stylesheet">
 </head>
 <body>
-    <div th:replace="~{admin/layout :: header}"></div>
-    
-    <div class="container-fluid">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/admin/dashboard">
+                <i class="bi bi-palette me-2"></i>ORIOLA - Colores
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/admin/dashboard">
+                    <i class="bi bi-arrow-left me-1"></i>Volver al Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
         <div class="row">
-            <div th:replace="~{admin/layout :: sidebar}"></div>
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky pt-3">
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Administración</span>
+                    </h6>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/dashboard">
+                                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/products">
+                                <i class="bi bi-box-seam me-2"></i>Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/admin/categories">
+                                <i class="bi bi-tags me-2"></i>Categorías
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/admin/colors">
+                                <i class="bi bi-palette me-2"></i>Colores
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/contacts">
+                                <i class="bi bi-envelope me-2"></i>Consultas
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
             
+            <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">
                         <i class="bi bi-palette me-2"></i>Gestión de Colores
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
-                        <a th:href="@{/admin/colors/new}" class="btn btn-oriola">
+                        <a th:href="@{/admin/colors/new}" class="btn btn-primary">
                             <i class="bi bi-plus-circle me-1"></i>Nuevo Color
                         </a>
                     </div>
@@ -38,99 +85,6 @@
                     <i class="bi bi-exclamation-triangle me-2"></i>
                     <span th:text="${error}"></span>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-
-                <!-- Filtros y búsqueda -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <form method="get" class="row g-3">
-                            <div class="col-md-6">
-                                <label for="search" class="form-label">Buscar colores</label>
-                                <input type="text" class="form-control" id="search" name="search" 
-                                       th:value="${search}" placeholder="Nombre, descripción o código hexadecimal...">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="sortBy" class="form-label">Ordenar por</label>
-                                <select class="form-select" id="sortBy" name="sortBy">
-                                    <option value="displayOrder" th:selected="${sortBy == 'displayOrder'}">Orden</option>
-                                    <option value="name" th:selected="${sortBy == 'name'}">Nombre</option>
-                                    <option value="productCount" th:selected="${sortBy == 'productCount'}">Productos</option>
-                                    <option value="createdAt" th:selected="${sortBy == 'createdAt'}">Fecha</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="sortDir" class="form-label">Dirección</label>
-                                <select class="form-select" id="sortDir" name="sortDir">
-                                    <option value="asc" th:selected="${sortDir == 'asc'}">Ascendente</option>
-                                    <option value="desc" th:selected="${sortDir == 'desc'}">Descendente</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-outline-oriola">
-                                    <i class="bi bi-search me-1"></i>Buscar
-                                </button>
-                                <a th:href="@{/admin/colors}" class="btn btn-outline-secondary ms-2">
-                                    <i class="bi bi-arrow-clockwise me-1"></i>Limpiar
-                                </a>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Estadísticas -->
-                <div class="row mb-4">
-                    <div class="col-md-3">
-                        <div class="card bg-primary text-white">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h6 class="card-title">Total Colores</h6>
-                                        <h3 th:text="${totalItems}">0</h3>
-                                    </div>
-                                    <i class="bi bi-palette fs-1"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-success text-white">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h6 class="card-title">Activos</h6>
-                                        <h3 th:text="${colors != null ? colors.content.size() : 0}">0</h3>
-                                    </div>
-                                    <i class="bi bi-check-circle fs-1"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-warning text-white">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h6 class="card-title">Con Productos</h6>
-                                        <h3 th:text="${colors != null ? colors.content.size() : 0}">0</h3>
-                                    </div>
-                                    <i class="bi bi-box fs-1"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-info text-white">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h6 class="card-title">Páginas</h6>
-                                        <h3 th:text="${totalPages}">0</h3>
-                                    </div>
-                                    <i class="bi bi-file-text fs-1"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Lista de colores -->
@@ -211,111 +165,17 @@
                             </table>
                         </div>
                         
-                        <div th:if="${searchResults != null and !searchResults.isEmpty()}" class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Orden</th>
-                                        <th>Color</th>
-                                        <th>Nombre</th>
-                                        <th>Descripción</th>
-                                        <th>Código Hex</th>
-                                        <th>Productos</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="color : ${searchResults}">
-                                        <td>
-                                            <span class="badge bg-secondary" th:text="${color.displayOrder}">1</span>
-                                        </td>
-                                        <td>
-                                            <div class="color-preview" 
-                                                 th:style="'background-color: ' + ${color.hexCode} + '; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #dee2e6;'"
-                                                 th:title="${color.name}"></div>
-                                        </td>
-                                        <td>
-                                            <strong th:text="${color.name}">Color</strong>
-                                        </td>
-                                        <td th:text="${color.description}">Descripción</td>
-                                        <td>
-                                            <code th:text="'#' + ${color.hexCode}">#FF6B6B</code>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-info" th:text="${color.productCount}">0</span>
-                                        </td>
-                                        <td>
-                                            <span th:if="${color.isActive}" class="badge bg-success">Activo</span>
-                                            <span th:unless="${color.isActive}" class="badge bg-secondary">Inactivo</span>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group" role="group">
-                                                <a th:href="@{/admin/colors/view/{id}(id=${color.id})}" 
-                                                   class="btn btn-sm btn-outline-info" title="Ver">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
-                                                <a th:href="@{/admin/colors/edit/{id}(id=${color.id})}" 
-                                                   class="btn btn-sm btn-outline-primary" title="Editar">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                <form th:action="@{/admin/colors/toggle-status/{id}(id=${color.id})}" 
-                                                      method="post" class="d-inline">
-                                                    <button type="submit" 
-                                                            th:class="'btn btn-sm ' + (${color.isActive} ? 'btn-outline-warning' : 'btn-outline-success')"
-                                                            th:title="${color.isActive} ? 'Desactivar' : 'Activar'">
-                                                        <i th:class="'bi ' + (${color.isActive} ? 'bi-pause' : 'bi-play')"></i>
-                                                    </button>
-                                                </form>
-                                                <form th:action="@{/admin/colors/delete/{id}(id=${color.id})}" 
-                                                      method="post" class="d-inline"
-                                                      onsubmit="return confirm('¿Estás seguro de eliminar este color?')">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <div th:if="${colors != null and colors.content.isEmpty() and searchResults == null}" 
+                        <div th:if="${colors != null and colors.content.isEmpty()}" 
                              class="text-center py-5">
                             <i class="bi bi-palette fs-1 text-muted"></i>
                             <h5 class="text-muted mt-3">No hay colores registrados</h5>
                             <p class="text-muted">Comienza creando tu primer color</p>
-                            <a th:href="@{/admin/colors/new}" class="btn btn-oriola">
+                            <a th:href="@{/admin/colors/new}" class="btn btn-primary">
                                 <i class="bi bi-plus-circle me-1"></i>Crear Primer Color
                             </a>
                         </div>
-                        
-                        <div th:if="${searchResults != null and searchResults.isEmpty()}" 
-                             class="text-center py-5">
-                            <i class="bi bi-search fs-1 text-muted"></i>
-                            <h5 class="text-muted mt-3">No se encontraron resultados</h5>
-                            <p class="text-muted">Intenta con otros términos de búsqueda</p>
-                        </div>
                     </div>
                 </div>
-
-                <!-- Paginación -->
-                <nav th:if="${colors != null and colors.totalPages > 1}" aria-label="Paginación de colores">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                            <a class="page-link" th:href="@{/admin/colors(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search})}">Anterior</a>
-                        </li>
-                        <li class="page-item" th:each="i : ${#numbers.sequence(0, colors.totalPages - 1)}" 
-                            th:classappend="${i == currentPage} ? 'active'">
-                            <a class="page-link" th:href="@{/admin/colors(page=${i}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search})}" 
-                               th:text="${i + 1}">1</a>
-                        </li>
-                        <li class="page-item" th:classappend="${currentPage == colors.totalPages - 1} ? 'disabled'">
-                            <a class="page-link" th:href="@{/admin/colors(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search})}">Siguiente</a>
-                        </li>
-                    </ul>
-                </nav>
             </main>
         </div>
     </div>

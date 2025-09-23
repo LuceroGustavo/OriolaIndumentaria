@@ -16,8 +16,17 @@ public class PublicController {
     
     @GetMapping("/")
     public String home(Model model) {
-        // Obtener productos destacados para la página principal
-        model.addAttribute("featuredProducts", productRepository.findAll());
+        // Obtener productos destacados, si no hay ninguno, mostrar los primeros 6 productos
+        var productosDestacados = productRepository.findByEsDestacadoTrueAndActivoTrue();
+        
+        if (productosDestacados.isEmpty()) {
+            // Si no hay productos destacados, mostrar los primeros 6 productos activos
+            model.addAttribute("products", productRepository.findByActivoTrue().stream().limit(6).toList());
+        } else {
+            // Mostrar productos destacados (máximo 6)
+            model.addAttribute("products", productosDestacados.stream().limit(6).toList());
+        }
+        
         return "index";
     }
     
