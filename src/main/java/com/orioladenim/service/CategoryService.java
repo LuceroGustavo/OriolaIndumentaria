@@ -229,13 +229,18 @@ public class CategoryService {
             return;
         }
         
-        // Crear categorías por defecto
+        // Crear categorías por defecto (solo tipos de prenda, no géneros ni temporadas)
         Category[] defaultCategories = {
+            // CATEGORÍAS POR TIPO DE PRENDA
             new Category("Remeras", "Camisetas de algodón, básicas y estampadas para todas las temporadas"),
             new Category("Pantalones de Jean", "Jeans clásicos y modernos, diferentes cortes y lavados"),
             new Category("Buzos", "Buzos con capucha, oversize y básicos para invierno"),
             new Category("Camperas", "Abrigos y camperas para todas las estaciones"),
             new Category("Shorts", "Shorts de jean, básicos y desgastados para el verano"),
+            new Category("Vestidos", "Vestidos casuales y formales para mujer"),
+            new Category("Accesorios", "Cinturones, gorras, bolsos y otros accesorios"),
+            
+            // CATEGORÍA ESPECIAL
             new Category("Sin Categoría", "Productos sin clasificar temporalmente")
         };
         

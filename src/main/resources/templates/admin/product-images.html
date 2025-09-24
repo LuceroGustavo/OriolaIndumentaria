@@ -56,8 +56,8 @@
                                 <p class="text-muted" th:text="${product.descripcion}">Descripción del producto</p>
                             </div>
                             <div class="col-md-4 text-end">
-                                <span class="badge bg-primary" th:text="${product.categoria}">Categoría</span>
-                                <span class="badge bg-success ms-2" th:text="${product.talle}">Talle</span>
+                                <span class="badge bg-primary" th:text="${product.getCategoriasComoTexto()}">Categorías</span>
+                                <span class="badge bg-success ms-2" th:text="${product.getTemporadasComoTexto()}">Temporadas</span>
                             </div>
                         </div>
 

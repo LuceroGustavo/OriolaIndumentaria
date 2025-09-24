@@ -21,11 +21,13 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     // Buscar productos nuevos y activos
     List<Product> findByEsNuevoTrueAndActivoTrue();
     
-    // Buscar productos por género
-    List<Product> findByGeneroAndActivoTrue(String genero);
+    // Buscar productos por género (usando la nueva relación Many-to-Many)
+    @Query("SELECT p FROM Product p JOIN p.generos g WHERE g = :genero AND p.activo = true")
+    List<Product> findByGeneroAndActivoTrue(@Param("genero") String genero);
     
-    // Buscar productos por temporada
-    List<Product> findByTemporadaAndActivoTrue(String temporada);
+    // Buscar productos por temporada (usando la nueva relación Many-to-Many)
+    @Query("SELECT p FROM Product p JOIN p.temporadas t WHERE t = :temporada AND p.activo = true")
+    List<Product> findByTemporadaAndActivoTrue(@Param("temporada") String temporada);
     
     // Buscar productos con descuento
     @Query("SELECT p FROM Product p WHERE p.descuentoPorcentaje > 0 AND p.activo = true")

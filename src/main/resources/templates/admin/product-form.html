@@ -112,6 +112,76 @@
         .talle-option.selected:hover {
             background-color: #e9ecef;
         }
+        
+        /* Estilos para chips de géneros */
+        .genero-chip {
+            display: inline-block;
+            background: #fd7e14;
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            margin: 0.25rem;
+            cursor: default;
+        }
+        
+        .genero-chip .remove-btn {
+            cursor: pointer;
+            margin-left: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .genero-chip .remove-btn:hover {
+            color: #ffc107;
+        }
+        
+        .genero-option:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .genero-option.selected {
+            background-color: #e9ecef;
+            color: #6c757d;
+        }
+        
+        .genero-option.selected:hover {
+            background-color: #e9ecef;
+        }
+        
+        /* Estilos para chips de temporadas */
+        .temporada-chip {
+            display: inline-block;
+            background: #20c997;
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            margin: 0.25rem;
+            cursor: default;
+        }
+        
+        .temporada-chip .remove-btn {
+            cursor: pointer;
+            margin-left: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .temporada-chip .remove-btn:hover {
+            color: #ffc107;
+        }
+        
+        .temporada-option:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .temporada-option.selected {
+            background-color: #e9ecef;
+            color: #6c757d;
+        }
+        
+        .temporada-option.selected:hover {
+            background-color: #e9ecef;
+        }
     </style>
 </head>
 <body>
@@ -365,28 +435,84 @@
                                         </div>
                                     </div>
 
+                                    <!-- Selección múltiple de géneros y temporadas -->
                                     <div class="row mb-4">
                                         <div class="col-md-6">
-                                            <label for="genero" class="form-label">Género</label>
-                                            <select class="form-select" id="genero" th:field="*{genero}">
-                                                <option value="">Seleccionar género</option>
-                                                <option value="MUJER">Mujer</option>
-                                                <option value="HOMBRE">Hombre</option>
-                                                <option value="UNISEX">Unisex</option>
-                                            </select>
+                                            <label for="generos" class="form-label">
+                                                Géneros
+                                                <i class="bi bi-question-circle text-primary ms-1" 
+                                                   data-bs-toggle="tooltip" 
+                                                   data-bs-placement="top" 
+                                                   title="Selecciona uno o más géneros para este producto"></i>
+                                            </label>
+                                            
+                                            <!-- Géneros seleccionados (chips) -->
+                                            <div id="selected-generos" class="mb-2" style="min-height: 40px; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 8px; background-color: #f8f9fa;">
+                                                <div id="no-generos" class="text-muted small">
+                                                    <i class="bi bi-info-circle me-1"></i>Haz clic en los géneros de abajo para seleccionarlos
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Dropdown de géneros disponibles -->
+                                            <div class="dropdown">
+                                                <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="generoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="bi bi-plus-circle me-1"></i>Agregar géneros
+                                                </button>
+                                                <ul class="dropdown-menu w-100" aria-labelledby="generoDropdown">
+                                                    <li th:each="genero : ${generos}">
+                                                        <a class="dropdown-item genero-option" 
+                                                           th:data-genero-name="${genero.name()}" 
+                                                           th:data-genero-display="${genero.displayName}"
+                                                           href="javascript:void(0)">
+                                                            <i class="bi bi-person me-2"></i>
+                                                            <span th:text="${genero.displayName}"></span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            
+                                            <!-- Input oculto para enviar los nombres -->
+                                            <input type="hidden" id="generoNames" name="generoNames" value="">
                                         </div>
+                                        
                                         <div class="col-md-6">
-                                            <label for="temporada" class="form-label">Temporada</label>
-                                            <select class="form-select" id="temporada" th:field="*{temporada}">
-                                                <option value="">Seleccionar temporada</option>
-                                                <option value="VERANO">Verano</option>
-                                                <option value="INVIERNO">Invierno</option>
-                                                <option value="PRIMAVERA">Primavera</option>
-                                                <option value="OTONO">Otoño</option>
-                                                <option value="TODO_EL_ANO">Todo el año</option>
-                                            </select>
+                                            <label for="temporadas" class="form-label">
+                                                Temporadas
+                                                <i class="bi bi-question-circle text-primary ms-1" 
+                                                   data-bs-toggle="tooltip" 
+                                                   data-bs-placement="top" 
+                                                   title="Selecciona una o más temporadas para este producto"></i>
+                                            </label>
+                                            
+                                            <!-- Temporadas seleccionadas (chips) -->
+                                            <div id="selected-temporadas" class="mb-2" style="min-height: 40px; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 8px; background-color: #f8f9fa;">
+                                                <div id="no-temporadas" class="text-muted small">
+                                                    <i class="bi bi-info-circle me-1"></i>Haz clic en las temporadas de abajo para seleccionarlas
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Dropdown de temporadas disponibles -->
+                                            <div class="dropdown">
+                                                <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="temporadaDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="bi bi-plus-circle me-1"></i>Agregar temporadas
+                                                </button>
+                                                <ul class="dropdown-menu w-100" aria-labelledby="temporadaDropdown">
+                                                    <li th:each="temporada : ${temporadas}">
+                                                        <a class="dropdown-item temporada-option" 
+                                                           th:data-temporada-name="${temporada.name()}" 
+                                                           th:data-temporada-display="${temporada.displayName}"
+                                                           href="javascript:void(0)">
+                                                            <i class="bi bi-calendar me-2"></i>
+                                                            <span th:text="${temporada.displayName}"></span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            
+                                            <!-- Input oculto para enviar los nombres -->
+                                            <input type="hidden" id="temporadaNames" name="temporadaNames" value="">
                                         </div>
-            </div>
+                                    </div>
             
                                     <div class="row mb-4">
                                         <div class="col-md-6">
@@ -456,26 +582,34 @@
                                         <div class="row g-2">
                                             <div class="col-12">
                                                 <div class="p-2 bg-light rounded">
-                                                    <strong>Campera de Corderoy:</strong><br>
-                                                    <small class="text-muted">Camperas + Invierno + Casual</small>
-                                                </div>
-                                            </div>
-                                            <div class="col-12">
-                                                <div class="p-2 bg-light rounded">
-                                                    <strong>Remera Básica:</strong><br>
-                                                    <small class="text-muted">Remeras + Verano + Básico</small>
+                                                    <strong>Musculosa Verano:</strong><br>
+                                                    <small class="text-muted">Categorías: Remeras, Verano<br>
+                                                    Géneros: Niño, Niña, Unisex<br>
+                                                    Temporadas: Verano, Primavera</small>
                                                 </div>
                                             </div>
                                             <div class="col-12">
                                                 <div class="p-2 bg-light rounded">
                                                     <strong>Jean Clásico:</strong><br>
-                                                    <small class="text-muted">Pantalones de Jean + Todo el año + Clásico</small>
+                                                    <small class="text-muted">Categorías: Pantalones de Jean<br>
+                                                    Géneros: Hombre, Mujer<br>
+                                                    Temporadas: Todo el año</small>
                                                 </div>
                                             </div>
                                             <div class="col-12">
                                                 <div class="p-2 bg-light rounded">
                                                     <strong>Buzo Oversize:</strong><br>
-                                                    <small class="text-muted">Buzos + Invierno + Oversize</small>
+                                                    <small class="text-muted">Categorías: Buzos, Invierno<br>
+                                                    Géneros: Hombre, Mujer, Unisex<br>
+                                                    Temporadas: Invierno, Otoño</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="p-2 bg-light rounded">
+                                                    <strong>Vestido Casual:</strong><br>
+                                                    <small class="text-muted">Categorías: Vestidos, Primavera<br>
+                                                    Géneros: Mujer<br>
+                                                    Temporadas: Primavera, Verano</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -484,7 +618,7 @@
                                     <div class="alert alert-info py-2">
                                         <small class="mb-0">
                                             <i class="bi bi-info-circle me-1"></i>
-                                            <strong>Tip:</strong> Un producto puede tener múltiples categorías para mejor organización y búsqueda.
+                                            <strong>Tip:</strong> Un producto puede tener múltiples categorías, géneros y temporadas para mejor organización y búsqueda.
                                         </small>
                                     </div>
                                 </div>
@@ -517,6 +651,8 @@
         let selectedCategories = [];
         let selectedColors = [];
         let selectedTalles = [];
+        let selectedGeneros = [];
+        let selectedTemporadas = [];
         
         document.addEventListener('DOMContentLoaded', function() {
             // Inicializar tooltips
@@ -690,6 +826,112 @@
             document.getElementById('talleNames').value = talleNames;
         }
 
+        // Funciones para géneros
+        function addGenero(generoName, generoDisplay) {
+            if (!selectedGeneros.find(genero => genero.name === generoName)) {
+                selectedGeneros.push({ name: generoName, display: generoDisplay });
+                updateGeneroDisplay();
+                updateGeneroHiddenInput();
+                updateGeneroDropdownOptions();
+            }
+        }
+
+        function removeGenero(generoName) {
+            selectedGeneros = selectedGeneros.filter(genero => genero.name !== generoName);
+            updateGeneroDisplay();
+            updateGeneroHiddenInput();
+            updateGeneroDropdownOptions();
+        }
+
+        function updateGeneroDisplay() {
+            const container = document.getElementById('selected-generos');
+            
+            if (selectedGeneros.length === 0) {
+                container.innerHTML = '<div id="no-generos" class="text-muted small"><i class="bi bi-info-circle me-1"></i>Haz clic en los géneros de abajo para seleccionarlos</div>';
+            } else {
+                container.innerHTML = selectedGeneros.map(genero => 
+                    '<span class="genero-chip">' +
+                        '<i class="bi bi-person me-1"></i>' + genero.display +
+                        '<span class="remove-btn" data-genero-name="' + genero.name + '">×</span>' +
+                    '</span>'
+                ).join('');
+            }
+        }
+
+        function updateGeneroDropdownOptions() {
+            document.querySelectorAll('.genero-option').forEach(option => {
+                const generoName = option.getAttribute('data-genero-name');
+                const generoDisplay = option.getAttribute('data-genero-display');
+                const isSelected = selectedGeneros.find(genero => genero.name === generoName);
+                
+                if (isSelected) {
+                    option.classList.add('selected');
+                    option.innerHTML = '<i class="bi bi-check-circle me-2 text-success"></i><span>' + generoDisplay + '</span>';
+                } else {
+                    option.classList.remove('selected');
+                    option.innerHTML = '<i class="bi bi-person me-2"></i><span>' + generoDisplay + '</span>';
+                }
+            });
+        }
+
+        function updateGeneroHiddenInput() {
+            const generoNames = selectedGeneros.map(genero => genero.name).join(',');
+            document.getElementById('generoNames').value = generoNames;
+        }
+
+        // Funciones para temporadas
+        function addTemporada(temporadaName, temporadaDisplay) {
+            if (!selectedTemporadas.find(temporada => temporada.name === temporadaName)) {
+                selectedTemporadas.push({ name: temporadaName, display: temporadaDisplay });
+                updateTemporadaDisplay();
+                updateTemporadaHiddenInput();
+                updateTemporadaDropdownOptions();
+            }
+        }
+
+        function removeTemporada(temporadaName) {
+            selectedTemporadas = selectedTemporadas.filter(temporada => temporada.name !== temporadaName);
+            updateTemporadaDisplay();
+            updateTemporadaHiddenInput();
+            updateTemporadaDropdownOptions();
+        }
+
+        function updateTemporadaDisplay() {
+            const container = document.getElementById('selected-temporadas');
+            
+            if (selectedTemporadas.length === 0) {
+                container.innerHTML = '<div id="no-temporadas" class="text-muted small"><i class="bi bi-info-circle me-1"></i>Haz clic en las temporadas de abajo para seleccionarlas</div>';
+            } else {
+                container.innerHTML = selectedTemporadas.map(temporada => 
+                    '<span class="temporada-chip">' +
+                        '<i class="bi bi-calendar me-1"></i>' + temporada.display +
+                        '<span class="remove-btn" data-temporada-name="' + temporada.name + '">×</span>' +
+                    '</span>'
+                ).join('');
+            }
+        }
+
+        function updateTemporadaDropdownOptions() {
+            document.querySelectorAll('.temporada-option').forEach(option => {
+                const temporadaName = option.getAttribute('data-temporada-name');
+                const temporadaDisplay = option.getAttribute('data-temporada-display');
+                const isSelected = selectedTemporadas.find(temporada => temporada.name === temporadaName);
+                
+                if (isSelected) {
+                    option.classList.add('selected');
+                    option.innerHTML = '<i class="bi bi-check-circle me-2 text-success"></i><span>' + temporadaDisplay + '</span>';
+                } else {
+                    option.classList.remove('selected');
+                    option.innerHTML = '<i class="bi bi-calendar me-2"></i><span>' + temporadaDisplay + '</span>';
+                }
+            });
+        }
+
+        function updateTemporadaHiddenInput() {
+            const temporadaNames = selectedTemporadas.map(temporada => temporada.name).join(',');
+            document.getElementById('temporadaNames').value = temporadaNames;
+        }
+
         // Event delegation para manejar todos los clicks
         document.addEventListener('click', function(e) {
             // Click en opciones del dropdown de categorías
@@ -722,6 +964,26 @@
                 return;
             }
             
+            // Click en opciones del dropdown de géneros
+            let generoOption = e.target.closest('.genero-option');
+            if (generoOption) {
+                e.preventDefault();
+                const generoName = generoOption.getAttribute('data-genero-name');
+                const generoDisplay = generoOption.getAttribute('data-genero-display');
+                addGenero(generoName, generoDisplay);
+                return;
+            }
+            
+            // Click en opciones del dropdown de temporadas
+            let temporadaOption = e.target.closest('.temporada-option');
+            if (temporadaOption) {
+                e.preventDefault();
+                const temporadaName = temporadaOption.getAttribute('data-temporada-name');
+                const temporadaDisplay = temporadaOption.getAttribute('data-temporada-display');
+                addTemporada(temporadaName, temporadaDisplay);
+                return;
+            }
+            
             // Click en botón de remover categoría
             if (e.target.classList.contains('remove-btn') && e.target.getAttribute('data-category-id')) {
                 e.preventDefault();
@@ -741,6 +1003,20 @@
                 e.preventDefault();
                 const talleName = e.target.getAttribute('data-talle-name');
                 removeTalle(talleName);
+            }
+            
+            // Click en botón de remover género
+            if (e.target.classList.contains('remove-btn') && e.target.getAttribute('data-genero-name')) {
+                e.preventDefault();
+                const generoName = e.target.getAttribute('data-genero-name');
+                removeGenero(generoName);
+            }
+            
+            // Click en botón de remover temporada
+            if (e.target.classList.contains('remove-btn') && e.target.getAttribute('data-temporada-name')) {
+                e.preventDefault();
+                const temporadaName = e.target.getAttribute('data-temporada-name');
+                removeTemporada(temporadaName);
             }
         });
 

@@ -34,10 +34,10 @@
                         <td th:text="${product.pId}"></td>
                         <td th:text="${product.name}"></td>
                         <td>
-                            <span th:if="${product.categoria}" class="badge bg-info" th:text="${product.categoria}"></span>
-                            <span th:unless="${product.categoria}" class="text-muted">Sin categoría</span>
+                            <span th:if="${product.categories != null and !product.categories.empty}" class="badge bg-info" th:text="${product.getCategoriasComoTexto()}"></span>
+                            <span th:unless="${product.categories != null and !product.categories.empty}" class="text-muted">Sin categoría</span>
                         </td>
-                        <td th:text="${product.talle}"></td>
+                        <td th:text="${product.getTemporadasComoTexto()}"></td>
                         <td>
                             <span th:if="${product.color}" th:text="${product.color}"></span>
                             <span th:unless="${product.color}" class="text-muted">-</span>

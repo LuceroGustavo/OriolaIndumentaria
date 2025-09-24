@@ -4,6 +4,8 @@ import com.orioladenim.entity.Product;
 import com.orioladenim.entity.Category;
 import com.orioladenim.entity.Color;
 import com.orioladenim.enums.Talle;
+import com.orioladenim.enums.Genero;
+import com.orioladenim.enums.Temporada;
 import com.orioladenim.repo.ProductRepository;
 import com.orioladenim.service.CategoryService;
 import com.orioladenim.service.ColorService;
@@ -41,6 +43,8 @@ public class ProductController {
         model.addAttribute("categories", categoryService.getActiveCategories());
         model.addAttribute("colors", colorService.getActiveColors());
         model.addAttribute("talles", Talle.values());
+        model.addAttribute("generos", Genero.values());
+        model.addAttribute("temporadas", Temporada.values());
         return "admin/product-form";
     }
 
@@ -49,12 +53,16 @@ public class ProductController {
                            @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
                            @RequestParam(value = "colorIds", required = false) List<Long> colorIds,
                            @RequestParam(value = "talleNames", required = false) List<String> talleNames,
+                           @RequestParam(value = "generoNames", required = false) List<String> generoNames,
+                           @RequestParam(value = "temporadaNames", required = false) List<String> temporadaNames,
                            BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("product", product);
             model.addAttribute("categories", categoryService.getActiveCategories());
             model.addAttribute("colors", colorService.getActiveColors());
             model.addAttribute("talles", Talle.values());
+            model.addAttribute("generos", Genero.values());
+            model.addAttribute("temporadas", Temporada.values());
             return "admin/product-form";
         }
         
@@ -90,6 +98,34 @@ public class ProductController {
             product.setTalles(selectedTalles);
         }
         
+        // Manejar géneros múltiples (enum)
+        if (generoNames != null && !generoNames.isEmpty()) {
+            List<Genero> selectedGeneros = new ArrayList<>();
+            for (String generoName : generoNames) {
+                try {
+                    Genero genero = Genero.valueOf(generoName);
+                    selectedGeneros.add(genero);
+                } catch (IllegalArgumentException e) {
+                    // Ignorar géneros inválidos
+                }
+            }
+            product.setGeneros(selectedGeneros);
+        }
+        
+        // Manejar temporadas múltiples (enum)
+        if (temporadaNames != null && !temporadaNames.isEmpty()) {
+            List<Temporada> selectedTemporadas = new ArrayList<>();
+            for (String temporadaName : temporadaNames) {
+                try {
+                    Temporada temporada = Temporada.valueOf(temporadaName);
+                    selectedTemporadas.add(temporada);
+                } catch (IllegalArgumentException e) {
+                    // Ignorar temporadas inválidas
+                }
+            }
+            product.setTemporadas(selectedTemporadas);
+        }
+        
         product.setFechaCreacion(java.time.LocalDateTime.now());
         product.setFechaActualizacion(java.time.LocalDateTime.now());
         Product savedProduct = productRepository.save(product);
@@ -103,6 +139,9 @@ public class ProductController {
         model.addAttribute("product", product);
         model.addAttribute("categories", categoryService.getActiveCategories());
         model.addAttribute("colors", colorService.getActiveColors());
+        model.addAttribute("talles", Talle.values());
+        model.addAttribute("generos", Genero.values());
+        model.addAttribute("temporadas", Temporada.values());
         return "admin/product-form";
     }
 
@@ -110,11 +149,18 @@ public class ProductController {
     public String updateProduct(@PathVariable Integer pId, 
                               @Valid Product product,
                               @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
+                              @RequestParam(value = "colorIds", required = false) List<Long> colorIds,
+                              @RequestParam(value = "talleNames", required = false) List<String> talleNames,
+                              @RequestParam(value = "generoNames", required = false) List<String> generoNames,
+                              @RequestParam(value = "temporadaNames", required = false) List<String> temporadaNames,
                               BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("product", product);
             model.addAttribute("categories", categoryService.getActiveCategories());
             model.addAttribute("colors", colorService.getActiveColors());
+            model.addAttribute("talles", Talle.values());
+            model.addAttribute("generos", Genero.values());
+            model.addAttribute("temporadas", Temporada.values());
             return "admin/product-form";
         }
         
@@ -129,8 +175,7 @@ public class ProductController {
         existingProduct.setDescripcion(product.getDescripcion());
         existingProduct.setMaterial(product.getMaterial());
         existingProduct.setCuidados(product.getCuidados());
-        existingProduct.setTemporada(product.getTemporada());
-        existingProduct.setGenero(product.getGenero());
+        // Los géneros y temporadas se manejan por separado más abajo
         existingProduct.setEdadRecomendada(product.getEdadRecomendada());
         existingProduct.setTallasDisponibles(product.getTallasDisponibles());
         existingProduct.setColoresDisponibles(product.getColoresDisponibles());
@@ -152,6 +197,65 @@ public class ProductController {
             existingProduct.setCategories(selectedCategories);
         } else {
             existingProduct.setCategories(new ArrayList<>());
+        }
+        
+        // Manejar colores múltiples
+        if (colorIds != null && !colorIds.isEmpty()) {
+            List<Color> selectedColors = new ArrayList<>();
+            for (Long colorId : colorIds) {
+                colorService.getColorById(colorId).ifPresent(selectedColors::add);
+            }
+            existingProduct.setColores(selectedColors);
+        } else {
+            existingProduct.setColores(new ArrayList<>());
+        }
+        
+        // Manejar talles múltiples
+        if (talleNames != null && !talleNames.isEmpty()) {
+            List<Talle> selectedTalles = new ArrayList<>();
+            for (String talleName : talleNames) {
+                try {
+                    Talle talle = Talle.valueOf(talleName);
+                    selectedTalles.add(talle);
+                } catch (IllegalArgumentException e) {
+                    // Ignorar talles inválidos
+                }
+            }
+            existingProduct.setTalles(selectedTalles);
+        } else {
+            existingProduct.setTalles(new ArrayList<>());
+        }
+        
+        // Manejar géneros múltiples
+        if (generoNames != null && !generoNames.isEmpty()) {
+            List<Genero> selectedGeneros = new ArrayList<>();
+            for (String generoName : generoNames) {
+                try {
+                    Genero genero = Genero.valueOf(generoName);
+                    selectedGeneros.add(genero);
+                } catch (IllegalArgumentException e) {
+                    // Ignorar géneros inválidos
+                }
+            }
+            existingProduct.setGeneros(selectedGeneros);
+        } else {
+            existingProduct.setGeneros(new ArrayList<>());
+        }
+        
+        // Manejar temporadas múltiples
+        if (temporadaNames != null && !temporadaNames.isEmpty()) {
+            List<Temporada> selectedTemporadas = new ArrayList<>();
+            for (String temporadaName : temporadaNames) {
+                try {
+                    Temporada temporada = Temporada.valueOf(temporadaName);
+                    selectedTemporadas.add(temporada);
+                } catch (IllegalArgumentException e) {
+                    // Ignorar temporadas inválidas
+                }
+            }
+            existingProduct.setTemporadas(selectedTemporadas);
+        } else {
+            existingProduct.setTemporadas(new ArrayList<>());
         }
         
         existingProduct.setFechaActualizacion(java.time.LocalDateTime.now());

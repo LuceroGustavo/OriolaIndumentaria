@@ -1,6 +1,5 @@
 package com.orioladenim.entity;
 
-import com.orioladenim.enums.Categoria;
 import com.orioladenim.enums.Genero;
 import com.orioladenim.enums.Talle;
 import com.orioladenim.enums.Temporada;
@@ -76,13 +75,19 @@ public class Product {
     @Column(name = "cuidados", columnDefinition = "TEXT")
     private String cuidados;
 
+    // Temporadas múltiples (enum)
+    @ElementCollection(targetClass = Temporada.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "product_temporadas", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "temporada")
-    private Temporada temporada;
+    private List<Temporada> temporadas = new ArrayList<>();
 
+    // Géneros múltiples (enum)
+    @ElementCollection(targetClass = Genero.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "product_generos", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "genero")
-    private Genero genero;
+    private List<Genero> generos = new ArrayList<>();
 
     @Column(name = "edad_recomendada")
     private String edadRecomendada;
@@ -203,6 +208,50 @@ public class Product {
     public Category getCategoriaPrincipal() {
         return !categories.isEmpty() ? categories.get(0) : null;
     }
+    
+    // Métodos para manejar temporadas múltiples
+    public void agregarTemporada(Temporada temporada) {
+        if (!temporadas.contains(temporada)) {
+            temporadas.add(temporada);
+        }
+    }
+    
+    public void removerTemporada(Temporada temporada) {
+        temporadas.remove(temporada);
+    }
+    
+    public boolean tieneTemporada(Temporada temporada) {
+        return temporadas.contains(temporada);
+    }
+    
+    public String getTemporadasComoTexto() {
+        return temporadas.stream()
+                .map(Temporada::getDisplayName)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("Sin temporada");
+    }
+    
+    // Métodos para manejar géneros múltiples
+    public void agregarGenero(Genero genero) {
+        if (!generos.contains(genero)) {
+            generos.add(genero);
+        }
+    }
+    
+    public void removerGenero(Genero genero) {
+        generos.remove(genero);
+    }
+    
+    public boolean tieneGenero(Genero genero) {
+        return generos.contains(genero);
+    }
+    
+    public String getGenerosComoTexto() {
+        return generos.stream()
+                .map(Genero::getDisplayName)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("Sin género");
+    }
 
     // Getters y Setters manuales (por si Lombok no funciona)
     public Integer getPId() { return pId; }
@@ -237,11 +286,11 @@ public class Product {
     public String getCuidados() { return cuidados; }
     public void setCuidados(String cuidados) { this.cuidados = cuidados; }
     
-    public Temporada getTemporada() { return temporada; }
-    public void setTemporada(Temporada temporada) { this.temporada = temporada; }
+    public List<Temporada> getTemporadas() { return temporadas; }
+    public void setTemporadas(List<Temporada> temporadas) { this.temporadas = temporadas; }
     
-    public Genero getGenero() { return genero; }
-    public void setGenero(Genero genero) { this.genero = genero; }
+    public List<Genero> getGeneros() { return generos; }
+    public void setGeneros(List<Genero> generos) { this.generos = generos; }
     
     public String getEdadRecomendada() { return edadRecomendada; }
     public void setEdadRecomendada(String edadRecomendada) { this.edadRecomendada = edadRecomendada; }
