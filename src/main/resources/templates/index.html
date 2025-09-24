@@ -17,7 +17,10 @@
                 <a href="/" class="logo">Orioladenim</a>
                 
                 <div class="header-nav">
-                    <ul class="nav-menu">
+                    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <ul class="nav-menu" id="navMenu">
                         <li class="nav-item">
                             <a href="/" class="nav-link active">Inicio</a>
                         </li>
@@ -30,28 +33,18 @@
                                 <div class="dropdown-grid">
                                     <div class="dropdown-column">
                                         <div class="dropdown-column-title">Remeras</div>
-                                        <a href="/catalog?category=REMERAS" class="dropdown-item">Remeras</a>
-                                        <a href="/catalog?category=REMERAS" class="dropdown-item">Remeras Básicas</a>
-                                        <a href="/catalog?category=REMERAS" class="dropdown-item">Remeras Estampadas</a>
+                                        <a href="/catalog?category=Remeras" class="dropdown-item">Remeras</a>
                                     </div>
                                     <div class="dropdown-column">
                                         <div class="dropdown-column-title">Pantalones</div>
-                                        <a href="/catalog?category=PANTALONES" class="dropdown-item">Pantalones</a>
-                                        <a href="/catalog?category=PANTALONES" class="dropdown-item">Jeans</a>
-                                        <a href="/catalog?category=PANTALONES" class="dropdown-item">Pantalones de Vestir</a>
+                                        <a href="/catalog?category=Pantalones" class="dropdown-item">Pantalones</a>
                                     </div>
                                     <div class="dropdown-column">
-                                        <div class="dropdown-column-title">Camisas</div>
-                                        <a href="/catalog?category=CAMISAS" class="dropdown-item">Camisas</a>
-                                        <a href="/catalog?category=CAMISAS" class="dropdown-item">Camisas de Vestir</a>
-                                        <a href="/catalog?category=CAMISAS" class="dropdown-item">Camisas Casuales</a>
+                                        <div class="dropdown-column-title">Buzos</div>
+                                        <a href="/catalog?category=Buzos" class="dropdown-item">Buzos</a>
                                     </div>
                                     <div class="dropdown-column">
-                                        <div class="dropdown-column-title">Otros</div>
-                                        <a href="/catalog?category=BUZOS" class="dropdown-item">Buzos</a>
-                                        <a href="/catalog?category=VESTIDOS" class="dropdown-item">Vestidos</a>
-                                        <a href="/catalog?category=SHORTS" class="dropdown-item">Shorts</a>
-                                        <a href="/catalog?category=CHOMBAS" class="dropdown-item">Chombas</a>
+                                        <div class="dropdown-column-title">Ver Todo</div>
                                         <a href="/catalog" class="dropdown-item special">Ver Todo</a>
                                     </div>
                                 </div>
@@ -94,8 +87,14 @@
                 <div th:each="product : ${products}" class="product-card">
                     <a th:href="@{/product/{id}(id=${product.pId})}" class="text-decoration-none text-dark">
                         <div class="product-image-container">
-                            <img th:src="${product.images != null and !product.images.empty ? '/uploads/' + product.images[0].imagePath : 'https://via.placeholder.com/350x350/f8f9fa/666666?text=ORIOLA'}" 
-                                 th:alt="${product.name}" class="product-image">
+                            <img th:if="${product.images != null and !product.images.empty}" 
+                                 th:src="@{/uploads/{path}(path=${product.images[0].imagePath})}" 
+                                 th:alt="${product.name}" 
+                                 class="product-image">
+                            <img th:if="${product.images == null or product.images.empty}" 
+                                 src="https://via.placeholder.com/350x350/f8f9fa/666666?text=ORIOLA" 
+                                 th:alt="${product.name}" 
+                                 class="product-image">
                         </div>
                         <div class="product-info">
                             <h3 class="product-name" th:text="${product.name}">Nombre del Producto</h3>
@@ -106,11 +105,11 @@
                                 <span th:if="${product.descuentoPorcentaje != null and product.descuentoPorcentaje > 0}" 
                                       class="product-discount" th:text="'-' + ${#numbers.formatDecimal(product.descuentoPorcentaje, 0, 0)} + '%'">-0%</span>
                             </div>
-                            <div class="product-colors" th:if="${product.coloresDisponibles != null and !#strings.isEmpty(product.coloresDisponibles)}">
-                                <div th:each="color : ${#strings.arraySplit(product.coloresDisponibles, ',')}" 
+                            <div class="product-colors" th:if="${product.colors != null and !product.colors.empty}">
+                                <div th:each="color : ${product.colors}" 
                                      class="color-dot" 
-                                     th:style="'background-color: ' + ${color.trim()}" 
-                                     th:title="${color.trim()}"></div>
+                                     th:style="'background-color: ' + ${color.hexCode}" 
+                                     th:title="${color.name}"></div>
                             </div>
                         </div>
                     </a>
@@ -283,6 +282,51 @@
                 });
             } else {
                 console.log('No se encontraron elementos del dropdown');
+            }
+        });
+
+        // Mobile menu functionality
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (navMenu.classList.contains('active')) {
+                navMenu.classList.remove('active');
+                mobileToggle.innerHTML = '<i class="bi bi-list"></i>';
+            } else {
+                navMenu.classList.add('active');
+                mobileToggle.innerHTML = '<i class="bi bi-x"></i>';
+            }
+        }
+
+        // Cerrar menú móvil al hacer clic en un enlace
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                const navMenu = document.getElementById('navMenu');
+                const mobileToggle = document.querySelector('.mobile-menu-toggle');
+                navMenu.classList.remove('active');
+                mobileToggle.innerHTML = '<i class="bi bi-list"></i>';
+            });
+        });
+
+        // Cerrar menú móvil al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            const navMenu = document.getElementById('navMenu');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
+                navMenu.classList.remove('active');
+                mobileToggle.innerHTML = '<i class="bi bi-list"></i>';
+            }
+        });
+
+        // Cerrar menú móvil al redimensionar la ventana
+        window.addEventListener('resize', () => {
+            const navMenu = document.getElementById('navMenu');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            if (window.innerWidth > 768) {
+                navMenu.classList.remove('active');
+                mobileToggle.innerHTML = '<i class="bi bi-list"></i>';
             }
         });
     </script>

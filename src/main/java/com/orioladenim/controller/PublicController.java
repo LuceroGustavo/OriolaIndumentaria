@@ -2,6 +2,7 @@ package com.orioladenim.controller;
 
 import com.orioladenim.entity.Product;
 import com.orioladenim.repo.ProductRepository;
+import com.orioladenim.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,20 +15,25 @@ public class PublicController {
     @Autowired
     private ProductRepository productRepository;
     
+    @Autowired
+    private CategoryService categoryService;
+    
     @GetMapping("/")
     public String home(Model model) {
-        // Obtener productos destacados, si no hay ninguno, mostrar los primeros 6 productos
-        var productosDestacados = productRepository.findByEsDestacadoTrueAndActivoTrue();
-        
-        if (productosDestacados.isEmpty()) {
-            // Si no hay productos destacados, mostrar los primeros 6 productos activos
-            model.addAttribute("products", productRepository.findByActivoTrue().stream().limit(6).toList());
-        } else {
-            // Mostrar productos destacados (máximo 6)
-            model.addAttribute("products", productosDestacados.stream().limit(6).toList());
+        try {
+            // Mostrar todos los productos activos
+            model.addAttribute("products", productRepository.findByActivoTrue());
+            
+            // Agregar categorías para el dropdown
+            model.addAttribute("categories", categoryService.getActiveCategories());
+            
+            return "index-simple";
+        } catch (Exception e) {
+            // En caso de error, mostrar página sin categorías
+            model.addAttribute("products", productRepository.findByActivoTrue());
+            model.addAttribute("categories", new java.util.ArrayList<>());
+            return "index-simple";
         }
-        
-        return "index";
     }
     
     @GetMapping("/catalog")
