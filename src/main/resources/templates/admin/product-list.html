@@ -25,7 +25,7 @@
                         <th>Color</th>
                         <th>Precio</th>
                         <th>Stock</th>
-                        <th>Estado</th>
+                        <th>Publicado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -48,8 +48,8 @@
                             <span th:if="${product.qty == 0}" class="badge bg-danger">Sin stock</span>
                         </td>
                         <td>
-                            <span th:if="${product.activo}" class="badge bg-success">Activo</span>
-                            <span th:if="${!product.activo}" class="badge bg-secondary">Inactivo</span>
+                            <span th:if="${product.activo}" class="badge bg-success">Publicado</span>
+                            <span th:if="${!product.activo}" class="badge bg-secondary">Oculto</span>
                         </td>
                         <td>
                             <div class="btn-group" role="group">
@@ -57,6 +57,12 @@
                                    class="btn btn-sm btn-outline-primary" title="Editar">
                                     <i class="bi bi-pencil"></i>
                                 </a>
+                                <button th:onclick="'toggleProductStatus(' + ${product.pId} + ', this)'" 
+                                        th:class="'btn btn-sm ' + (${product.activo} ? 'btn-outline-warning' : 'btn-outline-success')"
+                                        th:title="${product.activo ? 'Desactivar publicación' : 'Activar publicación'}"
+                                        th:data-product-id="${product.pId}">
+                                    <i th:class="${product.activo ? 'bi bi-eye-slash' : 'bi bi-eye'}"></i>
+                                </button>
                                 <a th:href="@{/admin/products/delete/{id}(id=${product.pId})}" 
                                    class="btn btn-sm btn-outline-danger"
                                    onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?');" title="Eliminar">
@@ -75,5 +81,56 @@
             </table>
         </div>
     </div>
+
+    <script>
+        function toggleProductStatus(productId, button) {
+            if (confirm('¿Estás seguro de que quieres cambiar el estado de publicación de este producto?')) {
+                fetch(`/admin/products/${productId}/toggle-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Mostrar mensaje de éxito
+                        showMessage('success', data.message);
+                        
+                        // Recargar la página para actualizar la vista
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        showMessage('error', data.message || 'Error al cambiar el estado del producto');
+                    }
+                })
+                .catch(error => {
+                    showMessage('error', 'Error al cambiar el estado del producto: ' + error.message);
+                });
+            }
+        }
+
+        function showMessage(type, message) {
+            // Crear elemento de mensaje
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            // Agregar al body
+            document.body.appendChild(alertDiv);
+            
+            // Auto-remover después de 5 segundos
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+    </script>
 </body>
 </html>

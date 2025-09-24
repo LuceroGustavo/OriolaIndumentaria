@@ -325,5 +325,30 @@ public class ProductController {
             return response;
         }
     }
+    
+    @PostMapping("/{pId}/toggle-status")
+    @ResponseBody
+    public java.util.Map<String, Object> toggleProductStatus(@PathVariable Integer pId) {
+        try {
+            Product product = productRepository.findById(pId)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            
+            // Cambiar el estado
+            product.setActivo(!product.getActivo());
+            productRepository.save(product);
+            
+            java.util.Map<String, Object> response = new java.util.HashMap<>();
+            response.put("success", true);
+            response.put("message", product.getActivo() ? "Producto activado y publicado" : "Producto desactivado y oculto del catálogo");
+            response.put("activo", product.getActivo());
+            
+            return response;
+        } catch (Exception e) {
+            java.util.Map<String, Object> response = new java.util.HashMap<>();
+            response.put("success", false);
+            response.put("message", "Error al cambiar el estado del producto: " + e.getMessage());
+            return response;
+        }
+    }
 }
 
