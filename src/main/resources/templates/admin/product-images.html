@@ -310,7 +310,7 @@
 
             const formData = new FormData();
             selectedFiles.forEach((file, index) => {
-                formData.append('files', file);
+                formData.append('images', file);
                 if (index === 0) {
                     formData.append('isPrimary', 'true');
                 }
@@ -320,7 +320,7 @@
             const progressBar = document.getElementById('uploadProgress');
             progressBar.style.display = 'block';
 
-            fetch(`/admin/upload/product/${productId}/multiple`, {
+            fetch(`/admin/products/${productId}/images/upload`, {
                 method: 'POST',
                 body: formData
             })
@@ -329,7 +329,7 @@
                 if (data.success) {
                     showMessage('success', 'Imágenes asociadas correctamente al producto');
                     setTimeout(() => {
-                        window.location.href = `/admin/products/edit/${productId}`;
+                        window.location.reload(); // Recargar la página para mostrar las imágenes
                     }, 2000);
                 } else {
                     showMessage('error', data.message || 'Error al asociar imágenes');

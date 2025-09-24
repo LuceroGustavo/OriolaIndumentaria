@@ -3,18 +3,23 @@ package com.orioladenim.controller;
 import com.orioladenim.entity.Product;
 import com.orioladenim.entity.Category;
 import com.orioladenim.entity.Color;
+import com.orioladenim.entity.ProductImage;
 import com.orioladenim.enums.Talle;
 import com.orioladenim.enums.Genero;
 import com.orioladenim.enums.Temporada;
 import com.orioladenim.repo.ProductRepository;
+import com.orioladenim.repo.ProductImageRepository;
 import com.orioladenim.service.CategoryService;
 import com.orioladenim.service.ColorService;
+import com.orioladenim.service.ImageProcessingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -24,6 +29,12 @@ public class ProductController {
     
     @Autowired
     private ProductRepository productRepository;
+    
+    @Autowired
+    private ProductImageRepository productImageRepository;
+    
+    @Autowired
+    private ImageProcessingService imageProcessingService;
     
     @Autowired
     private CategoryService categoryService;
@@ -39,7 +50,9 @@ public class ProductController {
 
     @GetMapping("/new")
     public String showForm(Model model) {
-        model.addAttribute("product", new Product());
+        Product product = new Product();
+        product.setPId(null); // Asegurar que no tenga ID para detectar como nuevo
+        model.addAttribute("product", product);
         model.addAttribute("categories", categoryService.getActiveCategories());
         model.addAttribute("colors", colorService.getActiveColors());
         model.addAttribute("talles", Talle.values());
@@ -129,7 +142,7 @@ public class ProductController {
         product.setFechaCreacion(java.time.LocalDateTime.now());
         product.setFechaActualizacion(java.time.LocalDateTime.now());
         Product savedProduct = productRepository.save(product);
-        return "redirect:/admin/products/" + savedProduct.getPId() + "/images";
+        return "redirect:/admin/products/edit/" + savedProduct.getPId();
     }
 
     @GetMapping("/edit/{pId}")
@@ -275,6 +288,42 @@ public class ProductController {
             .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
         model.addAttribute("product", product);
         return "admin/product-images";
+    }
+
+    @PostMapping("/{pId}/images/upload")
+    @ResponseBody
+    public java.util.Map<String, Object> uploadImages(@PathVariable Integer pId, 
+                              @RequestParam("images") MultipartFile[] images) {
+        try {
+            Product product = productRepository.findById(pId)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            
+            int savedCount = 0;
+            for (int i = 0; i < images.length; i++) {
+                MultipartFile file = images[i];
+                if (!file.isEmpty()) {
+                    // Usar el servicio de procesamiento de imágenes existente
+                    ProductImage productImage = imageProcessingService.processAndSaveImage(file, pId, i == 0);
+                    productImage.setProduct(product);
+                    productImage.setDisplayOrder(i);
+                    
+                    productImageRepository.save(productImage);
+                    savedCount++;
+                }
+            }
+            
+            java.util.Map<String, Object> response = new java.util.HashMap<>();
+            response.put("success", true);
+            response.put("message", "Imágenes asociadas correctamente");
+            response.put("count", savedCount);
+            
+            return response;
+        } catch (Exception e) {
+            java.util.Map<String, Object> response = new java.util.HashMap<>();
+            response.put("success", false);
+            response.put("message", "Error al procesar las imágenes: " + e.getMessage());
+            return response;
+        }
     }
 }
 

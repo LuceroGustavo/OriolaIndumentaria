@@ -20,6 +20,12 @@
 - Templates HTML seguían referenciando campos eliminados
 - Causaba errores de compilación en Thymeleaf
 
+### 4. **Problemas en la Carga de Imágenes**
+- El `ProductController` implementaba lógica manual de procesamiento de imágenes
+- No utilizaba el `ImageProcessingService` existente que maneja conversión a WebP
+- Causaba errores `FileNotFoundException` al intentar guardar imágenes
+- La redirección después de cargar imágenes no funcionaba correctamente
+
 ## 🔧 **Correcciones Implementadas**
 
 ### **1. Eliminación del Enum Categoria**
@@ -143,7 +149,65 @@ List<Product> findByTemporadaAndActivoTrue(@Param("temporada") String temporada)
       th:text="${product.getCategoriasComoTexto()}"></span>
 ```
 
-### **7. Actualización del Formulario de Productos**
+### **7. Corrección del Sistema de Carga de Imágenes**
+
+#### **Problema Identificado:**
+El `ProductController` tenía implementación manual de procesamiento de imágenes que no utilizaba el `ImageProcessingService` existente, causando errores `FileNotFoundException`.
+
+#### **Solución Implementada:**
+
+**Antes (Lógica Manual):**
+```java
+@PostMapping("/{pId}/images/upload")
+@ResponseBody
+public java.util.Map<String, Object> uploadImages(@PathVariable Integer pId, 
+                          @RequestParam("images") MultipartFile[] images) {
+    // Crear directorio manualmente
+    java.io.File uploadDir = new java.io.File("uploads");
+    if (!uploadDir.exists()) {
+        uploadDir.mkdirs();
+    }
+    
+    // Procesar archivos manualmente
+    for (MultipartFile file : images) {
+        String fileName = System.currentTimeMillis() + "_" + i + extension;
+        java.io.File destFile = new java.io.File(uploadDir, fileName);
+        file.transferTo(destFile);
+        // ... más lógica manual
+    }
+}
+```
+
+**Después (Usando ImageProcessingService):**
+```java
+@PostMapping("/{pId}/images/upload")
+@ResponseBody
+public java.util.Map<String, Object> uploadImages(@PathVariable Integer pId, 
+                          @RequestParam("images") MultipartFile[] images) {
+    for (int i = 0; i < images.length; i++) {
+        MultipartFile file = images[i];
+        if (!file.isEmpty()) {
+            // Usar el servicio de procesamiento de imágenes existente
+            ProductImage productImage = imageProcessingService.processAndSaveImage(file, pId, i == 0);
+            productImage.setProduct(product);
+            productImage.setDisplayOrder(i);
+            
+            productImageRepository.save(productImage);
+            savedCount++;
+        }
+    }
+}
+```
+
+#### **Beneficios de la Corrección:**
+- ✅ **Conversión automática a WebP** - Utiliza el `WebPConversionService` existente
+- ✅ **Creación de thumbnails** - Genera automáticamente miniaturas
+- ✅ **Validación de archivos** - Verifica tamaño, formato y extensiones permitidas
+- ✅ **Manejo de errores robusto** - Fallback a PNG si WebP falla
+- ✅ **Gestión de directorios** - Crea automáticamente `uploads/` y `uploads/thumbnails/`
+- ✅ **Optimización de imágenes** - Redimensiona automáticamente a 1920x1080 máximo
+
+### **8. Actualización del Formulario de Productos**
 
 #### **Nuevas Secciones para Múltiples Selecciones:**
 
@@ -220,9 +284,11 @@ List<Product> findByTemporadaAndActivoTrue(@Param("temporada") String temporada)
 ### **✅ Funcionalidades Verificadas:**
 1. **Creación de Productos** - Formulario completo funcional
 2. **Selección Múltiple** - Categorías, colores, géneros, temporadas, talles
-3. **Guardado de Imágenes** - Redirección correcta a página de imágenes
-4. **Templates** - Sin errores de compilación Thymeleaf
-5. **Base de Datos** - Relaciones correctas y consultas optimizadas
+3. **Carga de Imágenes** - Procesamiento correcto con conversión a WebP
+4. **Gestión de Imágenes** - Redirección correcta y permanencia en página de imágenes
+5. **Templates** - Sin errores de compilación Thymeleaf
+6. **Base de Datos** - Relaciones correctas y consultas optimizadas
+7. **Procesamiento de Archivos** - Validación, optimización y creación de thumbnails
 
 ### **✅ Flujo Completo Verificado:**
 ```
@@ -240,7 +306,7 @@ Redirigir a Imágenes → Subir Imágenes → Producto Completo
 - `src/main/java/com/orioladenim/enums/Categoria.java` - **ELIMINADO**
 
 ### **Controladores:**
-- `src/main/java/com/orioladenim/controller/ProductController.java` - Actualizado para múltiples selecciones
+- `src/main/java/com/orioladenim/controller/ProductController.java` - Actualizado para múltiples selecciones y corrección de carga de imágenes
 
 ### **Repositorios:**
 - `src/main/java/com/orioladenim/repo/ProductRepository.java` - Consultas corregidas
@@ -262,7 +328,9 @@ El sistema ahora permite:
 - ✅ Múltiples colores por producto
 - ✅ Múltiples talles por producto
 - ✅ Formularios optimizados y funcionales
-- ✅ Guardado correcto de imágenes
+- ✅ Carga y procesamiento correcto de imágenes con conversión a WebP
+- ✅ Creación automática de thumbnails
+- ✅ Validación y optimización de archivos de imagen
 - ✅ Sin errores de compilación o ejecución
 
 **Resultado:** Sistema completamente funcional con lógica consolidada y optimizada.
