@@ -28,22 +28,34 @@ public class Product {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "talle")
-    private Talle talle;
 
     @NotBlank(message = "Las medidas son requeridas")
     @Column(name = "medidas", nullable = false)
     private String medidas;
 
-    @NotBlank(message = "El color es requerido")
-    @Column(name = "color", nullable = false)
+    @Column(name = "color")
     private String color; // Campo legacy para compatibilidad
     
-    // Relación con Color (Many-to-One)
+    // Relación con Color (Many-to-One) - Color principal
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "color_id")
     private Color colorEntity;
+    
+    // Relación Many-to-Many con Colores (colores disponibles)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "product_colors",
+        joinColumns = @JoinColumn(name = "product_id"),
+        inverseJoinColumns = @JoinColumn(name = "color_id")
+    )
+    private List<Color> colores = new ArrayList<>();
+    
+    // Talles disponibles (enum)
+    @ElementCollection(targetClass = Talle.class, fetch = FetchType.LAZY)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "product_talles", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "talle")
+    private List<Talle> talles = new ArrayList<>();
 
     @Positive(message = "El precio debe ser positivo")
     @Column(name = "price", nullable = false)
@@ -56,9 +68,6 @@ public class Product {
     @Column(name = "descripcion", columnDefinition = "TEXT")
     private String descripcion;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "categoria", nullable = false)
-    private Categoria categoria;
 
     // Campos adicionales para indumentaria
     @Column(name = "material")
@@ -109,10 +118,15 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ProductImage> images = new ArrayList<>();
     
-    // Relación con categoría (Many-to-One)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
+    // Relación con categorías (Many-to-Many)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "product_categories",
+        joinColumns = @JoinColumn(name = "product_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Category> categories = new ArrayList<>();
+    
 
     // Método para obtener la imagen principal
     public ProductImage getImagenPrincipal() {
@@ -162,6 +176,33 @@ public class Product {
     public String getColorHex() {
         return colorEntity != null ? colorEntity.getHexCodeOrDefault() : "#6c757d";
     }
+    
+    // Métodos para manejar categorías múltiples
+    public void agregarCategoria(Category categoria) {
+        if (!categories.contains(categoria)) {
+            categories.add(categoria);
+        }
+    }
+    
+    public void removerCategoria(Category categoria) {
+        categories.remove(categoria);
+    }
+    
+    public boolean tieneCategoria(Category categoria) {
+        return categories.contains(categoria);
+    }
+    
+    public String getCategoriasComoTexto() {
+        return categories.stream()
+                .map(Category::getName)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("Sin categorías");
+    }
+    
+    // Método para obtener la categoría principal (primera de la lista)
+    public Category getCategoriaPrincipal() {
+        return !categories.isEmpty() ? categories.get(0) : null;
+    }
 
     // Getters y Setters manuales (por si Lombok no funciona)
     public Integer getPId() { return pId; }
@@ -170,8 +211,6 @@ public class Product {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     
-    public Talle getTalle() { return talle; }
-    public void setTalle(Talle talle) { this.talle = talle; }
     
     public String getMedidas() { return medidas; }
     public void setMedidas(String medidas) { this.medidas = medidas; }
@@ -188,8 +227,6 @@ public class Product {
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
     
-    public Categoria getCategoria() { return categoria; }
-    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
     
     public Boolean getActivo() { return activo; }
     public void setActivo(Boolean activo) { this.activo = activo; }
@@ -236,8 +273,16 @@ public class Product {
     public List<ProductImage> getImages() { return images; }
     public void setImages(List<ProductImage> images) { this.images = images; }
     
-    public Category getCategory() { return category; }
-    public void setCategory(Category category) { this.category = category; }
+    // Getters y setters para las nuevas relaciones
+    public List<Color> getColores() { return colores; }
+    public void setColores(List<Color> colores) { this.colores = colores; }
+    
+    public List<Talle> getTalles() { return talles; }
+    public void setTalles(List<Talle> talles) { this.talles = talles; }
+    
+    
+    public List<Category> getCategories() { return categories; }
+    public void setCategories(List<Category> categories) { this.categories = categories; }
     
     public Color getColorEntity() { return colorEntity; }
     public void setColorEntity(Color colorEntity) { this.colorEntity = colorEntity; }

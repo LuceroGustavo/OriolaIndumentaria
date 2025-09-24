@@ -1,6 +1,9 @@
 package com.orioladenim.controller;
 
 import com.orioladenim.entity.Product;
+import com.orioladenim.entity.Category;
+import com.orioladenim.entity.Color;
+import com.orioladenim.enums.Talle;
 import com.orioladenim.repo.ProductRepository;
 import com.orioladenim.service.CategoryService;
 import com.orioladenim.service.ColorService;
@@ -10,6 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.ArrayList;
 
 @Controller
 @RequestMapping("/admin/products")
@@ -35,17 +40,56 @@ public class ProductController {
         model.addAttribute("product", new Product());
         model.addAttribute("categories", categoryService.getActiveCategories());
         model.addAttribute("colors", colorService.getActiveColors());
+        model.addAttribute("talles", Talle.values());
         return "admin/product-form";
     }
 
     @PostMapping("/save")
-    public String addProduct(@Valid Product product, BindingResult result, Model model) {
+    public String addProduct(@Valid Product product, 
+                           @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
+                           @RequestParam(value = "colorIds", required = false) List<Long> colorIds,
+                           @RequestParam(value = "talleNames", required = false) List<String> talleNames,
+                           BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("product", product);
             model.addAttribute("categories", categoryService.getActiveCategories());
             model.addAttribute("colors", colorService.getActiveColors());
+            model.addAttribute("talles", Talle.values());
             return "admin/product-form";
         }
+        
+        // Manejar categorías múltiples
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            List<Category> selectedCategories = new ArrayList<>();
+            for (Long categoryId : categoryIds) {
+                categoryService.findById(categoryId).ifPresent(selectedCategories::add);
+            }
+            product.setCategories(selectedCategories);
+        }
+        
+        // Manejar colores múltiples
+        if (colorIds != null && !colorIds.isEmpty()) {
+            List<Color> selectedColors = new ArrayList<>();
+            for (Long colorId : colorIds) {
+                colorService.getColorById(colorId).ifPresent(selectedColors::add);
+            }
+            product.setColores(selectedColors);
+        }
+        
+        // Manejar talles múltiples (enum)
+        if (talleNames != null && !talleNames.isEmpty()) {
+            List<Talle> selectedTalles = new ArrayList<>();
+            for (String talleName : talleNames) {
+                try {
+                    Talle talle = Talle.valueOf(talleName);
+                    selectedTalles.add(talle);
+                } catch (IllegalArgumentException e) {
+                    // Ignorar talles inválidos
+                }
+            }
+            product.setTalles(selectedTalles);
+        }
+        
         product.setFechaCreacion(java.time.LocalDateTime.now());
         product.setFechaActualizacion(java.time.LocalDateTime.now());
         Product savedProduct = productRepository.save(product);
@@ -63,16 +107,55 @@ public class ProductController {
     }
 
     @PostMapping("/edit/{pId}")
-    public String updateProduct(@PathVariable Integer pId, @Valid Product product, BindingResult result, Model model) {
+    public String updateProduct(@PathVariable Integer pId, 
+                              @Valid Product product,
+                              @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
+                              BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("product", product);
             model.addAttribute("categories", categoryService.getActiveCategories());
             model.addAttribute("colors", colorService.getActiveColors());
             return "admin/product-form";
         }
-        product.setPId(pId);
-        product.setFechaActualizacion(java.time.LocalDateTime.now());
-        productRepository.save(product);
+        
+        // Obtener el producto existente
+        Product existingProduct = productRepository.findById(pId)
+            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        
+        // Actualizar campos básicos
+        existingProduct.setName(product.getName());
+        existingProduct.setPrice(product.getPrice());
+        existingProduct.setQty(product.getQty());
+        existingProduct.setDescripcion(product.getDescripcion());
+        existingProduct.setMaterial(product.getMaterial());
+        existingProduct.setCuidados(product.getCuidados());
+        existingProduct.setTemporada(product.getTemporada());
+        existingProduct.setGenero(product.getGenero());
+        existingProduct.setEdadRecomendada(product.getEdadRecomendada());
+        existingProduct.setTallasDisponibles(product.getTallasDisponibles());
+        existingProduct.setColoresDisponibles(product.getColoresDisponibles());
+        existingProduct.setEsDestacado(product.getEsDestacado());
+        existingProduct.setEsNuevo(product.getEsNuevo());
+        existingProduct.setDescuentoPorcentaje(product.getDescuentoPorcentaje());
+        existingProduct.setPrecioOriginal(product.getPrecioOriginal());
+        existingProduct.setActivo(product.getActivo());
+        existingProduct.setColorEntity(product.getColorEntity());
+        existingProduct.setMedidas(product.getMedidas());
+        existingProduct.setColor(product.getColor());
+        
+        // Manejar categorías múltiples
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            List<Category> selectedCategories = new ArrayList<>();
+            for (Long categoryId : categoryIds) {
+                categoryService.findById(categoryId).ifPresent(selectedCategories::add);
+            }
+            existingProduct.setCategories(selectedCategories);
+        } else {
+            existingProduct.setCategories(new ArrayList<>());
+        }
+        
+        existingProduct.setFechaActualizacion(java.time.LocalDateTime.now());
+        productRepository.save(existingProduct);
         return "redirect:/admin/products";
     }
 

@@ -8,7 +8,15 @@ public enum Talle {
     XL("XL"),
     XXL("XXL"),
     XXXL("XXXL"),
-    UNICO("Único");
+    T36("36"),
+    T38("38"),
+    T40("40"),
+    T42("42"),
+    T44("44"),
+    T46("46"),
+    T48("48"),
+    T50("50"),
+    T52("52");
 
     private final String displayName;
 
@@ -19,5 +27,9 @@ public enum Talle {
     public String getDisplayName() {
         return displayName;
     }
+    
+    @Override
+    public String toString() {
+        return displayName;
+    }
 }
-

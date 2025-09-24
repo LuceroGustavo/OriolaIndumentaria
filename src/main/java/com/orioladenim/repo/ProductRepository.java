@@ -11,8 +11,6 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
     
-    // Buscar productos por categoría
-    List<Product> findByCategoria(String categoria);
     
     // Buscar productos activos
     List<Product> findByActivoTrue();
@@ -45,8 +43,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     @Query("SELECT p FROM Product p WHERE LOWER(p.color) LIKE LOWER(CONCAT('%', :color, '%')) AND p.activo = true")
     List<Product> findByColorContainingIgnoreCase(@Param("color") String color);
     
-    // Contar productos por categoría
-    @Query("SELECT COUNT(p) FROM Product p WHERE p.categoria = :categoria AND p.activo = true")
+    // Contar productos por categoría (usando Many-to-Many)
+    @Query("SELECT COUNT(p) FROM Product p JOIN p.categories c WHERE c.name = :categoria AND p.activo = true")
     Long countByCategoria(@Param("categoria") String categoria);
     
     // Obtener productos más recientes

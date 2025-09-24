@@ -31,13 +31,8 @@ public class Category {
     @Column(name = "description", length = 200)
     private String description;
     
-    @Size(max = 7, message = "El código de color debe tener máximo 7 caracteres")
-    @Column(name = "color_code", length = 7)
-    private String colorCode; // Código hexadecimal del color (#ff6b6b)
-    
-    @Size(max = 50, message = "El nombre del icono no puede exceder 50 caracteres")
-    @Column(name = "icon_name", length = 50)
-    private String iconName; // Nombre del icono (ej: "shirt", "dress", "pants")
+    @Column(name = "image_path", length = 500)
+    private String imagePath; // Ruta de la imagen de la categoría
     
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
@@ -56,9 +51,10 @@ public class Category {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
     
-    // Relación con Product (One-to-Many)
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // Relación con Product (Many-to-Many) - lado inverso
+    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
+    
     
     // Constructores
     public Category() {}
@@ -71,11 +67,10 @@ public class Category {
         this.productCount = 0;
     }
     
-    public Category(String name, String description, String colorCode, String iconName) {
+    public Category(String name, String description, String imagePath) {
         this.name = name;
         this.description = description;
-        this.colorCode = colorCode;
-        this.iconName = iconName;
+        this.imagePath = imagePath;
         this.isActive = true;
         this.displayOrder = 0;
         this.productCount = 0;
@@ -100,12 +95,31 @@ public class Category {
         return this.name != null ? this.name : "Sin categoría";
     }
     
-    public String getColorCodeOrDefault() {
-        return this.colorCode != null ? this.colorCode : "#6c757d";
+    public String getImagePathOrDefault() {
+        return this.imagePath != null ? this.imagePath : "/img/categories/default-category.jpg";
     }
     
-    public String getIconNameOrDefault() {
-        return this.iconName != null ? this.iconName : "tag";
+    // Métodos para manejar la relación Many-to-Many
+    public void agregarProducto(Product producto) {
+        if (!products.contains(producto)) {
+            products.add(producto);
+            incrementProductCount();
+        }
+    }
+    
+    public void removerProducto(Product producto) {
+        if (products.remove(producto)) {
+            decrementProductCount();
+        }
+    }
+    
+    public boolean tieneProducto(Product producto) {
+        return products.contains(producto);
+    }
+    
+    // Método para obtener el total de productos
+    public int getTotalProductos() {
+        return (products != null ? products.size() : 0);
     }
     
     // Getters y Setters
@@ -133,20 +147,12 @@ public class Category {
         this.description = description;
     }
     
-    public String getColorCode() {
-        return colorCode;
+    public String getImagePath() {
+        return imagePath;
     }
     
-    public void setColorCode(String colorCode) {
-        this.colorCode = colorCode;
-    }
-    
-    public String getIconName() {
-        return iconName;
-    }
-    
-    public void setIconName(String iconName) {
-        this.iconName = iconName;
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
     
     public Boolean getIsActive() {
@@ -197,14 +203,14 @@ public class Category {
         this.products = products;
     }
     
+    
     @Override
     public String toString() {
         return "Category{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", colorCode='" + colorCode + '\'' +
-                ", iconName='" + iconName + '\'' +
+                ", imagePath='" + imagePath + '\'' +
                 ", isActive=" + isActive +
                 ", displayOrder=" + displayOrder +
                 ", productCount=" + productCount +

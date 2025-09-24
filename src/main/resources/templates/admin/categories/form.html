@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${category.id != null ? 'Editar Categoría' : 'Nueva Categoría'} + ' - ORIOLA Denim'">Nueva Categoría - ORIOLA Denim</title>
+    <title th:text="${category.id != null ? 'Editar Categoría' : 'Nueva Categoría'} + ' - Orioladenim'">Nueva Categoría - Orioladenim</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link th:href="@{/css/style.css}" rel="stylesheet">
@@ -13,7 +13,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="/admin/categories">
-                <i class="bi bi-tags me-2"></i>ORIOLA - Categorías
+                <i class="bi bi-tags me-2"></i>Orioladenim - Categorías
             </a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="/admin/categories">
@@ -107,36 +107,25 @@
                                 <div class="form-text">Descripción opcional para la categoría</div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="colorCode" class="form-label">Color de Identificación *</label>
-                                        <div class="input-group">
-                                            <input type="color" class="form-control form-control-color" id="colorCode" 
-                                                   th:field="*{colorCode}" value="#ff6b6b">
-                                            <input type="text" class="form-control" th:field="*{colorCode}" 
-                                                   placeholder="#ff6b6b" pattern="^#[0-9A-Fa-f]{6}$">
-                                        </div>
-                                        <div class="form-text">Color para identificar visualmente la categoría</div>
+                            <div class="mb-3">
+                                <label for="imagePath" class="form-label">Imagen de la Categoría</label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" id="imagePath" th:field="*{imagePath}" 
+                                               placeholder="/img/categories/categoria-ejemplo.jpg">
+                                        <div class="form-text">Ruta de la imagen (ej: /img/categories/remeras.jpg)</div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="iconName" class="form-label">Icono</label>
-                                        <select class="form-select" id="iconName" th:field="*{iconName}">
-                                            <option value="">Seleccionar icono</option>
-                                            <option value="shirt">👕 Camiseta</option>
-                                            <option value="pants">👖 Pantalones</option>
-                                            <option value="hat">👒 Sombrero</option>
-                                            <option value="shoe">👟 Zapatos</option>
-                                            <option value="bag">👜 Bolso</option>
-                                            <option value="watch">⌚ Reloj</option>
-                                            <option value="glasses">👓 Lentes</option>
-                                            <option value="tag">🏷️ Etiqueta</option>
-                                            <option value="star">⭐ Estrella</option>
-                                            <option value="heart">❤️ Corazón</option>
-                                        </select>
-                                        <div class="form-text">Icono representativo de la categoría</div>
+                                    <div class="col-md-6">
+                                        <div class="category-image-preview" style="width: 100px; height: 100px; border: 2px dashed #dee2e6; border-radius: 8px; overflow: hidden;">
+                                            <img th:if="${category.imagePath != null and !category.imagePath.isEmpty()}"
+                                                 th:src="${category.imagePath}" 
+                                                 th:alt="${category.name}"
+                                                 style="width: 100%; height: 100%; object-fit: cover;">
+                                            <div th:unless="${category.imagePath != null and !category.imagePath.isEmpty()}"
+                                                 class="d-flex align-items-center justify-content-center text-muted h-100">
+                                                <i class="bi bi-image fs-4"></i>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -182,11 +171,11 @@
                                 </ul>
                             </div>
                             <div class="col-md-6">
-                                <h6>🎨 Columnas en la Lista:</h6>
+                                <h6>🖼️ Gestión de Imágenes:</h6>
                                 <ul class="list-unstyled">
-                                    <li>• <strong>Color</strong>: Código hexadecimal para identificación visual</li>
-                                    <li>• <strong>Icono</strong>: Nombre del icono de Bootstrap Icons</li>
-                                    <li>• <strong>Productos</strong>: Contador de productos en la categoría</li>
+                                    <li>• <strong>Imagen</strong>: Ruta a archivo de imagen para la categoría</li>
+                                    <li>• <strong>Formato</strong>: JPG, PNG, WebP recomendados</li>
+                                    <li>• <strong>Tamaño</strong>: 400x400px ideal para tarjetas</li>
                                 </ul>
                             </div>
                         </div>
@@ -198,19 +187,26 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Sincronizar el color picker con el input de texto
-        document.getElementById('colorCode').addEventListener('input', function() {
-            const colorInput = document.querySelector('input[type="text"][th\\:field="*{colorCode}"]');
-            if (colorInput) {
-                colorInput.value = this.value;
-            }
-        });
-        
-        // Sincronizar el input de texto con el color picker
-        document.querySelector('input[type="text"][th\\:field="*{colorCode}"]').addEventListener('input', function() {
-            const colorPicker = document.getElementById('colorCode');
-            if (this.value.match(/^#[0-9A-Fa-f]{6}$/)) {
-                colorPicker.value = this.value;
+        // Actualizar preview de imagen cuando cambie la ruta
+        document.getElementById('imagePath').addEventListener('input', function() {
+            const preview = document.querySelector('.category-image-preview img');
+            const placeholder = document.querySelector('.category-image-preview div');
+            
+            if (this.value && this.value.trim() !== '') {
+                if (preview) {
+                    preview.src = this.value;
+                    preview.style.display = 'block';
+                }
+                if (placeholder) {
+                    placeholder.style.display = 'none';
+                }
+            } else {
+                if (preview) {
+                    preview.style.display = 'none';
+                }
+                if (placeholder) {
+                    placeholder.style.display = 'flex';
+                }
             }
         });
     </script>

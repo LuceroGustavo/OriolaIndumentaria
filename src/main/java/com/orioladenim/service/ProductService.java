@@ -43,9 +43,6 @@ public class ProductService {
         }
     }
     
-    public List<Product> findByCategoria(String categoria) {
-        return productRepository.findByCategoria(categoria);
-    }
     
     public List<Product> findByActivoTrue() {
         return productRepository.findByActivoTrue();

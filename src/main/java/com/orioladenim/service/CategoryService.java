@@ -55,6 +55,14 @@ public class CategoryService {
     }
     
     /**
+     * Alias para getCategoryById para compatibilidad
+     */
+    @Transactional(readOnly = true)
+    public Optional<Category> findById(Long id) {
+        return getCategoryById(id);
+    }
+    
+    /**
      * Buscar categoría por nombre
      */
     @Transactional(readOnly = true)
@@ -100,8 +108,7 @@ public class CategoryService {
         // Actualizar campos
         existingCategory.setName(categoryData.getName());
         existingCategory.setDescription(categoryData.getDescription());
-        existingCategory.setColorCode(categoryData.getColorCode());
-        existingCategory.setIconName(categoryData.getIconName());
+        existingCategory.setImagePath(categoryData.getImagePath());
         existingCategory.setIsActive(categoryData.getIsActive());
         existingCategory.setDisplayOrder(categoryData.getDisplayOrder());
         
@@ -224,11 +231,12 @@ public class CategoryService {
         
         // Crear categorías por defecto
         Category[] defaultCategories = {
-            new Category("Remeras", "Camisetas y remeras de algodón", "#ff6b6b", "shirt"),
-            new Category("Buzos", "Buzos y sweaters de invierno", "#4ecdc4", "hoodie"),
-            new Category("Camisas", "Camisas formales y casuales", "#45b7d1", "shirt"),
-            new Category("Pantalones", "Jeans y pantalones de vestir", "#96ceb4", "pants"),
-            new Category("Accesorios", "Cinturones, gorras y accesorios", "#feca57", "tag")
+            new Category("Remeras", "Camisetas de algodón, básicas y estampadas para todas las temporadas"),
+            new Category("Pantalones de Jean", "Jeans clásicos y modernos, diferentes cortes y lavados"),
+            new Category("Buzos", "Buzos con capucha, oversize y básicos para invierno"),
+            new Category("Camperas", "Abrigos y camperas para todas las estaciones"),
+            new Category("Shorts", "Shorts de jean, básicos y desgastados para el verano"),
+            new Category("Sin Categoría", "Productos sin clasificar temporalmente")
         };
         
         for (int i = 0; i < defaultCategories.length; i++) {
@@ -253,8 +261,16 @@ public class CategoryService {
             throw new IllegalArgumentException("La descripción no puede exceder 200 caracteres");
         }
         
-        if (category.getColorCode() != null && !category.getColorCode().matches("^#[0-9A-Fa-f]{6}$")) {
-            throw new IllegalArgumentException("El código de color debe ser un hexadecimal válido (ej: #ff6b6b)");
+        if (category.getImagePath() != null && category.getImagePath().length() > 500) {
+            throw new IllegalArgumentException("La ruta de la imagen no puede exceder 500 caracteres");
         }
+    }
+    
+    /**
+     * Obtener el número total de categorías
+     */
+    @Transactional(readOnly = true)
+    public long getCategoryCount() {
+        return categoryRepository.count();
     }
 }

@@ -76,16 +76,30 @@ public class DataInitializer implements CommandLineRunner {
         
         // Crear categorías por defecto
         try {
+            long categoryCountBefore = categoryService.getCategoryCount();
             categoryService.createDefaultCategories();
-            System.out.println("✅ Categorías por defecto creadas");
+            long categoryCountAfter = categoryService.getCategoryCount();
+            
+            if (categoryCountAfter > categoryCountBefore) {
+                System.out.println("✅ Categorías por defecto creadas");
+            } else {
+                System.out.println("ℹ️ Categorías ya existen");
+            }
         } catch (Exception e) {
             System.out.println("ℹ️ Categorías ya existen o error: " + e.getMessage());
         }
         
         // Crear colores por defecto
         try {
+            long colorCountBefore = colorService.getColorCount();
             colorService.createDefaultColors();
-            System.out.println("✅ Colores por defecto creados");
+            long colorCountAfter = colorService.getColorCount();
+            
+            if (colorCountAfter > colorCountBefore) {
+                System.out.println("✅ Colores por defecto creados");
+            } else {
+                System.out.println("ℹ️ Colores ya existen");
+            }
         } catch (Exception e) {
             System.out.println("ℹ️ Colores ya existen o error: " + e.getMessage());
         }

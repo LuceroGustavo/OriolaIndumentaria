@@ -91,21 +91,21 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
      * Actualizar contador de productos de una categoría
      */
     @Query("UPDATE Category c SET c.productCount = " +
-           "(SELECT COUNT(p) FROM Product p WHERE p.category = c AND p.activo = true) " +
+           "(SELECT COUNT(p) FROM Product p JOIN p.categories cat WHERE cat = c AND p.activo = true) " +
            "WHERE c.id = :categoryId")
     void updateProductCount(@Param("categoryId") Long categoryId);
     
     /**
-     * Buscar categorías por color
+     * Buscar categorías por imagen
      */
-    @Query("SELECT c FROM Category c WHERE c.colorCode = :colorCode AND c.isActive = true")
-    List<Category> findByColorCode(@Param("colorCode") String colorCode);
+    @Query("SELECT c FROM Category c WHERE c.imagePath = :imagePath AND c.isActive = true")
+    List<Category> findByImagePath(@Param("imagePath") String imagePath);
     
     /**
-     * Buscar categorías por icono
+     * Buscar categorías con imagen
      */
-    @Query("SELECT c FROM Category c WHERE c.iconName = :iconName AND c.isActive = true")
-    List<Category> findByIconName(@Param("iconName") String iconName);
+    @Query("SELECT c FROM Category c WHERE c.imagePath IS NOT NULL AND c.imagePath != '' AND c.isActive = true")
+    List<Category> findCategoriesWithImages();
     
     /**
      * Estadísticas de categorías

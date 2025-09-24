@@ -282,4 +282,12 @@ public class ColorService {
             throw new IllegalArgumentException("El código hexadecimal debe tener formato #RRGGBB");
         }
     }
+    
+    /**
+     * Obtener el número total de colores
+     */
+    @Transactional(readOnly = true)
+    public long getColorCount() {
+        return colorRepository.count();
+    }
 }
