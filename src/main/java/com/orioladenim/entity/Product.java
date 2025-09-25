@@ -136,7 +136,7 @@ public class Product {
     // Método para obtener la imagen principal
     public ProductImage getImagenPrincipal() {
         return images.stream()
-                .filter(img -> img.getIsPrimary())
+                .filter(img -> img.getIsPrimary() != null && img.getIsPrimary())
                 .findFirst()
                 .orElse(images.isEmpty() ? null : images.get(0));
     }

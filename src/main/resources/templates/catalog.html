@@ -109,8 +109,14 @@
                 <div th:each="product : ${products}" class="product-card">
                     <a th:href="@{/product/{id}(id=${product.pId})}" class="text-decoration-none text-dark">
                         <div class="product-image-container">
-                            <img th:src="${product.images != null and !product.images.empty ? '/uploads/' + product.images[0].imagePath : 'https://via.placeholder.com/350x350/f8f9fa/666666?text=Orioladenim'}" 
-                                 th:alt="${product.name}" class="product-image">
+                            <img th:if="${product.images != null and !product.images.empty}" 
+                                 th:src="${product.getImagenPrincipalUrl()}" 
+                                 th:alt="${product.name}" 
+                                 class="product-image">
+                            <img th:if="${product.images == null or product.images.empty}" 
+                                 src="https://via.placeholder.com/350x350/f8f9fa/666666?text=Orioladenim" 
+                                 th:alt="${product.name}" 
+                                 class="product-image">
                         </div>
                         <div class="product-info">
                             <h3 class="product-name" th:text="${product.name}">Nombre del Producto</h3>
