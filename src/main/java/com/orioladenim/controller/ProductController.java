@@ -43,8 +43,38 @@ public class ProductController {
     private ColorService colorService;
 
     @GetMapping
-    public String listProducts(Model model) {
-        model.addAttribute("products", productRepository.findAll());
+    public String listProducts(@RequestParam(required = false) String search,
+                              @RequestParam(required = false) String category,
+                              @RequestParam(required = false) String activo,
+                              Model model) {
+        List<Product> products = productRepository.findAll();
+        
+        // Aplicar filtros
+        if (search != null && !search.trim().isEmpty()) {
+            products = products.stream()
+                    .filter(p -> p.getName().toLowerCase().contains(search.toLowerCase()))
+                    .collect(java.util.stream.Collectors.toList());
+        }
+        
+        if (category != null && !category.trim().isEmpty()) {
+            products = products.stream()
+                    .filter(p -> p.getCategories().stream()
+                            .anyMatch(c -> c.getName().toLowerCase().contains(category.toLowerCase())))
+                    .collect(java.util.stream.Collectors.toList());
+        }
+        
+        if (activo != null && !activo.trim().isEmpty()) {
+            Boolean activoFiltro = Boolean.parseBoolean(activo);
+            products = products.stream()
+                    .filter(p -> p.getActivo().equals(activoFiltro))
+                    .collect(java.util.stream.Collectors.toList());
+        }
+        
+        model.addAttribute("products", products);
+        model.addAttribute("categories", categoryService.getActiveCategories());
+        model.addAttribute("search", search);
+        model.addAttribute("selectedCategory", category);
+        model.addAttribute("activo", activo);
         return "admin/product-list";
     }
 

@@ -112,21 +112,21 @@
 
 
     <!-- Product Detail -->
-    <section class="product-detail-section" style="background: white; margin-top: 0;">
-        <div class="container-fluid px-0">
+    <section class="product-detail-section" style="background: white; margin-top: 0; padding: 40px 0;">
+        <div class="container product-detail-container">
             <div class="row g-0">
                 <!-- Imagen del Producto -->
                 <div class="col-12 col-lg-6">
                     <!-- Galería para PC -->
-                    <div class="product-gallery-desktop d-none d-lg-flex">
+                    <div class="product-gallery-desktop d-none d-lg-flex" style="max-width: 100%; width: 100%;">
                         <!-- Thumbnails Verticales (Lado Izquierdo) -->
-                        <div class="thumbnail-column me-3" th:if="${product.images != null and product.images.size() > 1}">
+                        <div class="thumbnail-column" th:if="${product.images != null and product.images.size() > 1}" style="margin-right: 25px; display: flex; flex-direction: column; height: 600px; overflow-y: auto;">
                             <div th:each="image, iterStat : ${product.images}" 
                                  th:class="${iterStat.first} ? 'thumbnail-vertical active' : 'thumbnail-vertical'"
                                  th:data-image-url="${image.getImageUrl()}"
                                  th:data-image-id="${image.id}"
                                  class="thumbnail-vertical" 
-                                 style="width: 80px; height: 100px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; overflow: hidden; border: 2px solid transparent; transition: all 0.3s ease; margin-bottom: 10px;">
+                                 style="width: 120px; height: 188px; margin-bottom: 16px; cursor: pointer; overflow: hidden; border: 1.5px solid transparent; transition: all 0.3s ease; text-align: center;">
                                 <img th:src="${image.getThumbnailUrl()}" 
                                      class="img-fluid" 
                                      style="width: 100%; height: 100%; object-fit: cover;">
@@ -134,16 +134,16 @@
                         </div>
                         
                         <!-- Imagen Principal -->
-                        <div class="main-image-container flex-grow-1">
-                            <div class="product-image-large" id="mainImageContainer" style="height: 600px; background: #f8f9fa; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 4rem; position: relative; overflow: hidden; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal">
+                        <div class="main-image-container" style="flex: 1; display: flex; justify-content: center; align-items: center;">
+                            <div class="product-image-large" id="mainImageContainer" style="width: 100%; max-width: 520px; height: 600px; background: #fff; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 4rem; position: relative; overflow: hidden; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal">
                                 <i class="bi bi-image" th:if="${product.images == null or product.images.isEmpty()}"></i>
                                 <img th:if="${product.images != null and !product.images.isEmpty()}" 
                                      th:src="${product.getImagenPrincipalUrl()}" 
                                      id="mainImage" 
                                      class="img-fluid" 
-                                     style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px; background: white;">
-                                <div class="image-overlay">
-                                    <button class="btn btn-light btn-sm">
+                                     style="width: auto; max-height: 100%; height: 600px; max-width: 520px; object-fit: contain; background: white;">
+                                <div class="image-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.3s ease;">
+                                    <button class="btn btn-light btn-sm" style="background: rgba(255,255,255,0.9); border: none; padding: 8px 16px; border-radius: 4px;">
                                         <i class="bi bi-zoom-in me-1"></i>Ampliar
                                     </button>
                                 </div>
@@ -151,64 +151,64 @@
                         </div>
                     </div>
 
-                    <!-- Galería para Móvil -->
-                    <div class="product-gallery-mobile d-lg-none">
-                        <div class="mobile-gallery-container" style="position: relative; width: 100%; height: 55vh; background: #f8f9fa; overflow: hidden; padding: 0 40px;">
-                            <!-- Imagen Principal Móvil -->
-                            <div class="mobile-main-image" id="mobileMainImage" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer;">
-                                <i class="bi bi-image" th:if="${product.images == null or product.images.isEmpty()}" style="font-size: 4rem; color: #ccc;"></i>
-                                <img th:if="${product.images != null and !product.images.isEmpty()}" 
-                                     th:src="${product.getImagenPrincipalUrl()}" 
-                                     id="mobileImage" 
-                                     class="img-fluid" 
-                                     style="width: 100%; height: 100%; object-fit: contain; background: white; border-radius: 12px;">
-                                
-                                <!-- Botón de zoom -->
-                                <div class="mobile-zoom-btn" style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                                    <i class="bi bi-zoom-in"></i>
-                                </div>
-                            </div>
-                            
-                            <!-- Indicadores de puntos -->
-                            <div class="mobile-gallery-indicators" th:if="${product.images != null and product.images.size() > 1}" 
-                                 style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 10;">
-                                <span th:each="image, iterStat : ${product.images}" 
-                                      th:class="${iterStat.first} ? 'indicator active' : 'indicator'"
-                                      th:data-image-index="${iterStat.index}"
-                                      class="indicator" 
-                                      style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.3s ease;"></span>
-                            </div>
-                        </div>
+        <!-- Galería para Móvil -->
+        <div class="product-gallery-mobile d-lg-none" style="margin-top: 0; padding: 0;">
+            <div class="mobile-gallery-container" style="position: relative; width: 100%; height: 60vh; background: #fff; overflow: hidden; padding: 0; display: flex; justify-content: center;">
+                <!-- Imagen Principal Móvil -->
+                <div class="mobile-main-image" id="mobileMainImage" style="width: 85%; min-width: 300px; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; padding: 0;">
+                    <i class="bi bi-image" th:if="${product.images == null or product.images.isEmpty()}" style="font-size: 4rem; color: #ccc;"></i>
+                    <img th:if="${product.images != null and !product.images.isEmpty()}" 
+                         th:src="${product.getImagenPrincipalUrl()}" 
+                         id="mobileImage" 
+                         class="img-fluid" 
+                         style="width: 100%; height: 100%; object-fit: contain; background: white; border-radius: 0; margin: 0; padding: 0;">
+                    
+                    <!-- Botón de zoom -->
+                    <div class="mobile-zoom-btn" style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <i class="bi bi-zoom-in"></i>
                     </div>
+                </div>
+                
+                <!-- Indicadores de puntos -->
+                <div class="mobile-gallery-indicators" th:if="${product.images != null and product.images.size() > 1}" 
+                     style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 10;">
+                    <span th:each="image, iterStat : ${product.images}" 
+                          th:class="${iterStat.first} ? 'indicator active' : 'indicator'"
+                          th:data-image-index="${iterStat.index}"
+                          class="indicator" 
+                          style="width: 8px; height: 8px; border-radius: 50%; background: rgba(0,0,0,0.44); cursor: pointer; transition: all 0.3s ease;"></span>
+                </div>
+            </div>
+        </div>
                 </div>
 
                 <!-- Información del Producto -->
                 <div class="col-12 col-lg-6">
-                    <div class="product-details">
+                    <div class="product-details" style="padding: 0 40px;">
                         <!-- Título del producto -->
-                        <h1 class="product-title mb-3" th:text="${product.name}" 
-                            style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 400; color: #000; letter-spacing: 1px;">
+                        <h1 class="product-title mb-4" th:text="${product.name}" 
+                            style="font-family: 'Inter', sans-serif; font-size: 32px; font-weight: 400; color: #000; letter-spacing: 0px; text-transform: uppercase; line-height: 1.2;">
                             Nombre del Producto
                         </h1>
                         
                         <!-- Precio -->
-                        <div class="product-price mb-4">
-                            <span class="current-price" th:text="'$' + ${#numbers.formatDecimal(product.price, 0, 0)}" 
-                                  style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 400; color: #000;">$0</span>
+                        <div class="product-price mb-5">
+                            <span class="current-price" th:text="'$ ' + ${#numbers.formatDecimal(product.price, 0, 0)}" 
+                                  style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 400; color: #000;">$ 0</span>
                         </div>
 
-                        <!-- Información inicial visible en móvil -->
-                        <div class="mobile-initial-info d-lg-none mb-4">
-                            <div class="mobile-product-header">
-                                <div class="mb-3">
-                                    <h2 class="mobile-product-title mb-0" th:text="${product.name}" 
-                                        style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 400; color: #000; letter-spacing: 0.5px; text-transform: uppercase;">
-                                        Nombre del Producto
-                                    </h2>
-                                </div>
-                                <div class="mobile-product-price mb-3 d-flex justify-content-between align-items-center">
-                                    <span class="mobile-current-price" th:text="'$' + ${#numbers.formatDecimal(product.price, 0, 0)}" 
-                                          style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 700; color: #000;">$0</span>
+        <!-- Información inicial visible en móvil -->
+        <div class="mobile-initial-info d-lg-none mb-4" style="padding: 20px 30px; background: white;">
+            <div class="mobile-product-header">
+                <div class="mb-3">
+                    <h2 class="mobile-product-title mb-0" th:text="${product.name}" 
+                        style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 400; color: #000; letter-spacing: 0px; text-transform: uppercase; line-height: 1.2;">
+                        Nombre del Producto
+                    </h2>
+                </div>
+                                <div class="mobile-product-price mb-4 d-flex justify-content-between align-items-center">
+                                    <span class="mobile-current-price" th:text="'$ ' + ${#numbers.formatDecimal(product.price, 0, 0)}" 
+                                          style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 400; color: #000;">$ 0</span>
                                     <!-- Círculos de colores en la fila del precio -->
                                     <div class="mobile-color-circles-price" th:if="${product.colores != null and !product.colores.isEmpty()}">
                                         <div class="color-circles d-flex gap-2">
@@ -271,15 +271,59 @@
                                 </div>
                                 
                                 <!-- Botones de acción -->
-                                <div class="mobile-action-buttons d-grid gap-2">
+                                <div class="mobile-action-buttons d-grid gap-3">
                                     <button class="btn btn-dark btn-lg" 
-                                            style="background: #000; border: none; padding: 16px 24px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: 1px; border-radius: 8px;">
-                                        <i class="bi bi-whatsapp me-2"></i>CONSULTAR POR WHATSAPP
+                                            th:data-product-name="${product.name}"
+                                            th:data-product-price="'$ ' + ${#numbers.formatDecimal(product.price, 0, 0)}"
+                                            style="background: #000; border: none; padding: 16px 24px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: 1px; border-radius: 8px; text-transform: uppercase;">
+                                        <i class="bi bi-whatsapp me-2"></i>Consultar por WhatsApp
                                     </button>
-                                    <button class="btn btn-outline-dark btn-lg"
-                                            style="border: 2px solid #000; color: #000; background: transparent; padding: 16px 24px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: 1px; border-radius: 8px;">
-                                        <i class="bi bi-envelope me-2"></i>ENVIAR CONSULTA
-                                    </button>
+                                    <a th:href="@{/contact(producto=${product.name})}" class="btn btn-outline-dark btn-lg"
+                                       style="border: 2px solid #000; color: #000; background: transparent; padding: 16px 24px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: 1px; border-radius: 8px; text-transform: uppercase; text-decoration: none;">
+                                        <i class="bi bi-envelope me-2"></i>Enviar Consulta
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Selector de variantes para PC -->
+                        <div class="variant-selector-desktop d-none d-lg-block mb-5">
+                            <h6 class="mb-4" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #000; text-transform: uppercase; letter-spacing: 1px;">
+                                SELECCIONÁ UNA VARIANTE
+                            </h6>
+                            
+                            <!-- Colores -->
+                            <div class="color-section mb-4" th:if="${product.colores != null and !product.colores.isEmpty()}">
+                                <div class="d-flex align-items-center mb-3">
+                                    <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; margin-right: 15px;">Color</span>
+                                    <div class="color-circles d-flex gap-3">
+                                        <div th:each="color, iterStat : ${product.colores}" 
+                                             th:class="${iterStat.first} ? 'color-circle active' : 'color-circle'"
+                                             th:data-color-id="${color.id}"
+                                             th:data-color-name="${color.name}"
+                                             th:style="'background-color: ' + ${color.hexCode} + ';'"
+                                             class="color-circle" 
+                                             style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: pointer; transition: all 0.3s ease; position: relative;">
+                                            <div class="color-check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px; opacity: 0; transition: opacity 0.3s ease;">
+                                                <i class="bi bi-check"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Talles -->
+                            <div class="size-section mb-4" th:if="${product.talles != null and !product.talles.isEmpty()}">
+                                <div class="d-flex align-items-center mb-3">
+                                    <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; margin-right: 15px;">Talle</span>
+                                    <div class="size-options d-flex gap-2">
+                                        <button th:each="talle, iterStat : ${product.talles}" 
+                                                th:class="${iterStat.first} ? 'size-btn active' : 'size-btn'"
+                                                th:text="${talle.displayName}"
+                                                class="size-btn" 
+                                                style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #e0e0e0; background: white; color: #000; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.3s ease;">
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -401,17 +445,17 @@
                             </div>
                         </div>
 
-                        <div class="product-actions mb-4">
-                            <div class="d-grid gap-2">
+                        <div class="product-actions mb-5">
+                            <div class="d-grid gap-3">
                                 <button class="btn btn-dark btn-lg" 
                                         th:data-product-name="${product.name}"
-                                        th:data-product-price="'$' + ${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}"
-                                        style="background: #000; border: none; padding: 12px 24px; font-family: 'Inter', sans-serif; font-weight: 400; font-size: 14px; letter-spacing: 1px; border-radius: 0;">
-                                    <i class="bi bi-whatsapp me-2"></i>CONSULTAR POR WHATSAPP
+                                        th:data-product-price="'$ ' + ${#numbers.formatDecimal(product.price, 0, 0)}"
+                                        style="background: #000; border: none; padding: 16px 24px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: 1px; border-radius: 8px; text-transform: uppercase;">
+                                    <i class="bi bi-whatsapp me-2"></i>Consultar por WhatsApp
                                 </button>
                                 <a th:href="@{/contact(producto=${product.name})}" class="btn btn-outline-dark btn-lg"
-                                   style="border: 1px solid #000; color: #000; background: transparent; padding: 12px 24px; font-family: 'Inter', sans-serif; font-weight: 400; font-size: 14px; letter-spacing: 1px; border-radius: 0;">
-                                    <i class="bi bi-envelope me-2"></i>ENVIAR CONSULTA
+                                   style="border: 2px solid #000; color: #000; background: transparent; padding: 16px 24px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: 1px; border-radius: 8px; text-transform: uppercase;">
+                                    <i class="bi bi-envelope me-2"></i>Enviar Consulta
                                 </a>
                             </div>
                         </div>
@@ -728,14 +772,14 @@
 
         // Manejar click del botón de WhatsApp en detalle de producto
         document.addEventListener('DOMContentLoaded', function() {
-            const whatsappBtn = document.querySelector('.whatsapp-btn[data-product-name]');
-            if (whatsappBtn) {
-                whatsappBtn.addEventListener('click', function() {
+            // Botones de WhatsApp (PC y móvil)
+            document.querySelectorAll('button[data-product-name]').forEach(btn => {
+                btn.addEventListener('click', function() {
                     const productName = this.getAttribute('data-product-name');
                     const productPrice = this.getAttribute('data-product-price');
                     openWhatsApp(productName, productPrice);
                 });
-            }
+            });
         });
     </script>
 
@@ -776,14 +820,11 @@
         }
 
         .thumbnail-vertical:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-color: #151414 !important;
         }
 
         .thumbnail-vertical.active {
-            border: 2px solid #000;
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 1.5px solid #151414 !important;
         }
 
         .thumbnail-vertical img {
@@ -836,16 +877,24 @@
         }
 
         .mobile-main-image {
+            overflow: hidden;
+        }
+        
+        .mobile-main-image img {
             transition: transform 0.3s ease;
+        }
+        
+        .mobile-main-image:hover img {
+            transform: scale(1.05);
         }
 
         .mobile-gallery-indicators .indicator.active {
-            background: rgba(255,255,255,1) !important;
+            background: #000 !important;
             transform: scale(1.2);
         }
 
         .mobile-gallery-indicators .indicator:hover {
-            background: rgba(255,255,255,0.8) !important;
+            background: rgba(0,0,0,0.8) !important;
         }
 
         /* Selector de colores móvil */
@@ -936,8 +985,33 @@
 
             /* Ajustar altura de galería móvil */
             .mobile-gallery-container {
-                height: 55vh !important;
-                padding: 0 40px !important;
+                height: 60vh !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            /* Reducir márgenes del contenedor principal */
+            .product-detail-container {
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+            
+            /* Reducir padding de la sección principal */
+            .product-detail-section {
+                padding: 0 !important;
+                margin-top: 0 !important;
+            }
+            
+            /* Ajustar padding del contenido */
+            .product-details {
+                padding: 15px !important;
+            }
+            
+            /* Hacer que la galería móvil ocupe todo el ancho */
+            .product-gallery-mobile {
+                margin: 0 !important;
+                padding: 0 !important;
             }
 
             /* Mejorar scroll */
@@ -975,19 +1049,31 @@
                 border-color: #666 !important;
             }
 
-            /* Estilos para círculos de color */
-            .color-circle.active {
-                border-color: #000 !important;
-                transform: scale(1.1);
-            }
+        /* Estilos para círculos de color */
+        .color-circle.active {
+            border-color: #151414 !important;
+            transform: scale(1.1);
+        }
 
-            .color-circle.active .color-check {
-                opacity: 1 !important;
-            }
+        .color-circle.active .color-check {
+            opacity: 1 !important;
+        }
 
-            .color-circle:hover {
-                transform: scale(1.05);
-            }
+        .color-circle:hover {
+            transform: scale(1.05);
+            border-color: #666 !important;
+        }
+
+        /* Estilos para botones de talle */
+        .size-btn.active {
+            border-color: #151414 !important;
+            background: #151414 !important;
+            color: white !important;
+        }
+
+        .size-btn:hover {
+            border-color: #666 !important;
+        }
 
             /* Círculos de colores en la fila del precio */
             .mobile-color-circles-price .color-circle {
@@ -997,7 +1083,7 @@
             }
 
             .mobile-color-circles-price .color-circle.active {
-                border-color: #000 !important;
+                border-color: #151414 !important;
                 transform: scale(1.1);
             }
         }
@@ -1203,20 +1289,45 @@
                 mobileMainImage.addEventListener('click', zoomMobileImage);
             }
 
-            // Selector de colores móvil
+            // Selector de colores (PC y móvil)
             document.querySelectorAll('.color-circle').forEach((circle, index) => {
                 circle.addEventListener('click', () => {
-                    // Remover active de todos
-                    document.querySelectorAll('.color-circle').forEach(c => {
-                        c.classList.remove('active');
-                        c.style.borderColor = '#e0e0e0';
-                        c.querySelector('.color-check').style.opacity = '0';
-                    });
+                    // Remover active de todos los círculos del mismo grupo
+                    const colorGroup = circle.closest('.color-circles');
+                    if (colorGroup) {
+                        colorGroup.querySelectorAll('.color-circle').forEach(c => {
+                            c.classList.remove('active');
+                            c.style.borderColor = '#e0e0e0';
+                            c.querySelector('.color-check').style.opacity = '0';
+                        });
+                    }
                     
                     // Activar el seleccionado
                     circle.classList.add('active');
-                    circle.style.borderColor = '#000';
+                    circle.style.borderColor = '#151414';
                     circle.querySelector('.color-check').style.opacity = '1';
+                });
+            });
+
+            // Selector de talles (PC y móvil)
+            document.querySelectorAll('.size-btn').forEach((btn, index) => {
+                btn.addEventListener('click', () => {
+                    // Remover active de todos los botones del mismo grupo
+                    const sizeGroup = btn.closest('.size-options');
+                    if (sizeGroup) {
+                        sizeGroup.querySelectorAll('.size-btn').forEach(b => {
+                            b.classList.remove('active');
+                            b.style.borderColor = '#e0e0e0';
+                            b.style.background = 'white';
+                            b.style.color = '#000';
+                        });
+                    }
+                    
+                    // Activar el seleccionado
+                    btn.classList.add('active');
+                    btn.style.borderColor = '#151414';
+                    btn.style.background = '#151414';
+                    btn.style.color = 'white';
                 });
             });
 

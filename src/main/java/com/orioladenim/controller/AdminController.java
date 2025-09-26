@@ -38,7 +38,7 @@ public class AdminController {
         User user = userService.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         
-        model.addAttribute("totalProducts", totalProducts);
+        model.addAttribute("totalProductos", totalProducts);
         model.addAttribute("productosDestacados", productosDestacados);
         model.addAttribute("productosActivos", productosActivos);
         model.addAttribute("username", username);

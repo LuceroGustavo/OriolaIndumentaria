@@ -52,5 +52,12 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     // Obtener productos más recientes
     @Query("SELECT p FROM Product p WHERE p.activo = true ORDER BY p.fechaCreacion DESC")
     List<Product> findProductosRecientes();
+    
+    // Buscar productos por nombre (sin filtro de activo para admin)
+    List<Product> findByNameContainingIgnoreCase(String name);
+    
+    // Buscar productos por categoría (sin filtro de activo para admin)
+    @Query("SELECT p FROM Product p JOIN p.categories c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :categoria, '%'))")
+    List<Product> findByCategoriesNameContainingIgnoreCase(@Param("categoria") String categoria);
 }
 
