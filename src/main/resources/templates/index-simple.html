@@ -22,7 +22,8 @@
                     </button>
                     <!-- Overlay para el menú móvil -->
                     <div class="nav-overlay" id="navOverlay" onclick="closeMobileMenu()"></div>
-                    <ul class="nav-menu" id="navMenu">
+                    <!-- Menú para PC (≥ 769px) -->
+                    <ul class="nav-menu nav-menu-desktop" id="navMenuDesktop">
                         <li class="nav-item">
                             <a href="/" class="nav-link active">Inicio</a>
                         </li>
@@ -32,21 +33,36 @@
                         <li class="nav-item dropdown">
                             <a href="javascript:void(0)" class="nav-link dropdown-toggle">Categorías</a>
                             <div class="dropdown-menu">
-                                <div class="submenu-header" onclick="closeSubmenu()">
-                                    <span class="submenu-title">CATEGORÍAS</span>
-                                    <button class="submenu-close">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <polyline points="6,9 12,15 18,9"></polyline>
-                                        </svg>
-                                    </button>
+                                <div class="dropdown-content">
+                                    <div class="dropdown-grid">
+                                        <a href="/catalog?category=Remeras" class="dropdown-item">Remeras</a>
+                                        <a href="/catalog?category=Pantalones" class="dropdown-item">Pantalones</a>
+                                        <a href="/catalog?category=Buzos" class="dropdown-item">Buzos</a>
+                                        <a href="/catalog?category=Shorts" class="dropdown-item">Shorts</a>
+                                        <a href="/catalog?category=Camisas" class="dropdown-item">Camisas</a>
+                                        <a href="/catalog" class="dropdown-item">Ver Todo</a>
+                                    </div>
                                 </div>
-                                <a href="/catalog?category=Remeras" class="dropdown-item">Remeras</a>
-                                <a href="/catalog?category=Pantalones" class="dropdown-item">Pantalones</a>
-                                <a href="/catalog?category=Buzos" class="dropdown-item">Buzos</a>
-                                <a href="/catalog?category=Shorts" class="dropdown-item">Shorts</a>
-                                <a href="/catalog?category=Camisas" class="dropdown-item">Camisas</a>
-                                <a href="/catalog" class="dropdown-item">Ver Todo</a>
                             </div>
+                        </li>
+                    </ul>
+
+                    <!-- Menú para Móvil (≤ 768px) -->
+                    <ul class="nav-menu nav-menu-mobile" id="navMenuMobile">
+                        <li class="nav-item">
+                            <a href="/" class="nav-link active" onclick="closeMobileMenu()">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog" class="nav-link" onclick="closeMobileMenu()">Novedades</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog" class="nav-link" onclick="closeMobileMenu()">Catálogo</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/contact" class="nav-link" onclick="closeMobileMenu()">Consulta</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/about" class="nav-link" onclick="closeMobileMenu()">Quiénes Somos</a>
                         </li>
                     </ul>
                 </div>
@@ -219,12 +235,11 @@
     </style>
 
     <script>
+        // Variables globales para evitar conflictos
+        let isMobileMenuOpen = false;
+        
         function toggleMobileMenu() {
-            const navMenu = document.getElementById('navMenu');
-            const navOverlay = document.getElementById('navOverlay');
-            const mobileToggle = document.querySelector('.mobile-menu-toggle');
-            
-            if (navMenu.classList.contains('active')) {
+            if (isMobileMenuOpen) {
                 closeMobileMenu();
             } else {
                 openMobileMenu();
@@ -232,23 +247,29 @@
         }
 
         function openMobileMenu() {
-            const navMenu = document.getElementById('navMenu');
+            const navMenuMobile = document.getElementById('navMenuMobile');
             const navOverlay = document.getElementById('navOverlay');
             const mobileToggle = document.querySelector('.mobile-menu-toggle');
             
-            navMenu.classList.add('active');
-            navOverlay.classList.add('active');
-            mobileToggle.innerHTML = '<i class="bi bi-x"></i>';
+            if (navMenuMobile && navOverlay && mobileToggle) {
+                navMenuMobile.classList.add('active');
+                navOverlay.classList.add('active');
+                mobileToggle.innerHTML = '<i class="bi bi-x"></i>';
+                isMobileMenuOpen = true;
+            }
         }
 
         function closeMobileMenu() {
-            const navMenu = document.getElementById('navMenu');
+            const navMenuMobile = document.getElementById('navMenuMobile');
             const navOverlay = document.getElementById('navOverlay');
             const mobileToggle = document.querySelector('.mobile-menu-toggle');
             
-            navMenu.classList.remove('active');
-            navOverlay.classList.remove('active');
-            mobileToggle.innerHTML = '<i class="bi bi-list"></i>';
+            if (navMenuMobile && navOverlay && mobileToggle) {
+                navMenuMobile.classList.remove('active');
+                navOverlay.classList.remove('active');
+                mobileToggle.innerHTML = '<i class="bi bi-list"></i>';
+                isMobileMenuOpen = false;
+            }
         }
 
         function closeSubmenu() {
@@ -275,95 +296,49 @@
 
         // Initialize event listeners
         document.addEventListener('DOMContentLoaded', function() {
+            // Search functionality
             const searchToggle = document.getElementById('searchToggle');
             if (searchToggle) {
                 searchToggle.addEventListener('click', toggleSearch);
             }
 
-            // Close search when clicking outside
-            document.addEventListener('click', function(e) {
-                const searchBar = document.getElementById('searchBar');
-                const searchToggle = document.getElementById('searchToggle');
-                
-                if (!searchBar.contains(e.target) && !searchToggle.contains(e.target)) {
-                    searchBar.classList.remove('active');
-                    searchToggle.innerHTML = '<i class="bi bi-search"></i>';
-                }
-            });
-
-            // Handle dropdown toggle
+            // Dropdown functionality - Solo en PC
             const dropdownToggle = document.querySelector('.dropdown-toggle');
             if (dropdownToggle) {
                 dropdownToggle.addEventListener('click', function(e) {
                     e.preventDefault();
                     const dropdown = this.closest('.dropdown');
-                    dropdown.classList.toggle('active');
                     
-                    // Solo en móvil: cerrar el menú principal cuando se abre el submenú
-                    if (window.innerWidth <= 768 && dropdown.classList.contains('active')) {
-                        closeMobileMenu();
+                    // Solo funcionar en PC (≥ 769px)
+                    if (window.innerWidth >= 769) {
+                        dropdown.classList.toggle('active');
                     }
                 });
             }
 
-            // Close submenu when clicking on the X button
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('submenu-close')) {
-                    const dropdown = document.querySelector('.dropdown.active');
-                    if (dropdown) {
-                        dropdown.classList.remove('active');
-                    }
-                }
+            // Cerrar menú móvil al hacer clic en enlaces
+            document.querySelectorAll('.nav-menu-mobile .nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    closeMobileMenu();
+                });
             });
 
-            // Close submenu when clicking outside of it
-            document.addEventListener('click', function(e) {
-                const dropdown = document.querySelector('.dropdown.active');
-                const dropdownMenu = document.querySelector('.dropdown-menu');
-                
-                if (dropdown && dropdownMenu && !dropdown.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                    dropdown.classList.remove('active');
-                }
-            });
-
-            // Close submenu when clicking on the overlay
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('dropdown-menu') && e.target === e.currentTarget) {
-                    const dropdown = document.querySelector('.dropdown.active');
-                    if (dropdown) {
-                        dropdown.classList.remove('active');
-                    }
-                }
-            });
-
-            // Close mobile menu when clicking on links (except dropdown toggle)
-            document.querySelectorAll('.nav-link').forEach(link => {
-                if (!link.classList.contains('dropdown-toggle')) {
-                    link.addEventListener('click', () => {
-                        closeMobileMenu();
-                    });
-                }
-            });
-
-            // Close mobile menu when clicking outside
+            // Cerrar menú móvil al hacer clic fuera
             document.addEventListener('click', (e) => {
-                const navMenu = document.getElementById('navMenu');
+                const navMenuMobile = document.getElementById('navMenuMobile');
                 const mobileToggle = document.querySelector('.mobile-menu-toggle');
                 
-                if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
+                if (navMenuMobile && mobileToggle && 
+                    !navMenuMobile.contains(e.target) && 
+                    !mobileToggle.contains(e.target)) {
                     closeMobileMenu();
                 }
             });
 
-            // Close mobile menu on resize and handle dropdown behavior
+            // Manejar resize de ventana
             window.addEventListener('resize', () => {
                 if (window.innerWidth > 768) {
                     closeMobileMenu();
-                    // En PC, cerrar cualquier submenú abierto
-                    const dropdown = document.querySelector('.dropdown.active');
-                    if (dropdown) {
-                        dropdown.classList.remove('active');
-                    }
                 }
             });
         });

@@ -17,7 +17,14 @@
                 <a href="/" class="logo">Orioladenim</a>
                 
                 <div class="header-nav">
-                    <ul class="nav-menu">
+                    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <!-- Overlay para el menú móvil -->
+                    <div class="nav-overlay" id="navOverlay" onclick="closeMobileMenu()"></div>
+                    
+                    <!-- Menú para PC (≥ 769px) -->
+                    <ul class="nav-menu nav-menu-desktop" id="navMenuDesktop">
                         <li class="nav-item">
                             <a href="/" class="nav-link">Inicio</a>
                         </li>
@@ -27,24 +34,64 @@
                         <li class="nav-item dropdown">
                             <a href="javascript:void(0)" class="nav-link dropdown-toggle">Categorías</a>
                             <div class="dropdown-menu">
-                                <a href="/catalog?category=REMERAS" class="dropdown-item">Remeras</a>
-                                <a href="/catalog?category=PANTALONES" class="dropdown-item">Pantalones</a>
-                                <a href="/catalog?category=CAMISAS" class="dropdown-item">Camisas</a>
-                                <a href="/catalog?category=BUZOS" class="dropdown-item">Buzos</a>
-                                <a href="/catalog?category=VESTIDOS" class="dropdown-item">Vestidos</a>
-                                <a href="/catalog?category=SHORTS" class="dropdown-item">Shorts</a>
-                                <a href="/catalog?category=CHOMBAS" class="dropdown-item">Chombas</a>
-                                <a href="/catalog" class="dropdown-item">Ver Todo</a>
+                                <div class="dropdown-content">
+                                    <div class="dropdown-grid">
+                                        <a href="/catalog?category=REMERAS" class="dropdown-item">Remeras</a>
+                                        <a href="/catalog?category=PANTALONES" class="dropdown-item">Pantalones</a>
+                                        <a href="/catalog?category=CAMISAS" class="dropdown-item">Camisas</a>
+                                        <a href="/catalog?category=BUZOS" class="dropdown-item">Buzos</a>
+                                        <a href="/catalog?category=VESTIDOS" class="dropdown-item">Vestidos</a>
+                                        <a href="/catalog?category=SHORTS" class="dropdown-item">Shorts</a>
+                                        <a href="/catalog?category=CHOMBAS" class="dropdown-item">Chombas</a>
+                                        <a href="/catalog" class="dropdown-item">Ver Todo</a>
+                                    </div>
+                                </div>
                             </div>
+                        </li>
+                    </ul>
+
+                    <!-- Menú para Móvil (≤ 768px) -->
+                    <ul class="nav-menu nav-menu-mobile" id="navMenuMobile">
+                        <li class="nav-item">
+                            <a href="/" class="nav-link" onclick="closeMobileMenu()">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog" class="nav-link" onclick="closeMobileMenu()">Catálogo</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog?category=REMERAS" class="nav-link" onclick="closeMobileMenu()">Remeras</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog?category=PANTALONES" class="nav-link" onclick="closeMobileMenu()">Pantalones</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog?category=CAMISAS" class="nav-link" onclick="closeMobileMenu()">Camisas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog?category=BUZOS" class="nav-link" onclick="closeMobileMenu()">Buzos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog?category=VESTIDOS" class="nav-link" onclick="closeMobileMenu()">Vestidos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog?category=SHORTS" class="nav-link" onclick="closeMobileMenu()">Shorts</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog?category=CHOMBAS" class="nav-link" onclick="closeMobileMenu()">Chombas</a>
                         </li>
                     </ul>
                 </div>
                 
                 <div class="header-actions">
-                    <div class="search-bar">
+                    <!-- Search bar - hidden on desktop, shown on mobile when search icon is clicked -->
+                    <div class="search-bar" id="searchBar">
                         <input type="text" class="search-input" placeholder="Buscar productos...">
                     </div>
                     <div class="header-icons">
+                        <!-- Search icon - only visible on mobile -->
+                        <button class="header-icon search-toggle" id="searchToggle" title="Buscar">
+                            <i class="bi bi-search"></i>
+                        </button>
                         <a href="https://www.instagram.com/oriolaindumentaria" class="header-icon" title="Instagram" target="_blank">
                             <i class="bi bi-instagram"></i>
                         </a>
@@ -63,26 +110,15 @@
         </div>
     </header>
 
-    <!-- Breadcrumb -->
-    <section class="py-3" style="background: white; margin-top: 80px;">
-        <div class="container">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Inicio</a></li>
-                    <li class="breadcrumb-item"><a href="/catalog">Catálogo</a></li>
-                    <li class="breadcrumb-item active" th:text="${product.name}">Producto</li>
-                </ol>
-            </nav>
-        </div>
-    </section>
 
     <!-- Product Detail -->
-    <section class="py-5" style="background: white;">
-        <div class="container">
-            <div class="row">
+    <section class="product-detail-section" style="background: white; margin-top: 0;">
+        <div class="container-fluid px-0">
+            <div class="row g-0">
                 <!-- Imagen del Producto -->
-                <div class="col-lg-6 mb-4">
-                    <div class="product-gallery d-flex">
+                <div class="col-12 col-lg-6">
+                    <!-- Galería para PC -->
+                    <div class="product-gallery-desktop d-none d-lg-flex">
                         <!-- Thumbnails Verticales (Lado Izquierdo) -->
                         <div class="thumbnail-column me-3" th:if="${product.images != null and product.images.size() > 1}">
                             <div th:each="image, iterStat : ${product.images}" 
@@ -114,16 +150,158 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Galería para Móvil -->
+                    <div class="product-gallery-mobile d-lg-none">
+                        <div class="mobile-gallery-container" style="position: relative; width: 100%; height: 55vh; background: #f8f9fa; overflow: hidden; padding: 0 40px;">
+                            <!-- Imagen Principal Móvil -->
+                            <div class="mobile-main-image" id="mobileMainImage" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer;">
+                                <i class="bi bi-image" th:if="${product.images == null or product.images.isEmpty()}" style="font-size: 4rem; color: #ccc;"></i>
+                                <img th:if="${product.images != null and !product.images.isEmpty()}" 
+                                     th:src="${product.getImagenPrincipalUrl()}" 
+                                     id="mobileImage" 
+                                     class="img-fluid" 
+                                     style="width: 100%; height: 100%; object-fit: contain; background: white; border-radius: 12px;">
+                                
+                                <!-- Botón de zoom -->
+                                <div class="mobile-zoom-btn" style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <i class="bi bi-zoom-in"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Indicadores de puntos -->
+                            <div class="mobile-gallery-indicators" th:if="${product.images != null and product.images.size() > 1}" 
+                                 style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 10;">
+                                <span th:each="image, iterStat : ${product.images}" 
+                                      th:class="${iterStat.first} ? 'indicator active' : 'indicator'"
+                                      th:data-image-index="${iterStat.index}"
+                                      class="indicator" 
+                                      style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.3s ease;"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Información del Producto -->
-                <div class="col-lg-6">
+                <div class="col-12 col-lg-6">
                     <div class="product-details">
-                        <h1 class="product-title mb-3" th:text="${product.name}" style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 400; color: #000; letter-spacing: 1px;">Nombre del Producto</h1>
+                        <!-- Título del producto -->
+                        <h1 class="product-title mb-3" th:text="${product.name}" 
+                            style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 400; color: #000; letter-spacing: 1px;">
+                            Nombre del Producto
+                        </h1>
                         
+                        <!-- Precio -->
                         <div class="product-price mb-4">
                             <span class="current-price" th:text="'$' + ${#numbers.formatDecimal(product.price, 0, 0)}" 
                                   style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 400; color: #000;">$0</span>
+                        </div>
+
+                        <!-- Información inicial visible en móvil -->
+                        <div class="mobile-initial-info d-lg-none mb-4">
+                            <div class="mobile-product-header">
+                                <div class="mb-3">
+                                    <h2 class="mobile-product-title mb-0" th:text="${product.name}" 
+                                        style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 400; color: #000; letter-spacing: 0.5px; text-transform: uppercase;">
+                                        Nombre del Producto
+                                    </h2>
+                                </div>
+                                <div class="mobile-product-price mb-3 d-flex justify-content-between align-items-center">
+                                    <span class="mobile-current-price" th:text="'$' + ${#numbers.formatDecimal(product.price, 0, 0)}" 
+                                          style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 700; color: #000;">$0</span>
+                                    <!-- Círculos de colores en la fila del precio -->
+                                    <div class="mobile-color-circles-price" th:if="${product.colores != null and !product.colores.isEmpty()}">
+                                        <div class="color-circles d-flex gap-2">
+                                            <div th:each="color, iterStat : ${product.colores}" 
+                                                 th:class="${iterStat.first} ? 'color-circle active' : 'color-circle'"
+                                                 th:data-color-id="${color.id}"
+                                                 th:data-color-name="${color.name}"
+                                                 th:style="'background-color: ' + ${color.hexCode} + ';'"
+                                                 class="color-circle" 
+                                                 style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: pointer; transition: all 0.3s ease; position: relative;">
+                                                <div class="color-check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 10px; opacity: 0; transition: opacity 0.3s ease;">
+                                                    <i class="bi bi-check"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Selector de variantes -->
+                                <div class="mobile-variant-selector mb-3">
+                                    <h6 class="mb-2" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #000; text-transform: uppercase; letter-spacing: 1px;">
+                                        SELECCIONÁ UNA VARIANTE
+                                    </h6>
+                                    
+                                    
+                                    <!-- Colores -->
+                                    <div class="mobile-color-section mb-3" th:if="${product.colores != null and !product.colores.isEmpty()}">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; margin-right: 10px;">Color:</span>
+                                            <div class="color-circles d-flex gap-2">
+                                                <div th:each="color, iterStat : ${product.colores}" 
+                                                     th:class="${iterStat.first} ? 'color-circle active' : 'color-circle'"
+                                                     th:data-color-id="${color.id}"
+                                                     th:data-color-name="${color.name}"
+                                                     th:style="'background-color: ' + ${color.hexCode} + ';'"
+                                                     class="color-circle" 
+                                                     style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: pointer; transition: all 0.3s ease; position: relative;">
+                                                    <div class="color-check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px; opacity: 0; transition: opacity 0.3s ease;">
+                                                        <i class="bi bi-check"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Talles -->
+                                    <div class="mobile-size-section mb-3" th:if="${product.talles != null and !product.talles.isEmpty()}">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; margin-right: 10px;">Talle:</span>
+                                            <div class="size-options d-flex gap-2">
+                                                <button th:each="talle, iterStat : ${product.talles}" 
+                                                        th:class="${iterStat.first} ? 'size-btn active' : 'size-btn'"
+                                                        th:text="${talle.displayName}"
+                                                        class="size-btn" 
+                                                        style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #e0e0e0; background: white; color: #000; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.3s ease;">
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Botones de acción -->
+                                <div class="mobile-action-buttons d-grid gap-2">
+                                    <button class="btn btn-dark btn-lg" 
+                                            style="background: #000; border: none; padding: 16px 24px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: 1px; border-radius: 8px;">
+                                        <i class="bi bi-whatsapp me-2"></i>CONSULTAR POR WHATSAPP
+                                    </button>
+                                    <button class="btn btn-outline-dark btn-lg"
+                                            style="border: 2px solid #000; color: #000; background: transparent; padding: 16px 24px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: 1px; border-radius: 8px;">
+                                        <i class="bi bi-envelope me-2"></i>ENVIAR CONSULTA
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Selector de colores para móvil -->
+                        <div class="mobile-color-selector mb-4 d-lg-none" th:if="${product.colores != null and !product.colores.isEmpty()}">
+                            <h6 class="mb-3" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; text-transform: uppercase; letter-spacing: 1px;">
+                                Color
+                            </h6>
+                            <div class="color-circles d-flex flex-wrap gap-3">
+                                <div th:each="color, iterStat : ${product.colores}" 
+                                     th:class="${iterStat.first} ? 'color-circle active' : 'color-circle'"
+                                     th:data-color-id="${color.id}"
+                                     th:data-color-name="${color.name}"
+                                     th:style="'background-color: ' + ${color.hexCode} + ';'"
+                                     class="color-circle" 
+                                     style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: pointer; transition: all 0.3s ease; position: relative;">
+                                    <div class="color-check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 16px; opacity: 0; transition: opacity 0.3s ease;">
+                                        <i class="bi bi-check"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="product-description mb-4">
@@ -132,20 +310,39 @@
 
                         <div class="product-specs mb-4">
                             <div class="row">
-                                <div class="col-md-6 mb-3" th:if="${product.color}">
-                                    <div class="spec-item d-flex align-items-center">
-                                        <i class="bi bi-palette me-2" style="color: #666; font-size: 14px;"></i>
-                                        <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Color: </span>
-                                        <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" th:text="${product.color}"></span>
+                                <!-- Colores disponibles -->
+                                <div class="col-md-6 mb-3" th:if="${product.colores != null and !product.colores.isEmpty()}">
+                                    <div class="spec-item">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-palette me-2" style="color: #666; font-size: 14px;"></i>
+                                            <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Colores: </span>
+                                        </div>
+                                        <div class="color-options d-flex flex-wrap gap-2">
+                                            <span th:each="color : ${product.colores}" 
+                                                  th:text="${color.name}" 
+                                                  class="badge bg-light text-dark border"
+                                                  style="font-size: 11px; padding: 4px 8px;"></span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6 mb-3" th:if="${product.talle}">
-                                    <div class="spec-item d-flex align-items-center">
-                                        <i class="bi bi-rulers me-2" style="color: #666; font-size: 14px;"></i>
-                                        <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Talle: </span>
-                                        <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" th:text="${product.talle}"></span>
+                                
+                                <!-- Talles disponibles -->
+                                <div class="col-md-6 mb-3" th:if="${product.talles != null and !product.talles.isEmpty()}">
+                                    <div class="spec-item">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-rulers me-2" style="color: #666; font-size: 14px;"></i>
+                                            <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Talles: </span>
+                                        </div>
+                                        <div class="size-options d-flex flex-wrap gap-2">
+                                            <span th:each="talle : ${product.talles}" 
+                                                  th:text="${talle.displayName}" 
+                                                  class="badge bg-light text-dark border"
+                                                  style="font-size: 11px; padding: 4px 8px;"></span>
+                                        </div>
                                     </div>
                                 </div>
+                                
+                                <!-- Medidas -->
                                 <div class="col-md-6 mb-3" th:if="${product.medidas}">
                                     <div class="spec-item d-flex align-items-center">
                                         <i class="bi bi-arrows-expand me-2" style="color: #666; font-size: 14px;"></i>
@@ -153,12 +350,52 @@
                                         <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" th:text="${product.medidas}"></span>
                                     </div>
                                 </div>
+                                
+                                <!-- Material -->
+                                <div class="col-md-6 mb-3" th:if="${product.material}">
+                                    <div class="spec-item d-flex align-items-center">
+                                        <i class="bi bi-shield-check me-2" style="color: #666; font-size: 14px;"></i>
+                                        <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Material: </span>
+                                        <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" th:text="${product.material}"></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Géneros -->
+                                <div class="col-md-6 mb-3" th:if="${product.generos != null and !product.generos.isEmpty()}">
+                                    <div class="spec-item d-flex align-items-center">
+                                        <i class="bi bi-person me-2" style="color: #666; font-size: 14px;"></i>
+                                        <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Género: </span>
+                                        <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" 
+                                              th:text="${#strings.listJoin(product.generos, ', ')}"></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Temporadas -->
+                                <div class="col-md-6 mb-3" th:if="${product.temporadas != null and !product.temporadas.isEmpty()}">
+                                    <div class="spec-item d-flex align-items-center">
+                                        <i class="bi bi-calendar me-2" style="color: #666; font-size: 14px;"></i>
+                                        <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Temporada: </span>
+                                        <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" 
+                                              th:text="${#strings.listJoin(product.temporadas, ', ')}"></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Stock -->
                                 <div class="col-md-6 mb-3">
                                     <div class="spec-item d-flex align-items-center">
                                         <i class="bi bi-box me-2" style="color: #666; font-size: 14px;"></i>
                                         <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Stock: </span>
                                         <span th:if="${product.qty > 0}" style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" th:text="${product.qty + ' unidades'}"></span>
                                         <span th:if="${product.qty == 0}" style="font-family: 'Inter', sans-serif; font-size: 13px; color: #999;">Sin stock</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Edad recomendada -->
+                                <div class="col-md-6 mb-3" th:if="${product.edadRecomendada}">
+                                    <div class="spec-item d-flex align-items-center">
+                                        <i class="bi bi-people me-2" style="color: #666; font-size: 14px;"></i>
+                                        <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Edad: </span>
+                                        <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" th:text="${product.edadRecomendada}"></span>
                                     </div>
                                 </div>
                             </div>
@@ -179,7 +416,7 @@
                             </div>
                         </div>
 
-                        <div class="product-features">
+                        <div class="product-features mb-4">
                             <h6 class="mb-3" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 400; color: #000; letter-spacing: 1px; text-transform: uppercase;">
                                 Características del Producto
                             </h6>
@@ -201,6 +438,14 @@
                                     Perfecto para ocasiones especiales
                                 </li>
                             </ul>
+                        </div>
+
+                        <!-- Cuidados del producto -->
+                        <div class="product-care mb-4" th:if="${product.cuidados}">
+                            <h6 class="mb-3" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 400; color: #000; letter-spacing: 1px; text-transform: uppercase;">
+                                Cuidados
+                            </h6>
+                            <div style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; line-height: 1.6;" th:text="${product.cuidados}"></div>
                         </div>
                     </div>
                 </div>
@@ -583,6 +828,440 @@
         .product-features ul li {
             padding: 0.25rem 0;
         }
+
+        /* Estilos para galería móvil */
+        .mobile-gallery-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mobile-main-image {
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-gallery-indicators .indicator.active {
+            background: rgba(255,255,255,1) !important;
+            transform: scale(1.2);
+        }
+
+        .mobile-gallery-indicators .indicator:hover {
+            background: rgba(255,255,255,0.8) !important;
+        }
+
+        /* Selector de colores móvil */
+        .color-circle.active {
+            border-color: #000 !important;
+            transform: scale(1.1);
+        }
+
+        .color-circle.active .color-check {
+            opacity: 1 !important;
+        }
+
+        .color-circle:hover {
+            transform: scale(1.05);
+        }
+
+        /* Mejoras de tipografía para móvil */
+        @media (max-width: 768px) {
+            .product-title {
+                font-size: 24px !important;
+                font-weight: 500 !important;
+                letter-spacing: 0.5px !important;
+            }
+
+            .product-price .current-price {
+                font-size: 28px !important;
+                font-weight: 600 !important;
+            }
+
+            .product-description p {
+                font-size: 15px !important;
+                line-height: 1.7 !important;
+            }
+
+            .spec-item {
+                font-size: 14px !important;
+            }
+
+            .product-actions .btn {
+                font-size: 16px !important;
+                padding: 16px 24px !important;
+                font-weight: 500 !important;
+            }
+        }
+
+        /* Estilos para el modal de zoom móvil */
+        .mobile-zoom-modal {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Mejoras en el layout móvil */
+        @media (max-width: 768px) {
+            .product-detail-section {
+                margin-top: 0 !important;
+            }
+
+            .product-details {
+                padding: 20px;
+                background: white;
+            }
+
+            .product-specs .row {
+                margin: 0 -10px;
+            }
+
+            .product-specs .col-md-6 {
+                padding: 0 10px;
+                margin-bottom: 15px;
+            }
+
+            /* Ocultar título y precio originales en móvil */
+            .product-title,
+            .product-price {
+                display: none !important;
+            }
+
+            /* Mostrar información inicial móvil */
+            .mobile-initial-info {
+                background: white;
+                padding: 20px;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            /* Ajustar altura de galería móvil */
+            .mobile-gallery-container {
+                height: 55vh !important;
+                padding: 0 40px !important;
+            }
+
+            /* Mejorar scroll */
+            .product-details {
+                min-height: 100vh;
+            }
+
+            /* Ajustar imagen móvil */
+            .mobile-main-image img {
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+
+            /* Estilos para botones de cantidad */
+            .quantity-btn {
+                border: 2px solid #e0e0e0 !important;
+                background: white !important;
+                color: #000 !important;
+                transition: all 0.3s ease;
+            }
+
+            .quantity-btn:hover {
+                border-color: #000 !important;
+                background: #f8f9fa !important;
+            }
+
+            /* Estilos para botones de talle */
+            .size-btn.active {
+                border-color: #000 !important;
+                background: #000 !important;
+                color: white !important;
+            }
+
+            .size-btn:hover {
+                border-color: #666 !important;
+            }
+
+            /* Estilos para círculos de color */
+            .color-circle.active {
+                border-color: #000 !important;
+                transform: scale(1.1);
+            }
+
+            .color-circle.active .color-check {
+                opacity: 1 !important;
+            }
+
+            .color-circle:hover {
+                transform: scale(1.05);
+            }
+
+            /* Círculos de colores en la fila del precio */
+            .mobile-color-circles-price .color-circle {
+                width: 24px !important;
+                height: 24px !important;
+                border: 2px solid #e0e0e0 !important;
+            }
+
+            .mobile-color-circles-price .color-circle.active {
+                border-color: #000 !important;
+                transform: scale(1.1);
+            }
+        }
+
+        /* Estilos para PC */
+        @media (min-width: 769px) {
+            .mobile-initial-info {
+                display: none !important;
+            }
+        }
     </style>
+
+    <script>
+        // Variables globales para evitar conflictos
+        let isMobileMenuOpen = false;
+        
+        function toggleMobileMenu() {
+            if (isMobileMenuOpen) {
+                closeMobileMenu();
+            } else {
+                openMobileMenu();
+            }
+        }
+
+        function openMobileMenu() {
+            const navMenuMobile = document.getElementById('navMenuMobile');
+            const navOverlay = document.getElementById('navOverlay');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (navMenuMobile && navOverlay && mobileToggle) {
+                navMenuMobile.classList.add('active');
+                navOverlay.classList.add('active');
+                mobileToggle.innerHTML = '<i class="bi bi-x"></i>';
+                isMobileMenuOpen = true;
+            }
+        }
+
+        function closeMobileMenu() {
+            const navMenuMobile = document.getElementById('navMenuMobile');
+            const navOverlay = document.getElementById('navOverlay');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (navMenuMobile && navOverlay && mobileToggle) {
+                navMenuMobile.classList.remove('active');
+                navOverlay.classList.remove('active');
+                mobileToggle.innerHTML = '<i class="bi bi-list"></i>';
+                isMobileMenuOpen = false;
+            }
+        }
+
+        function toggleSearch() {
+            const searchBar = document.getElementById('searchBar');
+            const searchToggle = document.getElementById('searchToggle');
+            
+            if (searchBar.classList.contains('active')) {
+                searchBar.classList.remove('active');
+                searchToggle.innerHTML = '<i class="bi bi-search"></i>';
+            } else {
+                searchBar.classList.add('active');
+                searchToggle.innerHTML = '<i class="bi bi-x"></i>';
+                // Focus on search input when opened
+                searchBar.querySelector('.search-input').focus();
+            }
+        }
+
+        // Variables para galería móvil
+        let currentImageIndex = 0;
+        let productImages = [];
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        // Función para cambiar imagen en galería móvil
+        function changeMobileImage(index) {
+            if (productImages.length === 0) return;
+            
+            currentImageIndex = index;
+            const mobileImage = document.getElementById('mobileImage');
+            const indicators = document.querySelectorAll('.mobile-gallery-indicators .indicator');
+            
+            if (mobileImage && productImages[index]) {
+                mobileImage.src = productImages[index].getImageUrl();
+            }
+            
+            // Actualizar indicadores
+            indicators.forEach((indicator, i) => {
+                if (i === index) {
+                    indicator.classList.add('active');
+                    indicator.style.background = 'rgba(255,255,255,1)';
+                } else {
+                    indicator.classList.remove('active');
+                    indicator.style.background = 'rgba(255,255,255,0.5)';
+                }
+            });
+        }
+
+        // Función para siguiente imagen
+        function nextMobileImage() {
+            if (productImages.length === 0) return;
+            const nextIndex = (currentImageIndex + 1) % productImages.length;
+            changeMobileImage(nextIndex);
+        }
+
+        // Función para imagen anterior
+        function prevMobileImage() {
+            if (productImages.length === 0) return;
+            const prevIndex = currentImageIndex === 0 ? productImages.length - 1 : currentImageIndex - 1;
+            changeMobileImage(prevIndex);
+        }
+
+        // Función para zoom de imagen móvil
+        function zoomMobileImage() {
+            const mobileImage = document.getElementById('mobileImage');
+            if (mobileImage) {
+                // Crear modal de zoom
+                const zoomModal = document.createElement('div');
+                zoomModal.className = 'mobile-zoom-modal';
+                zoomModal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.9);
+                    z-index: 9999;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                `;
+                
+                const zoomImage = document.createElement('img');
+                zoomImage.src = mobileImage.src;
+                zoomImage.style.cssText = `
+                    max-width: 90%;
+                    max-height: 90%;
+                    object-fit: contain;
+                `;
+                
+                zoomModal.appendChild(zoomImage);
+                document.body.appendChild(zoomModal);
+                
+                // Cerrar al hacer clic
+                zoomModal.addEventListener('click', () => {
+                    document.body.removeChild(zoomModal);
+                });
+            }
+        }
+
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obtener imágenes del producto
+            const imageElements = document.querySelectorAll('[data-image-url]');
+            productImages = Array.from(imageElements).map(el => ({
+                getImageUrl: () => el.getAttribute('data-image-url'),
+                getThumbnailUrl: () => el.querySelector('img').src
+            }));
+
+            // Search functionality
+            const searchToggle = document.getElementById('searchToggle');
+            if (searchToggle) {
+                searchToggle.addEventListener('click', toggleSearch);
+            }
+
+            // Dropdown functionality - Solo en PC
+            const dropdownToggle = document.querySelector('.dropdown-toggle');
+            if (dropdownToggle) {
+                dropdownToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const dropdown = this.closest('.dropdown');
+                    
+                    // Solo funcionar en PC (≥ 769px)
+                    if (window.innerWidth >= 769) {
+                        dropdown.classList.toggle('active');
+                    }
+                });
+            }
+
+            // Galería móvil - Indicadores
+            document.querySelectorAll('.mobile-gallery-indicators .indicator').forEach((indicator, index) => {
+                indicator.addEventListener('click', () => {
+                    changeMobileImage(index);
+                });
+            });
+
+            // Galería móvil - Botón de zoom
+            const mobileZoomBtn = document.querySelector('.mobile-zoom-btn');
+            if (mobileZoomBtn) {
+                mobileZoomBtn.addEventListener('click', zoomMobileImage);
+            }
+
+            // Galería móvil - Touch gestures
+            const mobileMainImage = document.getElementById('mobileMainImage');
+            if (mobileMainImage) {
+                mobileMainImage.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                });
+
+                mobileMainImage.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].clientX;
+                    handleSwipe();
+                });
+
+                mobileMainImage.addEventListener('click', zoomMobileImage);
+            }
+
+            // Selector de colores móvil
+            document.querySelectorAll('.color-circle').forEach((circle, index) => {
+                circle.addEventListener('click', () => {
+                    // Remover active de todos
+                    document.querySelectorAll('.color-circle').forEach(c => {
+                        c.classList.remove('active');
+                        c.style.borderColor = '#e0e0e0';
+                        c.querySelector('.color-check').style.opacity = '0';
+                    });
+                    
+                    // Activar el seleccionado
+                    circle.classList.add('active');
+                    circle.style.borderColor = '#000';
+                    circle.querySelector('.color-check').style.opacity = '1';
+                });
+            });
+
+            // Cerrar menú móvil al hacer clic en enlaces
+            document.querySelectorAll('.nav-menu-mobile .nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    closeMobileMenu();
+                });
+            });
+
+            // Cerrar menú móvil al hacer clic fuera
+            document.addEventListener('click', (e) => {
+                const navMenuMobile = document.getElementById('navMenuMobile');
+                const mobileToggle = document.querySelector('.mobile-menu-toggle');
+                
+                if (navMenuMobile && mobileToggle && 
+                    !navMenuMobile.contains(e.target) && 
+                    !mobileToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
+
+            // Manejar resize de ventana
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    closeMobileMenu();
+                }
+            });
+        });
+
+        // Función para manejar swipe
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swipe izquierda - siguiente imagen
+                    nextMobileImage();
+                } else {
+                    // Swipe derecha - imagen anterior
+                    prevMobileImage();
+                }
+            }
+        }
+    </script>
 </body>
 </html>

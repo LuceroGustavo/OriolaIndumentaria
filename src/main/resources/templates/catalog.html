@@ -17,7 +17,14 @@
                 <a href="/" class="logo">Orioladenim</a>
                 
                 <div class="header-nav">
-                    <ul class="nav-menu">
+                    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <!-- Overlay para el menú móvil -->
+                    <div class="nav-overlay" id="navOverlay" onclick="closeMobileMenu()"></div>
+                    
+                    <!-- Menú para PC (≥ 769px) -->
+                    <ul class="nav-menu nav-menu-desktop" id="navMenuDesktop">
                         <li class="nav-item">
                             <a href="/" class="nav-link">Inicio</a>
                         </li>
@@ -27,24 +34,61 @@
                         <li class="nav-item dropdown">
                             <a href="javascript:void(0)" class="nav-link dropdown-toggle">Categorías</a>
                             <div class="dropdown-menu">
-                                <a href="/catalog?category=REMERAS" class="dropdown-item">Remeras</a>
-                                <a href="/catalog?category=PANTALONES" class="dropdown-item">Pantalones</a>
-                                <a href="/catalog?category=CAMISAS" class="dropdown-item">Camisas</a>
-                                <a href="/catalog?category=BUZOS" class="dropdown-item">Buzos</a>
-                                <a href="/catalog?category=VESTIDOS" class="dropdown-item">Vestidos</a>
-                                <a href="/catalog?category=SHORTS" class="dropdown-item">Shorts</a>
-                                <a href="/catalog?category=CHOMBAS" class="dropdown-item">Chombas</a>
-                                <a href="/catalog" class="dropdown-item">Ver Todo</a>
+                                <div class="dropdown-content">
+                                    <div class="dropdown-grid">
+                                        <a href="/catalog?category=REMERAS" class="dropdown-item">Remeras</a>
+                                        <a href="/catalog?category=PANTALONES" class="dropdown-item">Pantalones</a>
+                                        <a href="/catalog?category=CAMISAS" class="dropdown-item">Camisas</a>
+                                        <a href="/catalog?category=BUZOS" class="dropdown-item">Buzos</a>
+                                        <a href="/catalog?category=VESTIDOS" class="dropdown-item">Vestidos</a>
+                                        <a href="/catalog?category=SHORTS" class="dropdown-item">Shorts</a>
+                                        <a href="/catalog?category=CHOMBAS" class="dropdown-item">Chombas</a>
+                                        <a href="/catalog" class="dropdown-item">Ver Todo</a>
+                                    </div>
+                                </div>
                             </div>
+                        </li>
+                    </ul>
+
+                    <!-- Menú para Móvil (≤ 768px) -->
+                    <ul class="nav-menu nav-menu-mobile" id="navMenuMobile">
+                        <li class="nav-item">
+                            <a href="/" class="nav-link" onclick="closeMobileMenu()">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog?category=REMERAS" class="nav-link" onclick="closeMobileMenu()">Remeras</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog?category=PANTALONES" class="nav-link" onclick="closeMobileMenu()">Pantalones</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog?category=CAMISAS" class="nav-link" onclick="closeMobileMenu()">Camisas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog?category=BUZOS" class="nav-link" onclick="closeMobileMenu()">Buzos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog?category=VESTIDOS" class="nav-link" onclick="closeMobileMenu()">Vestidos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog?category=SHORTS" class="nav-link" onclick="closeMobileMenu()">Shorts</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog?category=CHOMBAS" class="nav-link" onclick="closeMobileMenu()">Chombas</a>
                         </li>
                     </ul>
                 </div>
                 
                 <div class="header-actions">
-                    <div class="search-bar">
+                    <!-- Search bar - hidden on desktop, shown on mobile when search icon is clicked -->
+                    <div class="search-bar" id="searchBar">
                         <input type="text" class="search-input" placeholder="Buscar productos...">
                     </div>
                     <div class="header-icons">
+                        <!-- Search icon - only visible on mobile -->
+                        <button class="header-icon search-toggle" id="searchToggle" title="Buscar">
+                            <i class="bi bi-search"></i>
+                        </button>
                         <a href="https://www.instagram.com/oriolaindumentaria" class="header-icon" title="Instagram" target="_blank">
                             <i class="bi bi-instagram"></i>
                         </a>
@@ -72,7 +116,7 @@
 
     <!-- Filtros Modernos -->
         <div class="container">
-        <div class="filters">
+        <div class="filters desktop-filters">
             <div class="filter-group">
                 <span style="font-weight: 600; margin-right: 10px;">Filtros:</span>
                 <button class="filter-btn active" data-category="all">Todos</button>
@@ -898,6 +942,11 @@
             .search-input input {
                 width: 200px;
             }
+            
+            /* Ocultar filtros en móvil */
+            .desktop-filters {
+                display: none !important;
+            }
         }
 
         @media (max-width: 480px) {
@@ -920,5 +969,108 @@
             }
         }
     </style>
+
+    <script>
+        // Variables globales para evitar conflictos
+        let isMobileMenuOpen = false;
+        
+        function toggleMobileMenu() {
+            if (isMobileMenuOpen) {
+                closeMobileMenu();
+            } else {
+                openMobileMenu();
+            }
+        }
+
+        function openMobileMenu() {
+            const navMenuMobile = document.getElementById('navMenuMobile');
+            const navOverlay = document.getElementById('navOverlay');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (navMenuMobile && navOverlay && mobileToggle) {
+                navMenuMobile.classList.add('active');
+                navOverlay.classList.add('active');
+                mobileToggle.innerHTML = '<i class="bi bi-x"></i>';
+                isMobileMenuOpen = true;
+            }
+        }
+
+        function closeMobileMenu() {
+            const navMenuMobile = document.getElementById('navMenuMobile');
+            const navOverlay = document.getElementById('navOverlay');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (navMenuMobile && navOverlay && mobileToggle) {
+                navMenuMobile.classList.remove('active');
+                navOverlay.classList.remove('active');
+                mobileToggle.innerHTML = '<i class="bi bi-list"></i>';
+                isMobileMenuOpen = false;
+            }
+        }
+
+        function toggleSearch() {
+            const searchBar = document.getElementById('searchBar');
+            const searchToggle = document.getElementById('searchToggle');
+            
+            if (searchBar.classList.contains('active')) {
+                searchBar.classList.remove('active');
+                searchToggle.innerHTML = '<i class="bi bi-search"></i>';
+            } else {
+                searchBar.classList.add('active');
+                searchToggle.innerHTML = '<i class="bi bi-x"></i>';
+                // Focus on search input when opened
+                searchBar.querySelector('.search-input').focus();
+            }
+        }
+
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search functionality
+            const searchToggle = document.getElementById('searchToggle');
+            if (searchToggle) {
+                searchToggle.addEventListener('click', toggleSearch);
+            }
+
+            // Dropdown functionality - Solo en PC
+            const dropdownToggle = document.querySelector('.dropdown-toggle');
+            if (dropdownToggle) {
+                dropdownToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const dropdown = this.closest('.dropdown');
+                    
+                    // Solo funcionar en PC (≥ 769px)
+                    if (window.innerWidth >= 769) {
+                        dropdown.classList.toggle('active');
+                    }
+                });
+            }
+
+            // Cerrar menú móvil al hacer clic en enlaces
+            document.querySelectorAll('.nav-menu-mobile .nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    closeMobileMenu();
+                });
+            });
+
+            // Cerrar menú móvil al hacer clic fuera
+            document.addEventListener('click', (e) => {
+                const navMenuMobile = document.getElementById('navMenuMobile');
+                const mobileToggle = document.querySelector('.mobile-menu-toggle');
+                
+                if (navMenuMobile && mobileToggle && 
+                    !navMenuMobile.contains(e.target) && 
+                    !mobileToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
+
+            // Manejar resize de ventana
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    closeMobileMenu();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
