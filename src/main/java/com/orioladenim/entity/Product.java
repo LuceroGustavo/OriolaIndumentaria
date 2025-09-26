@@ -252,6 +252,28 @@ public class Product {
                 .reduce((a, b) -> a + ", " + b)
                 .orElse("Sin género");
     }
+    
+    // Métodos para manejar talles múltiples
+    public void agregarTalle(Talle talle) {
+        if (!talles.contains(talle)) {
+            talles.add(talle);
+        }
+    }
+    
+    public void removerTalle(Talle talle) {
+        talles.remove(talle);
+    }
+    
+    public boolean tieneTalle(Talle talle) {
+        return talles.contains(talle);
+    }
+    
+    public String getTallesComoTexto() {
+        return talles.stream()
+                .map(Talle::getDisplayName)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("Sin talle");
+    }
 
     // Getters y Setters manuales (por si Lombok no funciona)
     public Integer getPId() { return pId; }

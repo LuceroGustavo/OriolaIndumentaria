@@ -151,35 +151,35 @@
                         </div>
                     </div>
 
-                    <!-- Galería para Móvil -->
-                    <div class="product-gallery-mobile d-lg-none">
-                        <div class="mobile-gallery-container" style="position: relative; width: 100%; height: 55vh; background: #f8f9fa; overflow: hidden; padding: 0 40px;">
-                            <!-- Imagen Principal Móvil -->
-                            <div class="mobile-main-image" id="mobileMainImage" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer;">
-                                <i class="bi bi-image" th:if="${product.images == null or product.images.isEmpty()}" style="font-size: 4rem; color: #ccc;"></i>
-                                <img th:if="${product.images != null and !product.images.isEmpty()}" 
-                                     th:src="${product.getImagenPrincipalUrl()}" 
-                                     id="mobileImage" 
-                                     class="img-fluid" 
-                                     style="width: 100%; height: 100%; object-fit: contain; background: white; border-radius: 12px;">
-                                
-                                <!-- Botón de zoom -->
-                                <div class="mobile-zoom-btn" style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                                    <i class="bi bi-zoom-in"></i>
-                                </div>
-                            </div>
-                            
-                            <!-- Indicadores de puntos -->
-                            <div class="mobile-gallery-indicators" th:if="${product.images != null and product.images.size() > 1}" 
-                                 style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 10;">
-                                <span th:each="image, iterStat : ${product.images}" 
-                                      th:class="${iterStat.first} ? 'indicator active' : 'indicator'"
-                                      th:data-image-index="${iterStat.index}"
-                                      class="indicator" 
-                                      style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.3s ease;"></span>
-                            </div>
-                        </div>
+        <!-- Galería para Móvil -->
+        <div class="product-gallery-mobile d-lg-none" style="margin-top: 0; padding: 0;">
+            <div class="mobile-gallery-container" style="position: relative; width: 100%; height: 55vh; background: #f8f9fa; overflow: hidden; padding: 0;">
+                <!-- Imagen Principal Móvil -->
+                <div class="mobile-main-image" id="mobileMainImage" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; padding: 0;">
+                    <i class="bi bi-image" th:if="${product.images == null or product.images.isEmpty()}" style="font-size: 4rem; color: #ccc;"></i>
+                    <img th:if="${product.images != null and !product.images.isEmpty()}" 
+                         th:src="${product.getImagenPrincipalUrl()}" 
+                         id="mobileImage" 
+                         class="img-fluid" 
+                         style="width: 100%; height: 100%; object-fit: contain; background: white; border-radius: 0; margin: 0; padding: 0;">
+                    
+                    <!-- Botón de zoom -->
+                    <div class="mobile-zoom-btn" style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <i class="bi bi-zoom-in"></i>
                     </div>
+                </div>
+                
+                <!-- Indicadores de puntos -->
+                <div class="mobile-gallery-indicators" th:if="${product.images != null and product.images.size() > 1}" 
+                     style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 10;">
+                    <span th:each="image, iterStat : ${product.images}" 
+                          th:class="${iterStat.first} ? 'indicator active' : 'indicator'"
+                          th:data-image-index="${iterStat.index}"
+                          class="indicator" 
+                          style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.3s ease;"></span>
+                </div>
+            </div>
+        </div>
                 </div>
 
                 <!-- Información del Producto -->
@@ -197,15 +197,15 @@
                                   style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 400; color: #000;">$0</span>
                         </div>
 
-                        <!-- Información inicial visible en móvil -->
-                        <div class="mobile-initial-info d-lg-none mb-4">
-                            <div class="mobile-product-header">
-                                <div class="mb-3">
-                                    <h2 class="mobile-product-title mb-0" th:text="${product.name}" 
-                                        style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 400; color: #000; letter-spacing: 0.5px; text-transform: uppercase;">
-                                        Nombre del Producto
-                                    </h2>
-                                </div>
+        <!-- Información inicial visible en móvil -->
+        <div class="mobile-initial-info d-lg-none mb-4" style="padding: 0 30px;">
+            <div class="mobile-product-header">
+                <div class="mb-3">
+                    <h2 class="mobile-product-title mb-0" th:text="${product.name}" 
+                        style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 400; color: #000; letter-spacing: 0.5px; text-transform: uppercase;">
+                        Nombre del Producto
+                    </h2>
+                </div>
                                 <div class="mobile-product-price mb-3 d-flex justify-content-between align-items-center">
                                     <span class="mobile-current-price" th:text="'$' + ${#numbers.formatDecimal(product.price, 0, 0)}" 
                                           style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 700; color: #000;">$0</span>
@@ -836,7 +836,15 @@
         }
 
         .mobile-main-image {
+            overflow: hidden;
+        }
+        
+        .mobile-main-image img {
             transition: transform 0.3s ease;
+        }
+        
+        .mobile-main-image:hover img {
+            transform: scale(1.05);
         }
 
         .mobile-gallery-indicators .indicator.active {

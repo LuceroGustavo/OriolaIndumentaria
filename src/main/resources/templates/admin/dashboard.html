@@ -31,6 +31,14 @@
         .card-stat:hover {
             transform: translateY(-5px);
         }
+        .hover-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .hover-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
         .stat-icon {
             font-size: 2.5rem;
             opacity: 0.7;
@@ -99,13 +107,15 @@
                 <!-- Stats Cards -->
                 <div class="row mb-4">
                     <div class="col-md-3 mb-3">
-                        <div class="card card-stat text-center">
-                            <div class="card-body">
-                                <i class="bi bi-box-seam stat-icon text-primary"></i>
-                                <h3 class="mt-2" th:text="${totalProductos}">0</h3>
-                                <p class="text-muted mb-0">Total Productos</p>
+                        <a href="/admin/products" class="text-decoration-none">
+                            <div class="card card-stat text-center hover-card">
+                                <div class="card-body">
+                                    <i class="bi bi-box-seam stat-icon text-primary"></i>
+                                    <h3 class="mt-2" th:text="${totalProductos}">0</h3>
+                                    <p class="text-muted mb-0">Total Productos</p>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                     <div class="col-md-3 mb-3">
                         <div class="card card-stat text-center">
@@ -121,7 +131,7 @@
                             <div class="card-body">
                                 <i class="bi bi-check-circle stat-icon text-success"></i>
                                 <h3 class="mt-2" th:text="${productosActivos}">0</h3>
-                                <p class="text-muted mb-0">Activos</p>
+                                <p class="text-muted mb-0">Publicados</p>
                             </div>
                         </div>
                     </div>
