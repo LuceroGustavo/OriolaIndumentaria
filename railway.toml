@@ -1,0 +1,13 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "java -jar target/oriola-denim-0.0.1-SNAPSHOT.jar"
+healthcheckPath = "/"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+[environments.production]
+[environments.production.variables]
+SPRING_PROFILES_ACTIVE = "prod"

@@ -548,17 +548,17 @@
                     method: 'DELETE'
                 })
                 .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+                .then(data => {
+                    if (data.success) {
                     showMessage('success', 'Imagen eliminada correctamente');
                     // Actualizar la interfaz sin recargar la página
                     setTimeout(() => {
                         updateImageInterface();
                     }, 500);
-                } else {
-                    showMessage('error', data.message || 'Error al eliminar imagen');
-                }
-            })
+                    } else {
+                        showMessage('error', data.message || 'Error al eliminar imagen');
+                    }
+                })
                 .catch(error => {
                     showMessage('error', 'Error al eliminar imagen: ' + error.message);
                 });
