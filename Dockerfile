@@ -14,11 +14,11 @@ RUN mvn dependency:go-offline -B
 # Copy source code
 COPY src ./src
 
-# Build the application
+# Build the application and create JAR
 RUN mvn clean package -DskipTests
 
-# Copy the JAR file
-COPY target/oriola-denim-0.0.1-SNAPSHOT.jar app.jar
+# The JAR is already in the target directory after the build
+# No need to copy it separately
 
 # Expose port 8080
 EXPOSE 8080
@@ -27,5 +27,5 @@ EXPOSE 8080
 ENV SPRING_PROFILES_ACTIVE=prod
 ENV PORT=8080
 
-# Run the application
-CMD ["java", "-jar", "app.jar", "--spring.profiles.active=prod"]
+# Run the application using the JAR from target directory
+CMD ["java", "-jar", "target/oriola-denim-0.0.1-SNAPSHOT.jar", "--spring.profiles.active=prod"]
