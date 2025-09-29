@@ -1,18 +1,18 @@
-# Usar imagen base de Java 17
+# Use OpenJDK 17 as base image
 FROM openjdk:17-jdk-slim
 
-# Crear directorio de trabajo
+# Set working directory
 WORKDIR /app
 
-# Copiar el JAR
+# Copy the JAR file
 COPY target/oriola-denim-0.0.1-SNAPSHOT.jar app.jar
 
-# Exponer puerto
+# Expose port 8080
 EXPOSE 8080
 
-# Variables de entorno por defecto
-ENV SPRING_PROFILES_ACTIVE=railway
+# Set environment variables
+ENV SPRING_PROFILES_ACTIVE=prod
 ENV PORT=8080
 
-# Comando para ejecutar la aplicación
-CMD ["java", "-jar", "app.jar", "--server.port=${PORT}"]
+# Run the application
+CMD ["java", "-jar", "app.jar", "--spring.profiles.active=prod"]
