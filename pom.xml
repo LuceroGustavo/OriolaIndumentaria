@@ -95,6 +95,12 @@
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 		
+		<!-- Dependencia para soporte de fechas Java 8 en Jackson -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
+		
 		<!-- Dependencia para geolocalización -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
