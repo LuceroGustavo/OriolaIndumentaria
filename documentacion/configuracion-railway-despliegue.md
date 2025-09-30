@@ -210,3 +210,4 @@ MAIL_PASSWORD=kmqh ktkl lhyj gwlf
 **Fecha de creación:** 30 de septiembre de 2025
 **Última actualización:** 30 de septiembre de 2025
 **Estado:** ✅ Funcionando correctamente
+**Límites de subida:** 10MB por archivo, 50MB total por request
