@@ -27,12 +27,12 @@ public class PublicController {
             // Agregar categorías para el dropdown
             model.addAttribute("categories", categoryService.getActiveCategories());
             
-            return "index-simple";
+            return "index";
         } catch (Exception e) {
             // En caso de error, mostrar página sin categorías
             model.addAttribute("products", productRepository.findByActivoTrue());
             model.addAttribute("categories", new java.util.ArrayList<>());
-            return "index-simple";
+            return "index";
         }
     }
     
