@@ -1,185 +1,212 @@
-# Configuración Railway - Oriola Denim
+# Configuración de Despliegue en Railway
 
-**Fecha:** 28 de Septiembre de 2025  
-**Desarrollador:** Asistente AI  
-**Estado:** ✅ LISTO PARA DESPLIEGUE
+## 🎯 **RESUMEN**
+Esta documentación describe cómo configurar y desplegar la aplicación OriolaIndumentaria en Railway, incluyendo la configuración de la base de datos MySQL y las variables de entorno necesarias.
 
-## 🚀 RESUMEN
+## 📋 **ARCHIVOS DE CONFIGURACIÓN**
 
-Configuración completa del proyecto Oriola Denim para despliegue en Railway, manteniendo capacidad de desarrollo local.
+### 1. **application-railway.properties**
+Ubicación: `src/main/resources/application-railway.properties`
 
-## 📋 PREPARACIÓN COMPLETADA
-
-### ✅ **Archivos Limpiados:**
-- ❌ `Dockerfile` (eliminado - no necesario para Railway)
-- ❌ `render.yaml` (eliminado - no necesario para Railway)
-- ❌ `.dockerignore` (eliminado - no necesario para Railway)
-
-### ✅ **Configuración Railway:**
-- ✅ `application-railway.properties` configurado
-- ✅ Variables de entorno preparadas
-- ✅ Base de datos MySQL configurada
-- ✅ Archivos estáticos configurados
-- ✅ Seguridad configurada
-
-## 🔧 CONFIGURACIÓN TÉCNICA
-
-### **Perfil Activo:**
 ```properties
-spring.profiles.active=railway
+# Railway Configuration - Simplified
+
+# Server Configuration
+server.port=${PORT:8080}
+
+# Database Configuration (Railway MySQL) - Using MYSQL_URL directly
+spring.datasource.url=${MYSQL_URL}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA Configuration
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+
+# File Upload Configuration
+spring.servlet.multipart.max-file-size=5MB
+spring.servlet.multipart.max-request-size=5MB
+
+# File storage configuration
+file.upload-dir=/app/uploads
+backup.directory=/app/backups
+
+# Static files configuration
+spring.web.resources.static-locations=classpath:/static/,file:/app/uploads/
+upload.path=/app/uploads
+upload.thumbnail.path=/app/uploads/thumbnails
+
+# Security Configuration
+spring.security.user.name=${ADMIN_USERNAME:admin}
+spring.security.user.password=${ADMIN_PASSWORD:admin123}
+spring.security.user.roles=ADMIN
+
+# Email configuration
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=${MAIL_USERNAME:luceroprograma@gmail.com}
+spring.mail.password=${MAIL_PASSWORD:kmqh ktkl lhyj gwlf}
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.smtp.ssl.trust=smtp.gmail.com
+
+# Custom email configuration
+app.email.from=${MAIL_USERNAME:luceroprograma@gmail.com}
+app.email.to=${MAIL_USERNAME:luceroprograma@gmail.com}
 ```
 
-### **Variables de Entorno Requeridas:**
+### 2. **railway.json**
+Ubicación: `railway.json` (raíz del proyecto)
+
+```json
+{
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "java -jar target/oriola-denim-0.0.1-SNAPSHOT.jar --spring.profiles.active=railway",
+    "healthcheckPath": "/admin/dashboard",
+    "healthcheckTimeout": 300,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}
+```
+
+### 3. **nixpacks.toml**
+Ubicación: `nixpacks.toml` (raíz del proyecto)
+
+```toml
+[phases.setup]
+nixPkgs = ["jdk17", "maven"]
+
+[phases.install]
+cmds = ["mvn clean package -DskipTests"]
+
+[phases.build]
+cmds = ["echo 'Build completed'"]
+
+[start]
+cmd = "java -jar target/oriola-denim-0.0.1-SNAPSHOT.jar --spring.profiles.active=railway"
+```
+
+## 🔧 **VARIABLES DE ENTORNO EN RAILWAY**
+
+### **Variables para la Aplicación (OriolaIndumentaria)**
+
+| Variable | Valor | Descripción |
+|----------|-------|-------------|
+| `SPRING_PROFILES_ACTIVE` | `railway` | Activa el perfil de Railway |
+| `ADMIN_USERNAME` | `admin` | Usuario administrador |
+| `ADMIN_PASSWORD` | `OriolaAdmin2025!` | Contraseña del administrador |
+| `MAIL_USERNAME` | `luceroprograma@gmail.com` | Email para notificaciones |
+| `MAIL_PASSWORD` | `kmqh ktkl lhyj gwlf` | Contraseña del email |
+
+### **Variables para MySQL (Generadas automáticamente por Railway)**
+
+| Variable | Valor | Descripción |
+|----------|-------|-------------|
+| `MYSQL_URL` | `jdbc:mysql://root:password@mysql.railway.internal:3306/railway` | URL completa de conexión |
+| `MYSQL_DATABASE` | `railway` | Nombre de la base de datos |
+| `MYSQL_ROOT_PASSWORD` | `password` | Contraseña del root de MySQL |
+| `MYSQLHOST` | `mysql.railway.internal` | Host interno de MySQL |
+| `MYSQLPORT` | `3306` | Puerto de MySQL |
+| `MYSQLUSER` | `root` | Usuario de MySQL |
+
+## 🚀 **PROCESO DE DESPLIEGUE**
+
+### **1. Preparación del Proyecto**
 ```bash
-# Base de datos (Railway MySQL)
-DATABASE_URL=jdbc:mysql://[host]:[port]/[database]
-DB_USERNAME=[username]
-DB_PASSWORD=[password]
+# Compilar el proyecto
+mvn clean package -DskipTests
 
-# Administrador (opcional - tiene valores por defecto)
+# Verificar que se generó el JAR
+ls -la target/oriola-denim-0.0.1-SNAPSHOT.jar
+```
+
+### **2. Configuración en Railway**
+
+#### **A. Crear Proyecto**
+1. Ir a [Railway.app](https://railway.app)
+2. Crear nuevo proyecto
+3. Conectar con GitHub
+
+#### **B. Agregar Servicios**
+1. **MySQL Database:**
+   - Agregar servicio MySQL
+   - Railway genera automáticamente las variables de conexión
+
+2. **Aplicación Spring Boot:**
+   - Conectar repositorio GitHub
+   - Configurar variables de entorno
+
+#### **C. Variables de Entorno**
+Configurar en Railway las variables para la aplicación:
+
+```bash
+SPRING_PROFILES_ACTIVE=railway
 ADMIN_USERNAME=admin
-ADMIN_PASSWORD=admin123
-
-# Email (opcional - usa configuración por defecto)
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
+ADMIN_PASSWORD=OriolaAdmin2025!
 MAIL_USERNAME=luceroprograma@gmail.com
 MAIL_PASSWORD=kmqh ktkl lhyj gwlf
 ```
 
-### **Rutas de Archivos:**
-- **Uploads:** `/app/uploads/`
-- **Backups:** `/app/backups/`
-- **Thumbnails:** `/app/uploads/thumbnails/`
+**NOTA:** `MYSQL_URL` se genera automáticamente por Railway.
 
-## 📦 PROCESO DE DESPLIEGUE
+### **3. Despliegue**
+1. Railway detecta cambios automáticamente
+2. Ejecuta el build usando Nixpacks
+3. Despliega la aplicación
+4. Conecta a la base de datos MySQL
 
-### **1. Crear Proyecto en Railway:**
-1. Ir a [railway.app](https://railway.app)
-2. Iniciar sesión con GitHub
-3. Crear nuevo proyecto
-4. Conectar repositorio: `LuceroGustavo/OriolaIndumentaria`
+## 🔍 **SOLUCIÓN DE PROBLEMAS**
 
-### **2. Configurar Base de Datos:**
-1. Agregar servicio MySQL
-2. Railway generará automáticamente:
-   - `DATABASE_URL`
-   - `DB_USERNAME`
-   - `DB_PASSWORD`
+### **Error: "Driver claims to not accept jdbcUrl"**
+**Problema:** La URL de MySQL no tiene el prefijo `jdbc:`
+**Solución:** Asegurar que `MYSQL_URL` incluya `jdbc:mysql://`
 
-### **3. Configurar Variables de Entorno:**
-```bash
-# En Railway Dashboard > Variables
-SPRING_PROFILES_ACTIVE=railway
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=[password_segura]
-```
+### **Error: "Access denied for user"**
+**Problema:** Variables de entorno no configuradas
+**Solución:** Verificar que todas las variables estén configuradas en Railway
 
-### **4. Desplegar:**
-1. Railway detectará automáticamente que es un proyecto Java/Maven
-2. Usará el comando: `mvn clean package -DskipTests`
-3. Ejecutará: `java -jar target/oriola-denim-0.0.1-SNAPSHOT.jar`
+### **Error: "Unknown database"**
+**Problema:** Base de datos no existe
+**Solución:** Railway crea automáticamente la base de datos
 
-## 🔄 DESARROLLO LOCAL
+## 📊 **MONITOREO**
 
-### **Mantener Desarrollo Local:**
-- ✅ **Perfil local:** `application.properties` (sin cambios)
-- ✅ **Base de datos local:** MySQL en puerto 3306
-- ✅ **Archivos locales:** Carpeta `uploads/` local
-- ✅ **Hot reload:** Spring Boot DevTools activo
+### **Logs de Railway**
+- **Build Logs:** Proceso de compilación
+- **Deploy Logs:** Inicio de la aplicación
+- **HTTP Logs:** Requests HTTP
 
-### **Comandos de Desarrollo:**
-```bash
-# Desarrollo local (perfil por defecto)
-mvn spring-boot:run
+### **Health Check**
+- **Endpoint:** `/admin/dashboard`
+- **Timeout:** 300 segundos
+- **Política de reinicio:** ON_FAILURE
 
-# Desarrollo con perfil específico
-mvn spring-boot:run -Dspring-boot.run.profiles=local
+## 🎯 **URLS IMPORTANTES**
 
-# Compilar para Railway
-mvn clean package -DskipTests
-```
+- **Aplicación:** `https://oriolaindumentaria-production.up.railway.app`
+- **Admin Dashboard:** `https://oriolaindumentaria-production.up.railway.app/admin/dashboard`
+- **Railway Dashboard:** `https://railway.app/project/[PROJECT_ID]`
 
-## 🌐 ACCESO A LA APLICACIÓN
+## ✅ **VERIFICACIÓN DE DESPLIEGUE EXITOSO**
 
-### **URLs de Acceso:**
-- **Aplicación:** `https://[proyecto].railway.app`
-- **Admin:** `https://[proyecto].railway.app/admin`
-- **Health Check:** `https://[proyecto].railway.app/actuator/health`
+1. **Build completado** sin errores
+2. **Aplicación iniciada** correctamente
+3. **Conexión a MySQL** establecida
+4. **Dashboard admin** accesible
+5. **Health check** pasando
 
-### **Credenciales por Defecto:**
-- **Usuario:** `admin`
-- **Contraseña:** `admin123` (cambiar en producción)
+## 📝 **NOTAS IMPORTANTES**
 
-## 📊 MONITOREO
-
-### **Logs:**
-- Railway proporciona logs en tiempo real
-- Nivel de logging: INFO para la aplicación
-- WARN para Spring Security y Hibernate
-
-### **Métricas:**
-- Health check endpoint disponible
-- Información del sistema en `/actuator/info`
-
-## 🔒 SEGURIDAD
-
-### **Configuración Actual:**
-- ✅ Usuario admin configurado
-- ✅ Contraseña por defecto (cambiar en producción)
-- ✅ Roles de seguridad implementados
-- ✅ Endpoints protegidos
-
-### **Recomendaciones para Producción:**
-1. Cambiar contraseña de admin
-2. Configurar HTTPS (Railway lo maneja automáticamente)
-3. Revisar permisos de base de datos
-4. Configurar backup automático
-
-## 🚨 TROUBLESHOOTING
-
-### **Problemas Comunes:**
-
-#### **Error de Base de Datos:**
-```bash
-# Verificar variables de entorno
-echo $DATABASE_URL
-echo $DB_USERNAME
-echo $DB_PASSWORD
-```
-
-#### **Error de Archivos:**
-```bash
-# Verificar permisos de directorio
-ls -la /app/uploads/
-ls -la /app/backups/
-```
-
-#### **Error de Puerto:**
-```bash
-# Railway usa variable PORT automáticamente
-echo $PORT
-```
-
-## 📝 PRÓXIMOS PASOS
-
-1. **Subir a GitHub** (ya completado)
-2. **Crear proyecto en Railway**
-3. **Configurar base de datos MySQL**
-4. **Configurar variables de entorno**
-5. **Desplegar y probar**
-
-## ✅ CHECKLIST DE DESPLIEGUE
-
-- [ ] Proyecto creado en Railway
-- [ ] Repositorio conectado
-- [ ] Base de datos MySQL agregada
-- [ ] Variables de entorno configuradas
-- [ ] Despliegue exitoso
-- [ ] Aplicación accesible
-- [ ] Admin login funcionando
-- [ ] Subida de imágenes funcionando
-- [ ] Backup/restore funcionando
+- **Volúmenes persistentes:** Las imágenes se guardan en `/app/uploads`
+- **Backups:** Se almacenan en `/app/backups`
+- **Base de datos:** Se crea automáticamente con `hibernate.ddl-auto=update`
+- **Perfil activo:** `railway` (configurado en `SPRING_PROFILES_ACTIVE`)
 
 ---
-*Documentación generada el 28 de Septiembre de 2025*
+
+**Fecha de creación:** 30 de septiembre de 2025
+**Última actualización:** 30 de septiembre de 2025
+**Estado:** ✅ Funcionando correctamente
