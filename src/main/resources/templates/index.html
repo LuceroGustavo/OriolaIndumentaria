@@ -34,7 +34,7 @@
                             <a href="javascript:void(0)" class="nav-link dropdown-toggle">Categorías</a>
                             <div class="dropdown-menu">
                                 <div class="dropdown-content">
-                                    <div class="dropdown-grid">
+                                <div class="dropdown-grid">
                                         <a href="/catalog?category=Remeras" class="dropdown-item">Remeras</a>
                                         <a href="/catalog?category=Pantalones" class="dropdown-item">Pantalones</a>
                                         <a href="/catalog?category=Buzos" class="dropdown-item">Buzos</a>
@@ -321,16 +321,16 @@
 
             // Cerrar menú móvil al hacer clic en enlaces
             document.querySelectorAll('.nav-menu-mobile .nav-link').forEach(link => {
-                link.addEventListener('click', () => {
+            link.addEventListener('click', () => {
                     closeMobileMenu();
-                });
             });
+        });
 
-            // Cerrar menú móvil al hacer clic fuera
-            document.addEventListener('click', (e) => {
+        // Cerrar menú móvil al hacer clic fuera
+        document.addEventListener('click', (e) => {
                 const navMenuMobile = document.getElementById('navMenuMobile');
-                const mobileToggle = document.querySelector('.mobile-menu-toggle');
-                
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
                 if (navMenuMobile && mobileToggle && 
                     !navMenuMobile.contains(e.target) && 
                     !mobileToggle.contains(e.target)) {
@@ -339,10 +339,10 @@
             });
 
             // Manejar resize de ventana
-            window.addEventListener('resize', () => {
-                if (window.innerWidth > 768) {
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
                     closeMobileMenu();
-                }
+            }
             });
         });
     </script>
