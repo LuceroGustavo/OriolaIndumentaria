@@ -254,7 +254,25 @@
                     </div>
                 </div>
 
-                <form th:action="@{/admin/products/save}" th:object="${product}" method="post" enctype="multipart/form-data">
+                <!-- Datos ocultos para inicialización -->
+                <div th:if="${product.pId != null}" style="display: none;">
+                    <!-- Categorías seleccionadas -->
+                    <div th:each="category : ${product.categories}" th:data-category-id="${category.id}" th:data-category-name="${category.name}"></div>
+                    
+                    <!-- Colores seleccionados -->
+                    <div th:each="color : ${product.colores}" th:data-color-id="${color.id}" th:data-color-name="${color.name}"></div>
+                    
+                    <!-- Talles seleccionados -->
+                    <div th:each="talle : ${product.talles}" th:data-talle-name="${talle.name()}" th:data-talle-display="${talle.displayName}"></div>
+                    
+                    <!-- Géneros seleccionados -->
+                    <div th:each="genero : ${product.generos}" th:data-genero-name="${genero.name()}" th:data-genero-display="${genero.displayName}"></div>
+                    
+                    <!-- Temporadas seleccionadas -->
+                    <div th:each="temporada : ${product.temporadas}" th:data-temporada-name="${temporada.name()}" th:data-temporada-display="${temporada.displayName}"></div>
+                </div>
+
+                <form th:action="${product.pId != null ? '/admin/products/edit/' + product.pId : '/admin/products/save'}" th:object="${product}" method="post" enctype="multipart/form-data">
                 <div class="row">
                         <!-- Información del Producto -->
                         <div class="col-md-8">
@@ -667,7 +685,95 @@
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
+            
+            // Inicializar valores seleccionados para edición
+            initializeSelectedValues();
         });
+        
+        function initializeSelectedValues() {
+            console.log('Inicializando valores seleccionados...');
+            
+            // Buscar el div oculto que contiene los datos del producto
+            // Este es el primer div con style="display: none;" antes del formulario
+            const allHiddenDivs = document.querySelectorAll('div[style*="display: none"]');
+            let hiddenDataDiv = null;
+            
+            // El primer div oculto es el que contiene los datos del producto
+            if (allHiddenDivs.length > 0) {
+                hiddenDataDiv = allHiddenDivs[0];
+            }
+            
+            console.log('Hidden data div found:', hiddenDataDiv ? 'Yes' : 'No');
+            
+            if (hiddenDataDiv) {
+                const categoryElements = hiddenDataDiv.querySelectorAll('[data-category-id]');
+                console.log('Elementos de categorías encontrados:', categoryElements.length);
+                categoryElements.forEach(element => {
+                    const id = element.getAttribute('data-category-id');
+                    const name = element.getAttribute('data-category-name');
+                    if (id && name) {
+                        selectedCategories.push({ id: id, name: name });
+                        console.log('Categoría agregada:', name);
+                    }
+                });
+            }
+            
+            if (hiddenDataDiv) {
+                // Leer datos de colores seleccionados SOLO del div oculto
+                const colorElements = hiddenDataDiv.querySelectorAll('[data-color-id]');
+                colorElements.forEach(element => {
+                    const id = element.getAttribute('data-color-id');
+                    const name = element.getAttribute('data-color-name');
+                    if (id && name) {
+                        selectedColors.push({ id: id, name: name });
+                    }
+                });
+                
+                // Leer datos de talles seleccionados SOLO del div oculto
+                const talleElements = hiddenDataDiv.querySelectorAll('[data-talle-name]');
+                talleElements.forEach(element => {
+                    const name = element.getAttribute('data-talle-name');
+                    const display = element.getAttribute('data-talle-display');
+                    if (name && display) {
+                        selectedTalles.push({ name: name, display: display });
+                    }
+                });
+                
+                // Leer datos de géneros seleccionados SOLO del div oculto
+                const generoElements = hiddenDataDiv.querySelectorAll('[data-genero-name]');
+                generoElements.forEach(element => {
+                    const name = element.getAttribute('data-genero-name');
+                    const display = element.getAttribute('data-genero-display');
+                    if (name && display) {
+                        selectedGeneros.push({ name: name, display: display });
+                    }
+                });
+                
+                // Leer datos de temporadas seleccionadas SOLO del div oculto
+                const temporadaElements = hiddenDataDiv.querySelectorAll('[data-temporada-name]');
+                temporadaElements.forEach(element => {
+                    const name = element.getAttribute('data-temporada-name');
+                    const display = element.getAttribute('data-temporada-display');
+                    if (name && display) {
+                        selectedTemporadas.push({ name: name, display: display });
+                    }
+                });
+            }
+            
+            // Actualizar displays
+            updateCategoryDisplay();
+            updateColorDisplay();
+            updateTalleDisplay();
+            updateGeneroDisplay();
+            updateTemporadaDisplay();
+            
+            // Actualizar inputs ocultos
+            updateHiddenInput();
+            updateColorHiddenInput();
+            updateTalleHiddenInput();
+            updateGeneroHiddenInput();
+            updateTemporadaHiddenInput();
+        }
 
         function addCategory(categoryId, categoryName) {
             // Verificar si ya existe

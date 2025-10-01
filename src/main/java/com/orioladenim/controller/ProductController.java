@@ -185,6 +185,15 @@ public class ProductController {
         model.addAttribute("talles", Talle.values());
         model.addAttribute("generos", Genero.values());
         model.addAttribute("temporadas", Temporada.values());
+        
+        // Debug: Verificar qué datos tiene el producto
+        System.out.println("Producto ID: " + product.getPId());
+        System.out.println("Categorías del producto: " + product.getCategories().size());
+        System.out.println("Colores del producto: " + product.getColores().size());
+        System.out.println("Talles del producto: " + product.getTalles().size());
+        System.out.println("Géneros del producto: " + product.getGeneros().size());
+        System.out.println("Temporadas del producto: " + product.getTemporadas().size());
+        
         return "admin/product-form";
     }
 
