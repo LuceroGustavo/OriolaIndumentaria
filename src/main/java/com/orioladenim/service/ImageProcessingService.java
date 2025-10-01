@@ -2,6 +2,7 @@ package com.orioladenim.service;
 
 import com.orioladenim.entity.ProductImage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,8 +26,11 @@ public class ImageProcessingService {
     @Autowired
     private WebPConversionService webPConversionService;
     
-    private static final String UPLOAD_DIR = "uploads";
-    private static final String THUMBNAIL_DIR = "uploads/thumbnails";
+    @Value("${upload.path:uploads}")
+    private String uploadPath;
+    
+    @Value("${upload.thumbnail.path:uploads/thumbnails}")
+    private String thumbnailPath;
     private static final int MAX_WIDTH = 1920;
     private static final int MAX_HEIGHT = 1080;
     private static final int THUMBNAIL_SIZE = 300;
@@ -39,8 +43,8 @@ public class ImageProcessingService {
     
     private void createDirectories() {
         try {
-            Files.createDirectories(Paths.get(UPLOAD_DIR));
-            Files.createDirectories(Paths.get(THUMBNAIL_DIR));
+            Files.createDirectories(Paths.get(uploadPath));
+            Files.createDirectories(Paths.get(thumbnailPath));
         } catch (IOException e) {
             throw new RuntimeException("Error creando directorios de imágenes", e);
         }
@@ -73,11 +77,11 @@ public class ImageProcessingService {
             BufferedImage resizedImage = resizeImage(originalImage, MAX_WIDTH, MAX_HEIGHT);
             
             // Convertir a WebP y guardar imagen principal
-            String imagePath = saveAsWebP(resizedImage, uniqueName, UPLOAD_DIR, extension);
+            String imagePath = saveAsWebP(resizedImage, uniqueName, uploadPath, extension);
             
             // Crear y guardar thumbnail
             BufferedImage thumbnail = createThumbnail(resizedImage, THUMBNAIL_SIZE);
-            saveAsWebP(thumbnail, uniqueName, THUMBNAIL_DIR, extension);
+            saveAsWebP(thumbnail, uniqueName, thumbnailPath, extension);
             
             // Crear entidad ProductImage
             ProductImage productImage = new ProductImage();
@@ -101,12 +105,12 @@ public class ImageProcessingService {
     private ProductImage handleWebPFile(MultipartFile file, String uniqueName, boolean isPrimary) throws IOException {
         // Guardar archivo WebP directamente
         String webpFilename = uniqueName + ".webp";
-        Path webpPath = Paths.get(UPLOAD_DIR, webpFilename);
+        Path webpPath = Paths.get(uploadPath, webpFilename);
         Files.write(webpPath, file.getBytes());
         
         // Crear thumbnail WebP (copiar el mismo archivo por ahora)
-        Path thumbnailPath = Paths.get(THUMBNAIL_DIR, webpFilename);
-        Files.write(thumbnailPath, file.getBytes());
+        Path thumbnailPathFile = Paths.get(thumbnailPath, webpFilename);
+        Files.write(thumbnailPathFile, file.getBytes());
         
         // Crear entidad ProductImage
         ProductImage productImage = new ProductImage();
@@ -282,15 +286,15 @@ public class ImageProcessingService {
     public void deleteImage(String imagePath) {
         try {
             // Eliminar imagen principal
-            Path mainImagePath = Paths.get(UPLOAD_DIR, imagePath);
+            Path mainImagePath = Paths.get(uploadPath, imagePath);
             if (Files.exists(mainImagePath)) {
                 Files.delete(mainImagePath);
             }
             
             // Eliminar thumbnail
-            Path thumbnailPath = Paths.get(THUMBNAIL_DIR, imagePath);
-            if (Files.exists(thumbnailPath)) {
-                Files.delete(thumbnailPath);
+            Path thumbnailPathFile = Paths.get(thumbnailPath, imagePath);
+            if (Files.exists(thumbnailPathFile)) {
+                Files.delete(thumbnailPathFile);
             }
         } catch (IOException e) {
             throw new RuntimeException("Error eliminando imagen: " + e.getMessage(), e);
