@@ -672,7 +672,7 @@ body {
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         z-index: 1000;
         transform: translateX(-100%);
-        transition: transform 0.3s ease-in-out;
+        transition: none;
         overflow-y: auto;
         overflow-x: hidden;
     }
@@ -693,7 +693,7 @@ body {
         background: rgba(0, 0, 0, 0.3);
         z-index: 999;
         opacity: 0;
-        transition: opacity 0.3s ease-in-out;
+        transition: none;
     }
     
     .nav-overlay.active {

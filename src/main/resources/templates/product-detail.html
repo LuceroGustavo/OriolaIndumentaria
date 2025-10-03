@@ -1097,39 +1097,50 @@
     </style>
 
     <script>
-        // Variables globales para evitar conflictos
+        // Versión ultra-simplificada del menú móvil
         let isMobileMenuOpen = false;
         
         function toggleMobileMenu() {
-            if (isMobileMenuOpen) {
-                closeMobileMenu();
-            } else {
-                openMobileMenu();
-            }
-        }
-
-        function openMobileMenu() {
-            const navMenuMobile = document.getElementById('navMenuMobile');
-            const navOverlay = document.getElementById('navOverlay');
-            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            const navMenu = document.getElementById('navMenuMobile');
+            const overlay = document.getElementById('navOverlay');
+            const toggle = document.querySelector('.mobile-menu-toggle');
             
-            if (navMenuMobile && navOverlay && mobileToggle) {
-                navMenuMobile.classList.add('active');
-                navOverlay.classList.add('active');
-                mobileToggle.innerHTML = '<i class="bi bi-x"></i>';
+            if (!navMenu || !overlay || !toggle) return;
+            
+            // Prevenir múltiples ejecuciones simultáneas
+            if (toggle.disabled) return;
+            toggle.disabled = true;
+            
+            if (isMobileMenuOpen) {
+                // Cerrar menú
+                navMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                toggle.innerHTML = '<i class="bi bi-list"></i>';
+                isMobileMenuOpen = false;
+            } else {
+                // Abrir menú
+                navMenu.classList.add('active');
+                overlay.classList.add('active');
+                toggle.innerHTML = '<i class="bi bi-x"></i>';
                 isMobileMenuOpen = true;
             }
+            
+            // Rehabilitar después de un breve delay
+            setTimeout(() => {
+                toggle.disabled = false;
+            }, 50);
         }
 
+        // Cerrar menú móvil
         function closeMobileMenu() {
-            const navMenuMobile = document.getElementById('navMenuMobile');
-            const navOverlay = document.getElementById('navOverlay');
-            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            const navMenu = document.getElementById('navMenuMobile');
+            const overlay = document.getElementById('navOverlay');
+            const toggle = document.querySelector('.mobile-menu-toggle');
             
-            if (navMenuMobile && navOverlay && mobileToggle) {
-                navMenuMobile.classList.remove('active');
-                navOverlay.classList.remove('active');
-                mobileToggle.innerHTML = '<i class="bi bi-list"></i>';
+            if (navMenu && overlay && toggle) {
+                navMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                toggle.innerHTML = '<i class="bi bi-list"></i>';
                 isMobileMenuOpen = false;
             }
         }
@@ -1338,17 +1349,11 @@
                 });
             });
 
-            // Cerrar menú móvil al hacer clic fuera
-            document.addEventListener('click', (e) => {
-                const navMenuMobile = document.getElementById('navMenuMobile');
-                const mobileToggle = document.querySelector('.mobile-menu-toggle');
-                
-                if (navMenuMobile && mobileToggle && 
-                    !navMenuMobile.contains(e.target) && 
-                    !mobileToggle.contains(e.target)) {
-                    closeMobileMenu();
-                }
-            });
+            // Cerrar menú móvil al hacer clic en el overlay
+            const overlay = document.getElementById('navOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', closeMobileMenu);
+            }
 
             // Manejar resize de ventana
             window.addEventListener('resize', () => {
