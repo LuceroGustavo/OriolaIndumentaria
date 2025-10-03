@@ -19,6 +19,11 @@ public class WebConfig implements WebMvcConfigurer {
         String absolutePath = Paths.get(uploadPath).toAbsolutePath().toString();
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:" + absolutePath + "/");
+        
+        // Asegurar que los recursos estáticos (CSS, JS) se sirvan correctamente
+        registry.addResourceHandler("/css/**", "/js/**", "/img/**")
+                .addResourceLocations("classpath:/static/css/", "classpath:/static/js/", "classpath:/static/img/")
+                .setCachePeriod(3600);
     }
 }
 
