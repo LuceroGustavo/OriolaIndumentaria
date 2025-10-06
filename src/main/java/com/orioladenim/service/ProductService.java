@@ -3,10 +3,11 @@ package com.orioladenim.service;
 import com.orioladenim.entity.Product;
 import com.orioladenim.repo.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -25,10 +26,12 @@ public class ProductService {
         return productRepository.findById(id).orElse(null);
     }
     
+    @CacheEvict(value = "products", allEntries = true)
     public Product save(Product product) {
         return productRepository.save(product);
     }
     
+    @CacheEvict(value = "products", allEntries = true)
     public void deleteById(Integer id) {
         // Buscar el producto antes de eliminarlo
         Product product = findById(id);
@@ -44,14 +47,17 @@ public class ProductService {
     }
     
     
+    @Cacheable(value = "products", key = "'active'")
     public List<Product> findByActivoTrue() {
         return productRepository.findByActivoTrue();
     }
     
+    @Cacheable(value = "products", key = "'featured'")
     public List<Product> findDestacados() {
         return productRepository.findByEsDestacadoTrueAndActivoTrue();
     }
     
+    @Cacheable(value = "products", key = "'new'")
     public List<Product> findNuevos() {
         return productRepository.findByEsNuevoTrueAndActivoTrue();
     }
