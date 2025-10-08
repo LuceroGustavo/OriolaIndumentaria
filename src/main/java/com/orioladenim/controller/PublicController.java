@@ -1,8 +1,10 @@
 package com.orioladenim.controller;
 
 import com.orioladenim.entity.Product;
+import com.orioladenim.entity.Historia;
 import com.orioladenim.repo.ProductRepository;
 import com.orioladenim.service.CategoryService;
+import com.orioladenim.service.HistoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +20,9 @@ public class PublicController {
     @Autowired
     private CategoryService categoryService;
     
+    @Autowired
+    private HistoriaService historiaService;
+    
     @GetMapping("/")
     public String home(Model model) {
         try {
@@ -27,11 +32,15 @@ public class PublicController {
             // Agregar categorías para el dropdown
             model.addAttribute("categories", categoryService.getActiveCategories());
             
+            // Obtener historia principal (la más reciente y activa)
+            model.addAttribute("historiaPrincipal", historiaService.findActivaPrincipal().orElse(null));
+            
             return "index";
         } catch (Exception e) {
-            // En caso de error, mostrar página sin categorías
+            // En caso de error, mostrar página sin categorías ni historia
             model.addAttribute("products", productRepository.findByActivoTrue());
             model.addAttribute("categories", new java.util.ArrayList<>());
+            model.addAttribute("historiaPrincipal", null);
             return "index";
         }
     }

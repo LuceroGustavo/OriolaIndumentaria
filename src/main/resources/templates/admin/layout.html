@@ -111,6 +111,9 @@
                     <a class="nav-link" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/admin/colors')} ? 'active'" href="/admin/colors">
                         <i class="bi bi-palette"></i>Colores
                     </a>
+                    <a class="nav-link" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/admin/historias')} ? 'active'" href="/admin/historias">
+                        <i class="bi bi-camera-video"></i>Historias
+                    </a>
                     
                     <!-- Comunicación -->
                     <div class="nav-section">Comunicación</div>

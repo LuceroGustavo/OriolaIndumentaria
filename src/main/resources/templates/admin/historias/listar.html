@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Historias - ORIOLA Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .historia-card {
+            transition: transform 0.2s;
+        }
+        .historia-card:hover {
+            transform: translateY(-2px);
+        }
+        .video-thumbnail {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .estado-badge {
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/dashboard">
+                                <i class="bi bi-house"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/products">
+                                <i class="bi bi-box"></i> Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/admin/historias">
+                                <i class="bi bi-camera-video"></i> Historias
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/contacts">
+                                <i class="bi bi-envelope"></i> Consultas
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="bi bi-camera-video text-primary"></i>
+                        Gestión de Historias
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <a href="/admin/historias/nueva" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Nueva Historia
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Estadísticas -->
+                <div class="row mb-4" th:if="${estadisticas}">
+                    <div class="col-md-4">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h5 class="card-title">Activas</h5>
+                                        <h3 th:text="${estadisticas.activas}">0</h3>
+                                    </div>
+                                    <i class="bi bi-check-circle fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-secondary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h5 class="card-title">Inactivas</h5>
+                                        <h3 th:text="${estadisticas.inactivas}">0</h3>
+                                    </div>
+                                    <i class="bi bi-x-circle fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h5 class="card-title">Total</h5>
+                                        <h3 th:text="${estadisticas.total}">0</h3>
+                                    </div>
+                                    <i class="bi bi-collection fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Búsqueda -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <form th:action="@{/admin/historias/buscar}" method="get">
+                            <div class="input-group">
+                                <input type="text" name="q" class="form-control" placeholder="Buscar historias..." th:value="${busqueda}">
+                                <button class="btn btn-outline-secondary" type="submit">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Alertas -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle"></i>
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Lista de historias -->
+                <div class="row" th:if="${historias != null and !historias.empty}">
+                    <div class="col-md-6 col-lg-4 mb-4" th:each="historia : ${historias}">
+                        <div class="card historia-card h-100">
+                            <div class="position-relative">
+                                <img th:src="${historia.thumbnailUrl}" 
+                                     th:alt="${historia.titulo}"
+                                     class="video-thumbnail">
+                                <div class="position-absolute top-0 end-0 p-2">
+                                    <span th:class="'badge estado-badge ' + (${historia.activa} ? 'bg-success' : 'bg-secondary')"
+                                          th:text="${historia.activa ? 'Activa' : 'Inactiva'}">
+                                        Estado
+                                    </span>
+                                </div>
+                                <div class="position-absolute bottom-0 start-0 p-2">
+                                    <span class="badge bg-dark">
+                                        <i class="bi bi-clock"></i>
+                                        <span th:text="${historia.duracionFormateada}">0:00</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title" th:text="${historia.titulo}">Título</h5>
+                                <p class="card-text text-muted small" th:text="${historia.descripcion}">Descripción</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar"></i>
+                                        <span th:text="${#temporals.format(historia.fechaCreacion, 'dd/MM/yyyy HH:mm')}">Fecha</span>
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="bi bi-file-earmark"></i>
+                                        <span th:text="${historia.pesoFormateado}">Tamaño</span>
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <div class="btn-group w-100" role="group">
+                                    <a th:href="@{/admin/historias/{id}(id=${historia.id})}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </a>
+                                    <a th:href="@{/admin/historias/editar/{id}(id=${historia.id})}" 
+                                       class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    <form th:action="@{/admin/historias/{id}/toggle(id=${historia.id})}" 
+                                          method="post" class="d-inline">
+                                        <button type="submit" 
+                                                th:class="'btn btn-sm ' + (${historia.activa} ? 'btn-outline-warning' : 'btn-outline-success')"
+                                                th:text="${historia.activa ? 'Desactivar' : 'Activar'}">
+                                            <i th:class="${historia.activa} ? 'bi bi-pause' : 'bi bi-play'"></i>
+                                        </button>
+                                    </form>
+                                    <form th:action="@{/admin/historias/{id}/eliminar(id=${historia.id})}" 
+                                          method="post" class="d-inline"
+                                          onsubmit="return confirm('¿Está seguro de que desea eliminar esta historia?')">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mensaje cuando no hay historias -->
+                <div th:if="${historias == null or historias.empty}" class="text-center py-5">
+                    <i class="bi bi-camera-video fs-1 text-muted"></i>
+                    <h3 class="text-muted mt-3">No hay historias</h3>
+                    <p class="text-muted">Comienza creando tu primera historia promocional</p>
+                    <a href="/admin/historias/nueva" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Crear Primera Historia
+                    </a>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
