@@ -2,7 +2,9 @@
 
 **Fecha:** 30 de septiembre de 2025  
 **Servidor:** LightNode - Buenos Aires, Argentina  
-**Propósito:** Servidor de producción para aplicación Spring Boot
+**Propósito:** Servidor de producción para aplicación Spring Boot  
+**Estado:** ✅ DESPLEGADO Y FUNCIONANDO (11 de Octubre, 2025)  
+**Commit:** 60
 
 ---
 
@@ -122,12 +124,16 @@
 
 ## 🚀 **PRÓXIMOS PASOS**
 
+### **Completados:**
+- [x] Clonar proyecto desde GitHub
+- [x] Configurar aplicación Spring Boot
+- [x] Compilar y desplegar aplicación
+- [x] Configurar archivos persistentes
+- [x] Probar aplicación en producción
+
 ### **Pendientes:**
-- [ ] Clonar proyecto desde GitHub
-- [ ] Configurar aplicación Spring Boot
 - [ ] Configurar Nginx como proxy
 - [ ] Configurar dominio y SSL
-- [ ] Probar aplicación en producción
 
 ### **Comandos pendientes:**
 ```bash
