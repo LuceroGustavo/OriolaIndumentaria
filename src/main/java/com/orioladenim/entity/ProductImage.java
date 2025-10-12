@@ -37,9 +37,12 @@ public class ProductImage {
     @JoinColumn(name = "product_id")
     private Product product;
     
-    // Campo para compatibilidad con backups del servidor Node
+    // Campos para compatibilidad con backups del servidor Node
     @Transient
     private Long productId;
+    
+    @Transient
+    private String productName;
 
     // Método para obtener la URL completa de la imagen
     public String getImageUrl() {
@@ -78,5 +81,8 @@ public class ProductImage {
     
     public Long getProductId() { return productId; }
     public void setProductId(Long productId) { this.productId = productId; }
+    
+    public String getProductName() { return productName; }
+    public void setProductName(String productName) { this.productName = productName; }
 }
 
