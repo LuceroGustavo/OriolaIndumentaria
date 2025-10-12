@@ -202,6 +202,9 @@ public class BackupService {
                     .map(product -> product.getPId())
                     .collect(java.util.stream.Collectors.toList());
                 categoryData.put("productIds", productIds);
+            } else {
+                // Incluir lista vacía para compatibilidad
+                categoryData.put("productIds", new ArrayList<>());
             }
             
             simplifiedCategories.add(categoryData);
