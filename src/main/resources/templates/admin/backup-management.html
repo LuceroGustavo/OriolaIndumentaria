@@ -334,15 +334,22 @@
         // File upload handling
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('backupFile');
+        const restoreForm = document.getElementById('restoreForm');
         
-        uploadArea.addEventListener('click', () => fileInput.click());
+        // Click en el área de upload
+        uploadArea.addEventListener('click', (e) => {
+            e.preventDefault();
+            fileInput.click();
+        });
         
+        // Drag and drop
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.classList.add('dragover');
         });
         
-        uploadArea.addEventListener('dragleave', () => {
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
             uploadArea.classList.remove('dragover');
         });
         
@@ -356,10 +363,13 @@
             }
         });
         
-        fileInput.addEventListener('change', updateUploadArea);
+        // Cambio en el input file
+        fileInput.addEventListener('change', function(e) {
+            updateUploadArea();
+        });
         
         function updateUploadArea() {
-            if (fileInput.files.length > 0) {
+            if (fileInput.files && fileInput.files.length > 0) {
                 const fileName = fileInput.files[0].name;
                 uploadArea.innerHTML = `
                     <i class="bi bi-file-zip fs-1 text-success"></i>
@@ -368,6 +378,24 @@
                 `;
             }
         }
+        
+        // Validación del formulario
+        restoreForm.addEventListener('submit', function(e) {
+            if (!fileInput.files || fileInput.files.length === 0) {
+                e.preventDefault();
+                alert('Por favor selecciona un archivo ZIP para restaurar');
+                return false;
+            }
+            
+            const file = fileInput.files[0];
+            if (!file.name.toLowerCase().endsWith('.zip')) {
+                e.preventDefault();
+                alert('Por favor selecciona un archivo ZIP válido');
+                return false;
+            }
+            
+            return true;
+        });
         
         // Delete backup function
         function deleteBackup(backupId) {
