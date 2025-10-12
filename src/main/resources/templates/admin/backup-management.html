@@ -371,11 +371,14 @@
         function updateUploadArea() {
             if (fileInput.files && fileInput.files.length > 0) {
                 const fileName = fileInput.files[0].name;
-                uploadArea.innerHTML = `
-                    <i class="bi bi-file-zip fs-1 text-success"></i>
-                    <p class="mt-2 mb-0">${fileName}</p>
-                    <small class="text-muted">Archivo seleccionado</small>
-                `;
+                // No reemplazar todo el HTML, solo actualizar el contenido visual
+                const icon = uploadArea.querySelector('i');
+                const text = uploadArea.querySelector('p');
+                const small = uploadArea.querySelector('small');
+                
+                if (icon) icon.className = 'bi bi-file-zip fs-1 text-success';
+                if (text) text.textContent = fileName;
+                if (small) small.textContent = 'Archivo seleccionado';
             }
         }
         
