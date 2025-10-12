@@ -65,6 +65,7 @@ stop_app() {
 # Función para actualizar código
 update_code() {
     print_option "2️⃣ Actualizando código desde GitHub..."
+    cd /home/oriola/OriolaIndumentaria || { print_error "Error: No se pudo cambiar al directorio del proyecto"; return 1; }
     git fetch origin
     if git pull origin master; then
         print_success "Código actualizado"
@@ -77,6 +78,7 @@ update_code() {
 compile_app() {
     print_option "3️⃣ Compilando aplicación..."
     print_warning "Esto puede tomar varios minutos..."
+    cd /home/oriola/OriolaIndumentaria || { print_error "Error: No se pudo cambiar al directorio del proyecto"; return 1; }
     if mvn clean package -DskipTests; then
         print_success "Compilación exitosa"
     else
@@ -87,6 +89,7 @@ compile_app() {
 # Función para iniciar aplicación
 start_app() {
     print_option "4️⃣ Iniciando aplicación..."
+    cd /home/oriola/OriolaIndumentaria || { print_error "Error: No se pudo cambiar al directorio del proyecto"; return 1; }
     if [ ! -f "target/oriola-denim-0.0.1-SNAPSHOT.jar" ]; then
         print_error "No se encontró el JAR. Compila primero (opción 3)"
         return 1
@@ -117,6 +120,7 @@ full_deploy() {
 # Función para ver logs
 view_logs() {
     print_option "7️⃣ Mostrando logs de la aplicación..."
+    cd /home/oriola/OriolaIndumentaria || { print_error "Error: No se pudo cambiar al directorio del proyecto"; return 1; }
     if [ -f "nohup.out" ]; then
         echo -e "${YELLOW}Últimas 50 líneas de logs:${NC}"
         tail -50 nohup.out
@@ -156,6 +160,7 @@ restart_app() {
 # Función para ver información del proyecto
 project_info() {
     print_option "9️⃣ Información del proyecto:"
+    cd /home/oriola/OriolaIndumentaria || { print_error "Error: No se pudo cambiar al directorio del proyecto"; return 1; }
     echo ""
     echo -e "${CYAN}=== INFORMACIÓN GIT ===${NC}"
     echo "Rama actual: $(git branch --show-current)"
