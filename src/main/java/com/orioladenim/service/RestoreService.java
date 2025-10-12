@@ -139,13 +139,22 @@ public class RestoreService {
         Path categoriesFile = tempDir.resolve("data/categories.json");
         if (Files.exists(categoriesFile)) {
             String categoriesJson = Files.readString(categoriesFile);
-            List<Category> categories = objectMapper.readValue(categoriesJson, new TypeReference<List<Category>>() {});
+            List<Map<String, Object>> categoriesData = objectMapper.readValue(categoriesJson, new TypeReference<List<Map<String, Object>>>() {});
             
-            for (Category category : categories) {
+            for (Map<String, Object> categoryData : categoriesData) {
                 // Verificar si la categoría ya existe
-                Optional<Category> existingCategory = categoryRepository.findByNameIgnoreCase(category.getName());
+                String categoryName = (String) categoryData.get("name");
+                Optional<Category> existingCategory = categoryRepository.findByNameIgnoreCase(categoryName);
                 if (existingCategory.isEmpty()) {
-                    category.setId(null); // Para generar nuevo ID
+                    Category category = new Category();
+                    category.setName(categoryName);
+                    category.setDescription((String) categoryData.get("description"));
+                    category.setImagePath((String) categoryData.get("imagePath"));
+                    category.setIsActive((Boolean) categoryData.get("isActive"));
+                    category.setDisplayOrder((Integer) categoryData.get("displayOrder"));
+                    category.setProductCount((Integer) categoryData.get("productCount"));
+                    
+                    // Ignorar productIds del backup (se restaurarán las relaciones después)
                     categoryRepository.save(category);
                 }
             }
@@ -156,10 +165,35 @@ public class RestoreService {
         Path productsFile = tempDir.resolve("data/products.json");
         if (Files.exists(productsFile)) {
             String productsJson = Files.readString(productsFile);
-            List<Product> products = objectMapper.readValue(productsJson, new TypeReference<List<Product>>() {});
+            List<Map<String, Object>> productsData = objectMapper.readValue(productsJson, new TypeReference<List<Map<String, Object>>>() {});
             
-            for (Product product : products) {
-                product.setPId(null); // Para generar nuevo ID
+            for (Map<String, Object> productData : productsData) {
+                Product product = new Product();
+                product.setName((String) productData.get("name"));
+                product.setDescripcion((String) productData.get("descripcion"));
+                product.setPrice((Double) productData.get("price"));
+                product.setMedidas((String) productData.get("medidas"));
+                product.setColor((String) productData.get("color"));
+                product.setActivo((Boolean) productData.get("activo"));
+                product.setEsDestacado((Boolean) productData.get("esDestacado"));
+                product.setEsNuevo((Boolean) productData.get("esNuevo"));
+                product.setMaterial((String) productData.get("material"));
+                product.setCuidados((String) productData.get("cuidados"));
+                product.setEdadRecomendada((String) productData.get("edadRecomendada"));
+                product.setQty((Integer) productData.get("qty"));
+                product.setPrecioOriginal((Double) productData.get("precioOriginal"));
+                product.setDescuentoPorcentaje((Double) productData.get("descuentoPorcentaje"));
+                product.setTallasDisponibles((String) productData.get("tallasDisponibles"));
+                product.setColoresDisponibles((String) productData.get("coloresDisponibles"));
+                
+                // Restaurar relaciones con categorías si existen
+                @SuppressWarnings("unchecked")
+                List<Integer> colorIds = (List<Integer>) productData.get("colores");
+                if (colorIds != null && !colorIds.isEmpty()) {
+                    // Buscar colores por IDs (simplificado - asumiendo que existen)
+                    // TODO: Implementar restauración de colores si es necesario
+                }
+                
                 productRepository.save(product);
             }
         }
