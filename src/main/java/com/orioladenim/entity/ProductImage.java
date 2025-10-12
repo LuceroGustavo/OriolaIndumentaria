@@ -36,6 +36,10 @@ public class ProductImage {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
+    
+    // Campo para compatibilidad con backups del servidor Node
+    @Transient
+    private Long productId;
 
     // Método para obtener la URL completa de la imagen
     public String getImageUrl() {
@@ -71,5 +75,8 @@ public class ProductImage {
     
     public Product getProduct() { return product; }
     public void setProduct(Product product) { this.product = product; }
+    
+    public Long getProductId() { return productId; }
+    public void setProductId(Long productId) { this.productId = productId; }
 }
 
