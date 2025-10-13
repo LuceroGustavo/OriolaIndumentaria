@@ -18,6 +18,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
         // Configurar el directorio de uploads para servir archivos estáticos
         String absolutePath = Paths.get(uploadPath).toAbsolutePath().toString();
+        System.out.println("Configurando uploads en: " + absolutePath);
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:" + absolutePath + "/");
         

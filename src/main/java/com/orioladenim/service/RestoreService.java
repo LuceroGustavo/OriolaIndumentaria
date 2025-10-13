@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.Comparator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -155,6 +156,47 @@ public class RestoreService {
         contactRepository.deleteAll();
         historiaRepository.deleteAll();
         // No eliminar usuarios por seguridad
+        
+        // Limpiar archivos físicos de uploads
+        clearPhysicalFiles();
+    }
+    
+    private void clearPhysicalFiles() {
+        try {
+            Path uploadPath = Paths.get(uploadDir);
+            if (Files.exists(uploadPath)) {
+                // Borrar todos los archivos de uploads (excepto .gitkeep)
+                Files.walk(uploadPath)
+                    .filter(Files::isRegularFile)
+                    .filter(path -> !path.getFileName().toString().equals(".gitkeep"))
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                            System.out.println("Archivo eliminado: " + path.getFileName());
+                        } catch (IOException e) {
+                            System.err.println("Error eliminando archivo " + path + ": " + e.getMessage());
+                        }
+                    });
+                
+                // Borrar subdirectorios vacíos (excepto el directorio principal)
+                Files.walk(uploadPath)
+                    .sorted(Comparator.reverseOrder())
+                    .filter(Files::isDirectory)
+                    .filter(path -> !path.equals(uploadPath))
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                            System.out.println("Directorio eliminado: " + path.getFileName());
+                        } catch (IOException e) {
+                            System.err.println("Error eliminando directorio " + path + ": " + e.getMessage());
+                        }
+                    });
+                
+                System.out.println("Archivos físicos de uploads eliminados correctamente");
+            }
+        } catch (IOException e) {
+            System.err.println("Error limpiando archivos físicos: " + e.getMessage());
+        }
     }
     
     private void restoreCategories(Path tempDir) throws IOException {
@@ -173,8 +215,8 @@ public class RestoreService {
                     category.setDescription((String) categoryData.get("description"));
                     category.setImagePath((String) categoryData.get("imagePath"));
                     category.setIsActive((Boolean) categoryData.get("isActive"));
-                    category.setDisplayOrder((Integer) categoryData.get("displayOrder"));
-                    category.setProductCount((Integer) categoryData.get("productCount"));
+                    category.setDisplayOrder(((Number) categoryData.get("displayOrder")).intValue());
+                    category.setProductCount(((Number) categoryData.get("productCount")).intValue());
                     
                     // Ignorar productIds del backup (se restaurarán las relaciones después)
                     categoryRepository.save(category);
@@ -202,7 +244,7 @@ public class RestoreService {
                 product.setMaterial((String) productData.get("material"));
                 product.setCuidados((String) productData.get("cuidados"));
                 product.setEdadRecomendada((String) productData.get("edadRecomendada"));
-                product.setQty((Integer) productData.get("qty"));
+                product.setQty(((Number) productData.get("qty")).intValue());
                 product.setPrecioOriginal((Double) productData.get("precioOriginal"));
                 product.setDescuentoPorcentaje((Double) productData.get("descuentoPorcentaje"));
                 product.setTallasDisponibles((String) productData.get("tallasDisponibles"));
@@ -225,49 +267,81 @@ public class RestoreService {
         Path imagesFile = tempDir.resolve("data/product_images.json");
         if (Files.exists(imagesFile)) {
             String imagesJson = Files.readString(imagesFile);
-            List<ProductImage> images = objectMapper.readValue(imagesJson, new TypeReference<List<ProductImage>>() {});
+            List<Map<String, Object>> imagesData = objectMapper.readValue(imagesJson, new TypeReference<List<Map<String, Object>>>() {});
             
             // Crear directorio de uploads si no existe
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
+                try {
+                    Files.createDirectories(uploadPath);
+                    System.out.println("Directorio uploads creado: " + uploadPath.toAbsolutePath());
+                } catch (Exception e) {
+                    System.err.println("Error creando directorio uploads: " + e.getMessage());
+                    throw new IOException("No se pudo crear el directorio uploads", e);
+                }
             }
             
-            for (ProductImage image : images) {
-                // Restaurar producto asociado
-                if (image.getProduct() != null) {
-                    // Buscar producto por nombre (simplificado)
-                    List<Product> products = productRepository.findByActivoTrue();
-                    Optional<Product> product = products.stream()
-                        .filter(p -> p.getName().equals(image.getProduct().getName()))
-                        .findFirst();
+            // Verificar permisos de escritura
+            if (!Files.isWritable(uploadPath)) {
+                throw new IOException("No hay permisos de escritura en el directorio uploads: " + uploadPath.toAbsolutePath());
+            }
+            
+            for (Map<String, Object> imageData : imagesData) {
+                try {
+                    // Crear nueva instancia de ProductImage
+                    ProductImage image = new ProductImage();
+                    
+                    // Configurar datos básicos
+                    image.setFileName((String) imageData.get("fileName"));
+                    image.setOriginalName((String) imageData.get("originalName"));
+                    image.setFileSize(((Number) imageData.get("fileSize")).longValue());
+                    image.setIsPrimary((Boolean) imageData.get("isPrimary"));
+                    image.setDisplayOrder(((Number) imageData.get("displayOrder")).intValue());
+                    
+                    // Configurar imagePath correctamente (solo el nombre del archivo)
+                    String fileName = (String) imageData.get("fileName");
+                    image.setImagePath(fileName); // Solo el nombre del archivo, no la ruta completa
+                    
+                    // Restaurar producto asociado
+                    Integer productId = ((Number) imageData.get("productId")).intValue();
+                    Optional<Product> product = productRepository.findById(productId);
                     if (product.isPresent()) {
                         image.setProduct(product.get());
                     } else {
+                        System.err.println("Producto no encontrado para imagen: " + fileName);
                         continue; // Saltar imagen si no encuentra el producto
                     }
-                }
-                
-                // Copiar archivo de imagen
-                Path sourceImage = tempDir.resolve("images").resolve(image.getFileName());
-                if (Files.exists(sourceImage)) {
-                    Path targetImage = uploadPath.resolve(image.getFileName());
-                    Files.copy(sourceImage, targetImage);
                     
-                    // Crear thumbnail si existe
-                    Path sourceThumbnail = tempDir.resolve("images/thumbnails").resolve(image.getFileName());
-                    if (Files.exists(sourceThumbnail)) {
-                        Path thumbnailsDir = uploadPath.resolve("thumbnails");
-                        if (!Files.exists(thumbnailsDir)) {
-                            Files.createDirectories(thumbnailsDir);
+                    // Copiar archivo de imagen
+                    Path sourceImage = tempDir.resolve("images").resolve(fileName);
+                    if (Files.exists(sourceImage)) {
+                        Path targetImage = uploadPath.resolve(fileName);
+                        Files.copy(sourceImage, targetImage, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                        System.out.println("Imagen copiada: " + fileName);
+                        
+                        // Crear thumbnail si existe
+                        Path sourceThumbnail = tempDir.resolve("images/thumbnails").resolve(fileName);
+                        if (Files.exists(sourceThumbnail)) {
+                            Path thumbnailsDir = uploadPath.resolve("thumbnails");
+                            if (!Files.exists(thumbnailsDir)) {
+                                Files.createDirectories(thumbnailsDir);
+                            }
+                            Path targetThumbnail = thumbnailsDir.resolve(fileName);
+                            Files.copy(sourceThumbnail, targetThumbnail, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                            System.out.println("Thumbnail copiado: " + fileName);
                         }
-                        Path targetThumbnail = thumbnailsDir.resolve(image.getFileName());
-                        Files.copy(sourceThumbnail, targetThumbnail);
+                    } else {
+                        System.err.println("Imagen no encontrada en backup: " + fileName);
                     }
+                    
+                    // Guardar en base de datos
+                    productImageRepository.save(image);
+                    
+                } catch (Exception e) {
+                    System.err.println("Error procesando imagen: " + e.getMessage());
+                    e.printStackTrace();
+                    // Continuar con la siguiente imagen
                 }
-                
-                image.setId(null); // Para generar nuevo ID
-                productImageRepository.save(image);
             }
         }
     }
@@ -314,8 +388,8 @@ public class RestoreService {
                     color.setDescription((String) colorData.get("description"));
                     color.setHexCode((String) colorData.get("hexCode"));
                     color.setIsActive((Boolean) colorData.get("isActive"));
-                    color.setDisplayOrder((Integer) colorData.get("displayOrder"));
-                    color.setProductCount((Integer) colorData.get("productCount"));
+                    color.setDisplayOrder(((Number) colorData.get("displayOrder")).intValue());
+                    color.setProductCount(((Number) colorData.get("productCount")).intValue());
                     colorRepository.save(color);
                 }
             }
@@ -354,16 +428,61 @@ public class RestoreService {
             String historiasJson = Files.readString(historiasFile);
             List<Map<String, Object>> historiasData = objectMapper.readValue(historiasJson, new TypeReference<List<Map<String, Object>>>() {});
             
+            Path uploadPath = Paths.get(uploadDir);
+            
             for (Map<String, Object> historiaData : historiasData) {
-                Historia historia = new Historia();
-                historia.setTitulo((String) historiaData.get("titulo"));
-                historia.setDescripcion((String) historiaData.get("descripcion"));
-                historia.setVideoPath((String) historiaData.get("videoPath"));
-                historia.setVideoThumbnail((String) historiaData.get("videoThumbnail"));
-                historia.setDuracionSegundos((Integer) historiaData.get("duracionSegundos"));
-                historia.setPesoArchivo((Long) historiaData.get("pesoArchivo"));
-                historia.setActiva((Boolean) historiaData.get("activa"));
-                historiaRepository.save(historia);
+                try {
+                    Historia historia = new Historia();
+                    historia.setTitulo((String) historiaData.get("titulo"));
+                    historia.setDescripcion((String) historiaData.get("descripcion"));
+                    
+                    // Configurar rutas de video correctamente
+                    String videoPath = (String) historiaData.get("videoPath");
+                    String videoThumbnail = (String) historiaData.get("videoThumbnail");
+                    
+                    // Extraer solo el nombre del archivo de la ruta completa
+                    String videoFileName = videoPath != null ? 
+                        Paths.get(videoPath).getFileName().toString() : null;
+                    String thumbnailFileName = videoThumbnail != null ? 
+                        Paths.get(videoThumbnail).getFileName().toString() : null;
+                    
+                    // Copiar archivo de video si existe
+                    if (videoFileName != null) {
+                        Path sourceVideo = tempDir.resolve("images").resolve(videoFileName);
+                        if (Files.exists(sourceVideo)) {
+                            Path targetVideo = uploadPath.resolve(videoFileName);
+                            Files.copy(sourceVideo, targetVideo, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                            historia.setVideoPath(videoFileName); // Solo el nombre del archivo
+                            System.out.println("Video copiado: " + videoFileName);
+                        } else {
+                            System.err.println("Video no encontrado en backup: " + videoFileName);
+                            historia.setVideoPath(videoPath); // Usar ruta original como fallback
+                        }
+                    }
+                    
+                    // Copiar thumbnail si existe
+                    if (thumbnailFileName != null) {
+                        Path sourceThumbnail = tempDir.resolve("images").resolve(thumbnailFileName);
+                        if (Files.exists(sourceThumbnail)) {
+                            Path targetThumbnail = uploadPath.resolve(thumbnailFileName);
+                            Files.copy(sourceThumbnail, targetThumbnail, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                            historia.setVideoThumbnail(thumbnailFileName); // Solo el nombre del archivo
+                            System.out.println("Thumbnail copiado: " + thumbnailFileName);
+                        } else {
+                            System.err.println("Thumbnail no encontrado en backup: " + thumbnailFileName);
+                            historia.setVideoThumbnail(videoThumbnail); // Usar ruta original como fallback
+                        }
+                    }
+                    
+                    historia.setDuracionSegundos(((Number) historiaData.get("duracionSegundos")).intValue());
+                    historia.setPesoArchivo(((Number) historiaData.get("pesoArchivo")).longValue());
+                    historia.setActiva((Boolean) historiaData.get("activa"));
+                    historiaRepository.save(historia);
+                    
+                } catch (Exception e) {
+                    System.err.println("Error procesando historia: " + e.getMessage());
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -379,7 +498,7 @@ public class RestoreService {
             List<Map<String, Object>> productColors = (List<Map<String, Object>>) relationshipsData.get("product_colors");
             if (productColors != null) {
                 for (Map<String, Object> rel : productColors) {
-                    Integer productId = (Integer) rel.get("productId");
+                    Integer productId = ((Number) rel.get("productId")).intValue();
                     Long colorId = ((Number) rel.get("colorId")).longValue();
                     
                     Optional<Product> product = productRepository.findById(productId);
@@ -400,7 +519,7 @@ public class RestoreService {
             List<Map<String, Object>> productCategories = (List<Map<String, Object>>) relationshipsData.get("product_categories");
             if (productCategories != null) {
                 for (Map<String, Object> rel : productCategories) {
-                    Integer productId = (Integer) rel.get("productId");
+                    Integer productId = ((Number) rel.get("productId")).intValue();
                     Long categoryId = ((Number) rel.get("categoryId")).longValue();
                     
                     Optional<Product> product = productRepository.findById(productId);
@@ -421,7 +540,7 @@ public class RestoreService {
             List<Map<String, Object>> productTalles = (List<Map<String, Object>>) relationshipsData.get("product_talles");
             if (productTalles != null) {
                 for (Map<String, Object> rel : productTalles) {
-                    Integer productId = (Integer) rel.get("productId");
+                    Integer productId = ((Number) rel.get("productId")).intValue();
                     String talleStr = (String) rel.get("talle");
                     
                     Optional<Product> product = productRepository.findById(productId);
