@@ -1,7 +1,6 @@
 package com.orioladenim.controller;
 
 import com.orioladenim.entity.Product;
-import com.orioladenim.entity.Historia;
 import com.orioladenim.repo.ProductRepository;
 import com.orioladenim.service.CategoryService;
 import com.orioladenim.service.HistoriaService;
@@ -26,8 +25,8 @@ public class PublicController {
     @GetMapping("/")
     public String home(Model model) {
         try {
-            // Mostrar todos los productos activos
-            model.addAttribute("products", productRepository.findByActivoTrue());
+            // Mostrar solo productos de novedades (esNuevo = true y activo = true)
+            model.addAttribute("products", productRepository.findByEsNuevoTrueAndActivoTrue());
             
             // Agregar categorías para el dropdown
             model.addAttribute("categories", categoryService.getActiveCategories());
@@ -38,7 +37,7 @@ public class PublicController {
             return "index";
         } catch (Exception e) {
             // En caso de error, mostrar página sin categorías ni historia
-            model.addAttribute("products", productRepository.findByActivoTrue());
+            model.addAttribute("products", productRepository.findByEsNuevoTrueAndActivoTrue());
             model.addAttribute("categories", new java.util.ArrayList<>());
             model.addAttribute("historiaPrincipal", null);
             return "index";

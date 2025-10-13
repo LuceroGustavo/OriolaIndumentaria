@@ -18,6 +18,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - **Menú desplegable de categorías inspirado en Lovely Denim**
 - **Navegación por hover en el menú de categorías**
 - **Diseño de 4 columnas para organización de categorías**
+- **Configuración .gitignore para archivos específicos de entorno**
 
 ### Changed
 - Refactorización del sistema de usuarios
@@ -25,6 +26,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - Actualización del formulario de productos con ejemplos de colores flexibles
 - **Rediseño completo del navbar con menú desplegable integrado**
 - **Aplicación del diseño Lovely Denim a todos los HTML públicos**
+- **Configuración de sincronización Git para entornos múltiples**
 
 ### Fixed
 - Errores de sintaxis en templates Thymeleaf
