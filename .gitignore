@@ -85,3 +85,13 @@ Desktop.ini
 # Application specific
 application-local.properties
 application-dev.properties
+
+# Archivos de datos específicos de entorno (no sincronizar entre equipos)
+uploads/*
+!uploads/.gitkeep
+backups/*
+!backups/.gitkeep
+
+# Archivos temporales adicionales
+*.tmp
+*.temp
