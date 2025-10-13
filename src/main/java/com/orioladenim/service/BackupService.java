@@ -2,6 +2,7 @@ package com.orioladenim.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orioladenim.entity.*;
+import com.orioladenim.enums.Talle;
 import com.orioladenim.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +37,15 @@ public class BackupService {
     @Autowired
     private BackupInfoRepository backupInfoRepository;
     
+    @Autowired
+    private ColorRepository colorRepository;
+    
+    @Autowired
+    private ContactRepository contactRepository;
+    
+    @Autowired
+    private HistoriaRepository historiaRepository;
+    
     @Value("${file.upload-dir:uploads}")
     private String uploadDir;
     
@@ -68,13 +78,25 @@ public class BackupService {
             // 2. Exportar categorías
             exportCategories(zos);
             
-            // 3. Exportar imágenes de productos
+            // 3. Exportar colores
+            exportColors(zos);
+            
+            // 4. Exportar contactos
+            exportContacts(zos);
+            
+            // 5. Exportar historias
+            exportHistorias(zos);
+            
+            // 6. Exportar imágenes de productos
             exportProductImages(zos);
             
-            // 4. Exportar usuarios
+            // 7. Exportar usuarios
             exportUsers(zos);
             
-            // 5. Crear archivo de metadatos
+            // 8. Exportar relaciones Many-to-Many
+            exportRelationships(zos);
+            
+            // 9. Crear archivo de metadatos
             createMetadataFile(zos, createdBy, description);
         }
         
@@ -86,6 +108,10 @@ public class BackupService {
         int productCount = (int) productRepository.count();
         int imageCount = (int) productImageRepository.count();
         int categoryCount = (int) categoryRepository.count();
+        int colorCount = (int) colorRepository.count();
+        int contactCount = (int) contactRepository.count();
+        int historiaCount = (int) historiaRepository.count();
+        int userCount = (int) userRepository.count();
         
         // Guardar información del backup
         BackupInfo backupInfo = new BackupInfo(fileName, filePath, fileSize, createdBy, "FULL");
@@ -93,6 +119,7 @@ public class BackupService {
         backupInfo.setProductCount(productCount);
         backupInfo.setImageCount(imageCount);
         backupInfo.setCategoryCount(categoryCount);
+        // Agregar contadores adicionales si BackupInfo los soporta
         backupInfoRepository.save(backupInfo);
         
         return filePath;
@@ -261,10 +288,156 @@ public class BackupService {
                         Files.copy(imagePath, zos);
                         zos.closeEntry();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        // Log error but continue with other images
+                        System.err.println("Error copying image: " + imagePath + " - " + e.getMessage());
                     }
                 });
         }
+    }
+    
+    private void exportColors(ZipOutputStream zos) throws IOException {
+        List<Color> colors = colorRepository.findAll();
+        
+        List<Map<String, Object>> simplifiedColors = new ArrayList<>();
+        for (Color color : colors) {
+            Map<String, Object> colorData = new HashMap<>();
+            colorData.put("id", color.getId());
+            colorData.put("name", color.getName());
+            colorData.put("description", color.getDescription());
+            colorData.put("hexCode", color.getHexCode());
+            colorData.put("isActive", color.getIsActive());
+            colorData.put("displayOrder", color.getDisplayOrder());
+            colorData.put("productCount", color.getProductCount());
+            colorData.put("createdAt", color.getCreatedAt());
+            colorData.put("updatedAt", color.getUpdatedAt());
+            
+            simplifiedColors.add(colorData);
+        }
+        
+        String colorsJson = objectMapper.writeValueAsString(simplifiedColors);
+        
+        ZipEntry entry = new ZipEntry("data/colors.json");
+        zos.putNextEntry(entry);
+        zos.write(colorsJson.getBytes());
+        zos.closeEntry();
+    }
+    
+    private void exportContacts(ZipOutputStream zos) throws IOException {
+        List<Contact> contacts = contactRepository.findAll();
+        
+        List<Map<String, Object>> simplifiedContacts = new ArrayList<>();
+        for (Contact contact : contacts) {
+            Map<String, Object> contactData = new HashMap<>();
+            contactData.put("id", contact.getId());
+            contactData.put("nombre", contact.getNombre());
+            contactData.put("email", contact.getEmail());
+            contactData.put("telefono", contact.getTelefono());
+            contactData.put("asunto", contact.getAsunto());
+            contactData.put("mensaje", contact.getMensaje());
+            contactData.put("productoInteres", contact.getProductoInteres());
+            contactData.put("fechaCreacion", contact.getFechaCreacion());
+            contactData.put("fechaActualizacion", contact.getFechaActualizacion());
+            contactData.put("leido", contact.isLeido());
+            contactData.put("respondido", contact.isRespondido());
+            contactData.put("respuesta", contact.getRespuesta());
+            contactData.put("fechaRespuesta", contact.getFechaRespuesta());
+            contactData.put("ipAddress", contact.getIpAddress());
+            contactData.put("userAgent", contact.getUserAgent());
+            contactData.put("ubicacion", contact.getUbicacion());
+            contactData.put("activo", contact.isActivo());
+            
+            simplifiedContacts.add(contactData);
+        }
+        
+        String contactsJson = objectMapper.writeValueAsString(simplifiedContacts);
+        
+        ZipEntry entry = new ZipEntry("data/contacts.json");
+        zos.putNextEntry(entry);
+        zos.write(contactsJson.getBytes());
+        zos.closeEntry();
+    }
+    
+    private void exportHistorias(ZipOutputStream zos) throws IOException {
+        List<Historia> historias = historiaRepository.findAll();
+        
+        List<Map<String, Object>> simplifiedHistorias = new ArrayList<>();
+        for (Historia historia : historias) {
+            Map<String, Object> historiaData = new HashMap<>();
+            historiaData.put("id", historia.getId());
+            historiaData.put("titulo", historia.getTitulo());
+            historiaData.put("descripcion", historia.getDescripcion());
+            historiaData.put("videoPath", historia.getVideoPath());
+            historiaData.put("videoThumbnail", historia.getVideoThumbnail());
+            historiaData.put("duracionSegundos", historia.getDuracionSegundos());
+            historiaData.put("pesoArchivo", historia.getPesoArchivo());
+            historiaData.put("activa", historia.getActiva());
+            historiaData.put("fechaCreacion", historia.getFechaCreacion());
+            historiaData.put("fechaActualizacion", historia.getFechaActualizacion());
+            
+            simplifiedHistorias.add(historiaData);
+        }
+        
+        String historiasJson = objectMapper.writeValueAsString(simplifiedHistorias);
+        
+        ZipEntry entry = new ZipEntry("data/historias.json");
+        zos.putNextEntry(entry);
+        zos.write(historiasJson.getBytes());
+        zos.closeEntry();
+    }
+    
+    private void exportRelationships(ZipOutputStream zos) throws IOException {
+        // Exportar relaciones Many-to-Many
+        Map<String, Object> relationships = new HashMap<>();
+        
+        // Product-Colors relationships
+        List<Map<String, Object>> productColors = new ArrayList<>();
+        List<Product> products = productRepository.findAll();
+        for (Product product : products) {
+            if (product.getColores() != null) {
+                for (Color color : product.getColores()) {
+                    Map<String, Object> rel = new HashMap<>();
+                    rel.put("productId", product.getPId());
+                    rel.put("colorId", color.getId());
+                    productColors.add(rel);
+                }
+            }
+        }
+        relationships.put("product_colors", productColors);
+        
+        // Product-Categories relationships
+        List<Map<String, Object>> productCategories = new ArrayList<>();
+        for (Product product : products) {
+            if (product.getCategories() != null) {
+                for (Category category : product.getCategories()) {
+                    Map<String, Object> rel = new HashMap<>();
+                    rel.put("productId", product.getPId());
+                    rel.put("categoryId", category.getId());
+                    productCategories.add(rel);
+                }
+            }
+        }
+        relationships.put("product_categories", productCategories);
+        
+        // Product-Talles relationships
+        List<Map<String, Object>> productTalles = new ArrayList<>();
+        for (Product product : products) {
+            if (product.getTalles() != null) {
+                for (Talle talle : product.getTalles()) {
+                    Map<String, Object> rel = new HashMap<>();
+                    rel.put("productId", product.getPId());
+                    rel.put("talle", talle.toString());
+                    productTalles.add(rel);
+                }
+            }
+        }
+        relationships.put("product_talles", productTalles);
+        
+        String relationshipsJson = objectMapper.writeValueAsString(relationships);
+        
+        ZipEntry entry = new ZipEntry("data/relationships.json");
+        zos.putNextEntry(entry);
+        zos.write(relationshipsJson.getBytes());
+        zos.closeEntry();
     }
     
     private void exportUsers(ZipOutputStream zos) throws IOException {
@@ -297,11 +470,16 @@ public class BackupService {
         metadata.put("createdAt", LocalDateTime.now().toString());
         metadata.put("createdBy", createdBy);
         metadata.put("description", description);
-        metadata.put("version", "1.0");
+        metadata.put("version", "2.0");
+        metadata.put("backupType", "FULL");
         metadata.put("productCount", productRepository.count());
         metadata.put("categoryCount", categoryRepository.count());
+        metadata.put("colorCount", colorRepository.count());
+        metadata.put("contactCount", contactRepository.count());
+        metadata.put("historiaCount", historiaRepository.count());
         metadata.put("imageCount", productImageRepository.count());
         metadata.put("userCount", userRepository.count());
+        metadata.put("totalTables", 8); // products, categories, colors, contacts, historias, product_images, users, backup_info
         
         String metadataJson = objectMapper.writeValueAsString(metadata);
         

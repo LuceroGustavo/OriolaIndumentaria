@@ -3,6 +3,7 @@ package com.orioladenim.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orioladenim.entity.*;
+import com.orioladenim.enums.Talle;
 import com.orioladenim.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +33,15 @@ public class RestoreService {
     
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private ColorRepository colorRepository;
+    
+    @Autowired
+    private ContactRepository contactRepository;
+    
+    @Autowired
+    private HistoriaRepository historiaRepository;
     
     @Value("${file.upload-dir:uploads}")
     private String uploadDir;
@@ -68,16 +78,24 @@ public class RestoreService {
                 clearExistingData();
             }
             
-            // Restaurar datos
+            // Restaurar datos en orden correcto (dependencias primero)
+            restoreColors(tempDir);
             restoreCategories(tempDir);
             restoreProducts(tempDir);
+            restoreRelationships(tempDir);
+            restoreContacts(tempDir);
+            restoreHistorias(tempDir);
             restoreProductImages(tempDir);
             restoreUsers(tempDir);
             
             return "Backup restaurado exitosamente. " + 
                    "Productos: " + metadata.get("productCount") + 
                    ", Categorías: " + metadata.get("categoryCount") + 
-                   ", Imágenes: " + metadata.get("imageCount");
+                   ", Colores: " + metadata.get("colorCount") +
+                   ", Contactos: " + metadata.get("contactCount") +
+                   ", Historias: " + metadata.get("historiaCount") +
+                   ", Imágenes: " + metadata.get("imageCount") +
+                   ", Usuarios: " + metadata.get("userCount");
             
         } finally {
             // Limpiar directorio temporal
@@ -129,9 +147,13 @@ public class RestoreService {
     @Transactional
     public void clearExistingData() {
         // Eliminar en orden correcto para respetar foreign keys
+        // Limpiar en orden correcto (dependencias primero)
         productImageRepository.deleteAll();
         productRepository.deleteAll();
         categoryRepository.deleteAll();
+        colorRepository.deleteAll();
+        contactRepository.deleteAll();
+        historiaRepository.deleteAll();
         // No eliminar usuarios por seguridad
     }
     
@@ -272,6 +294,149 @@ public class RestoreService {
                     user.setPassword("$2a$10$defaultPasswordHash"); // Password por defecto
                     
                     userRepository.save(user);
+                }
+            }
+        }
+    }
+    
+    private void restoreColors(Path tempDir) throws IOException {
+        Path colorsFile = tempDir.resolve("data/colors.json");
+        if (Files.exists(colorsFile)) {
+            String colorsJson = Files.readString(colorsFile);
+            List<Map<String, Object>> colorsData = objectMapper.readValue(colorsJson, new TypeReference<List<Map<String, Object>>>() {});
+            
+            for (Map<String, Object> colorData : colorsData) {
+                String colorName = (String) colorData.get("name");
+                Optional<Color> existingColor = colorRepository.findByNameIgnoreCase(colorName);
+                if (existingColor.isEmpty()) {
+                    Color color = new Color();
+                    color.setName(colorName);
+                    color.setDescription((String) colorData.get("description"));
+                    color.setHexCode((String) colorData.get("hexCode"));
+                    color.setIsActive((Boolean) colorData.get("isActive"));
+                    color.setDisplayOrder((Integer) colorData.get("displayOrder"));
+                    color.setProductCount((Integer) colorData.get("productCount"));
+                    colorRepository.save(color);
+                }
+            }
+        }
+    }
+    
+    private void restoreContacts(Path tempDir) throws IOException {
+        Path contactsFile = tempDir.resolve("data/contacts.json");
+        if (Files.exists(contactsFile)) {
+            String contactsJson = Files.readString(contactsFile);
+            List<Map<String, Object>> contactsData = objectMapper.readValue(contactsJson, new TypeReference<List<Map<String, Object>>>() {});
+            
+            for (Map<String, Object> contactData : contactsData) {
+                Contact contact = new Contact();
+                contact.setNombre((String) contactData.get("nombre"));
+                contact.setEmail((String) contactData.get("email"));
+                contact.setTelefono((String) contactData.get("telefono"));
+                contact.setAsunto((String) contactData.get("asunto"));
+                contact.setMensaje((String) contactData.get("mensaje"));
+                contact.setProductoInteres((String) contactData.get("productoInteres"));
+                contact.setLeido((Boolean) contactData.get("leido"));
+                contact.setRespondido((Boolean) contactData.get("respondido"));
+                contact.setRespuesta((String) contactData.get("respuesta"));
+                contact.setIpAddress((String) contactData.get("ipAddress"));
+                contact.setUserAgent((String) contactData.get("userAgent"));
+                contact.setUbicacion((String) contactData.get("ubicacion"));
+                contact.setActivo((Boolean) contactData.get("activo"));
+                contactRepository.save(contact);
+            }
+        }
+    }
+    
+    private void restoreHistorias(Path tempDir) throws IOException {
+        Path historiasFile = tempDir.resolve("data/historias.json");
+        if (Files.exists(historiasFile)) {
+            String historiasJson = Files.readString(historiasFile);
+            List<Map<String, Object>> historiasData = objectMapper.readValue(historiasJson, new TypeReference<List<Map<String, Object>>>() {});
+            
+            for (Map<String, Object> historiaData : historiasData) {
+                Historia historia = new Historia();
+                historia.setTitulo((String) historiaData.get("titulo"));
+                historia.setDescripcion((String) historiaData.get("descripcion"));
+                historia.setVideoPath((String) historiaData.get("videoPath"));
+                historia.setVideoThumbnail((String) historiaData.get("videoThumbnail"));
+                historia.setDuracionSegundos((Integer) historiaData.get("duracionSegundos"));
+                historia.setPesoArchivo((Long) historiaData.get("pesoArchivo"));
+                historia.setActiva((Boolean) historiaData.get("activa"));
+                historiaRepository.save(historia);
+            }
+        }
+    }
+    
+    private void restoreRelationships(Path tempDir) throws IOException {
+        Path relationshipsFile = tempDir.resolve("data/relationships.json");
+        if (Files.exists(relationshipsFile)) {
+            String relationshipsJson = Files.readString(relationshipsFile);
+            Map<String, Object> relationshipsData = objectMapper.readValue(relationshipsJson, new TypeReference<Map<String, Object>>() {});
+            
+            // Restaurar relaciones Product-Colors
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> productColors = (List<Map<String, Object>>) relationshipsData.get("product_colors");
+            if (productColors != null) {
+                for (Map<String, Object> rel : productColors) {
+                    Integer productId = (Integer) rel.get("productId");
+                    Long colorId = ((Number) rel.get("colorId")).longValue();
+                    
+                    Optional<Product> product = productRepository.findById(productId);
+                    Optional<Color> color = colorRepository.findById(colorId);
+                    
+                    if (product.isPresent() && color.isPresent()) {
+                        if (product.get().getColores() == null) {
+                            product.get().setColores(new ArrayList<>());
+                        }
+                        product.get().getColores().add(color.get());
+                        productRepository.save(product.get());
+                    }
+                }
+            }
+            
+            // Restaurar relaciones Product-Categories
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> productCategories = (List<Map<String, Object>>) relationshipsData.get("product_categories");
+            if (productCategories != null) {
+                for (Map<String, Object> rel : productCategories) {
+                    Integer productId = (Integer) rel.get("productId");
+                    Long categoryId = ((Number) rel.get("categoryId")).longValue();
+                    
+                    Optional<Product> product = productRepository.findById(productId);
+                    Optional<Category> category = categoryRepository.findById(categoryId);
+                    
+                    if (product.isPresent() && category.isPresent()) {
+                        if (product.get().getCategories() == null) {
+                            product.get().setCategories(new ArrayList<>());
+                        }
+                        product.get().getCategories().add(category.get());
+                        productRepository.save(product.get());
+                    }
+                }
+            }
+            
+            // Restaurar relaciones Product-Talles
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> productTalles = (List<Map<String, Object>>) relationshipsData.get("product_talles");
+            if (productTalles != null) {
+                for (Map<String, Object> rel : productTalles) {
+                    Integer productId = (Integer) rel.get("productId");
+                    String talleStr = (String) rel.get("talle");
+                    
+                    Optional<Product> product = productRepository.findById(productId);
+                    if (product.isPresent()) {
+                        try {
+                            Talle talle = Talle.valueOf(talleStr);
+                            if (product.get().getTalles() == null) {
+                                product.get().setTalles(new ArrayList<>());
+                            }
+                            product.get().getTalles().add(talle);
+                            productRepository.save(product.get());
+                        } catch (IllegalArgumentException e) {
+                            // Ignorar talles inválidos
+                        }
+                    }
                 }
             }
         }
