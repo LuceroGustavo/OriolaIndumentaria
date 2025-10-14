@@ -65,11 +65,53 @@ public class RestoreService {
         Path tempDir = Files.createTempDirectory("backup_restore");
         
         try {
+            // Asegurar que todas las carpetas necesarias existan
+            ensureRequiredDirectories();
+            
             // Extraer archivo ZIP
             extractZipFile(backupFile, tempDir);
+            System.out.println("📁 Directorio temporal creado: " + tempDir.toAbsolutePath());
             
             // Validar estructura del backup
             validateBackupStructure(tempDir);
+            
+            // Verificar contenido del directorio temporal
+            System.out.println("🔍 Contenido del directorio temporal:");
+            Files.walk(tempDir)
+                .forEach(path -> {
+                    try {
+                        if (Files.isDirectory(path)) {
+                            System.out.println("📁 " + tempDir.relativize(path));
+                        } else {
+                            System.out.println("📄 " + tempDir.relativize(path));
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error listando: " + e.getMessage());
+                    }
+                });
+            
+            // Verificar específicamente la carpeta images
+            Path imagesDir = tempDir.resolve("images");
+            if (Files.exists(imagesDir)) {
+                System.out.println("✅ Carpeta images encontrada en: " + imagesDir.toAbsolutePath());
+                try {
+                    Files.list(imagesDir).forEach(file -> {
+                        try {
+                            if (Files.isDirectory(file)) {
+                                System.out.println("📁 images/" + file.getFileName());
+                            } else {
+                                System.out.println("📄 images/" + file.getFileName());
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Error listando archivo: " + e.getMessage());
+                        }
+                    });
+                } catch (Exception e) {
+                    System.err.println("Error listando carpeta images: " + e.getMessage());
+                }
+            } else {
+                System.err.println("❌ Carpeta images NO encontrada en: " + imagesDir.toAbsolutePath());
+            }
             
             // Leer metadatos
             Map<String, Object> metadata = readMetadata(tempDir);
@@ -83,10 +125,10 @@ public class RestoreService {
             restoreColors(tempDir);
             restoreCategories(tempDir);
             restoreProducts(tempDir);
+            restoreProductImages(tempDir); // Restaurar imágenes DESPUÉS de productos
             restoreRelationships(tempDir);
             restoreContacts(tempDir);
             restoreHistorias(tempDir);
-            restoreProductImages(tempDir);
             restoreUsers(tempDir);
             
             return "Backup restaurado exitosamente. " + 
@@ -225,6 +267,9 @@ public class RestoreService {
         }
     }
     
+    // Mapa para asociar IDs originales con IDs nuevos
+    private Map<Integer, Integer> productIdMapping = new HashMap<>();
+    
     private void restoreProducts(Path tempDir) throws IOException {
         Path productsFile = tempDir.resolve("data/products.json");
         if (Files.exists(productsFile)) {
@@ -233,6 +278,10 @@ public class RestoreService {
             
             for (Map<String, Object> productData : productsData) {
                 Product product = new Product();
+                
+                // Obtener ID original del backup
+                Integer originalId = ((Number) productData.get("pId")).intValue();
+                
                 product.setName((String) productData.get("name"));
                 product.setDescripcion((String) productData.get("descripcion"));
                 product.setPrice((Double) productData.get("price"));
@@ -258,7 +307,14 @@ public class RestoreService {
                     // TODO: Implementar restauración de colores si es necesario
                 }
                 
-                productRepository.save(product);
+                // Guardar producto y obtener el nuevo ID generado
+                Product savedProduct = productRepository.save(product);
+                Integer newId = savedProduct.getPId();
+                
+                // Mapear ID original -> ID nuevo
+                productIdMapping.put(originalId, newId);
+                
+                System.out.println("✅ Producto restaurado: " + product.getName() + " (Original ID: " + originalId + " -> Nuevo ID: " + newId + ")");
             }
         }
     }
@@ -278,6 +334,18 @@ public class RestoreService {
                 } catch (Exception e) {
                     System.err.println("Error creando directorio uploads: " + e.getMessage());
                     throw new IOException("No se pudo crear el directorio uploads", e);
+                }
+            }
+            
+            // Crear directorio de thumbnails si no existe
+            Path thumbnailsDir = uploadPath.resolve("thumbnails");
+            if (!Files.exists(thumbnailsDir)) {
+                try {
+                    Files.createDirectories(thumbnailsDir);
+                    System.out.println("Directorio thumbnails creado: " + thumbnailsDir.toAbsolutePath());
+                } catch (Exception e) {
+                    System.err.println("Error creando directorio thumbnails: " + e.getMessage());
+                    // No lanzar excepción, continuar sin thumbnails
                 }
             }
             
@@ -302,40 +370,58 @@ public class RestoreService {
                     String fileName = (String) imageData.get("fileName");
                     image.setImagePath(fileName); // Solo el nombre del archivo, no la ruta completa
                     
-                    // Restaurar producto asociado
-                    Integer productId = ((Number) imageData.get("productId")).intValue();
-                    Optional<Product> product = productRepository.findById(productId);
-                    if (product.isPresent()) {
-                        image.setProduct(product.get());
-                    } else {
-                        System.err.println("Producto no encontrado para imagen: " + fileName);
-                        continue; // Saltar imagen si no encuentra el producto
-                    }
-                    
-                    // Copiar archivo de imagen
+                    // PRIMERO: Copiar archivo de imagen físicamente (independientemente del producto)
                     Path sourceImage = tempDir.resolve("images").resolve(fileName);
+                    System.out.println("🔍 Buscando imagen en: " + sourceImage.toAbsolutePath());
+                    
+                    boolean imagenCopiada = false;
                     if (Files.exists(sourceImage)) {
                         Path targetImage = uploadPath.resolve(fileName);
                         Files.copy(sourceImage, targetImage, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                        System.out.println("Imagen copiada: " + fileName);
+                        System.out.println("✅ Imagen copiada: " + fileName);
+                        imagenCopiada = true;
                         
                         // Crear thumbnail si existe
                         Path sourceThumbnail = tempDir.resolve("images/thumbnails").resolve(fileName);
+                        System.out.println("🔍 Buscando thumbnail en: " + sourceThumbnail.toAbsolutePath());
+                        
                         if (Files.exists(sourceThumbnail)) {
-                            Path thumbnailsDir = uploadPath.resolve("thumbnails");
+                            // Usar la variable thumbnailsDir ya declarada arriba
                             if (!Files.exists(thumbnailsDir)) {
                                 Files.createDirectories(thumbnailsDir);
                             }
                             Path targetThumbnail = thumbnailsDir.resolve(fileName);
                             Files.copy(sourceThumbnail, targetThumbnail, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                            System.out.println("Thumbnail copiado: " + fileName);
+                            System.out.println("✅ Thumbnail copiado: " + fileName);
+                        } else {
+                            System.out.println("⚠️ Thumbnail no encontrado: " + fileName);
                         }
                     } else {
-                        System.err.println("Imagen no encontrada en backup: " + fileName);
+                        System.err.println("❌ Imagen no encontrada en backup: " + fileName);
+                        continue; // Saltar si no existe el archivo físico
                     }
                     
-                    // Guardar en base de datos
-                    productImageRepository.save(image);
+                    // SEGUNDO: Intentar asociar con producto usando el mapeo de IDs
+                    Integer originalProductId = ((Number) imageData.get("productId")).intValue();
+                    Integer newProductId = productIdMapping.get(originalProductId);
+                    
+                    if (newProductId != null) {
+                        Optional<Product> product = productRepository.findById(newProductId);
+                        if (product.isPresent()) {
+                            image.setProduct(product.get());
+                            System.out.println("✅ Imagen asociada al producto: " + fileName + " (Original ID: " + originalProductId + " -> Nuevo ID: " + newProductId + ")");
+                        } else {
+                            System.err.println("⚠️ Producto no encontrado para imagen: " + fileName + " (Nuevo ID: " + newProductId + ") - Imagen copiada pero sin asociar");
+                        }
+                    } else {
+                        System.err.println("⚠️ No se encontró mapeo para producto original ID: " + originalProductId + " - Imagen copiada pero sin asociar");
+                    }
+                    
+                    // Guardar en base de datos (con o sin producto asociado)
+                    if (imagenCopiada) {
+                        productImageRepository.save(image);
+                        System.out.println("✅ Imagen guardada en base de datos: " + fileName);
+                    }
                     
                 } catch (Exception e) {
                     System.err.println("Error procesando imagen: " + e.getMessage());
@@ -430,6 +516,41 @@ public class RestoreService {
             
             Path uploadPath = Paths.get(uploadDir);
             
+            // Crear directorio de uploads si no existe
+            if (!Files.exists(uploadPath)) {
+                try {
+                    Files.createDirectories(uploadPath);
+                    System.out.println("Directorio uploads creado: " + uploadPath.toAbsolutePath());
+                } catch (Exception e) {
+                    System.err.println("Error creando directorio uploads: " + e.getMessage());
+                    throw new IOException("No se pudo crear el directorio uploads", e);
+                }
+            }
+            
+            // Crear directorio de historias si no existe
+            Path historiasDir = uploadPath.resolve("historias");
+            if (!Files.exists(historiasDir)) {
+                try {
+                    Files.createDirectories(historiasDir);
+                    System.out.println("Directorio historias creado: " + historiasDir.toAbsolutePath());
+                } catch (Exception e) {
+                    System.err.println("Error creando directorio historias: " + e.getMessage());
+                    throw new IOException("No se pudo crear el directorio historias", e);
+                }
+            }
+            
+            // Crear directorio de thumbnails de historias si no existe
+            Path historiasThumbnailsDir = uploadPath.resolve("thumbnails").resolve("historias");
+            if (!Files.exists(historiasThumbnailsDir)) {
+                try {
+                    Files.createDirectories(historiasThumbnailsDir);
+                    System.out.println("Directorio thumbnails/historias creado: " + historiasThumbnailsDir.toAbsolutePath());
+                } catch (Exception e) {
+                    System.err.println("Error creando directorio thumbnails/historias: " + e.getMessage());
+                    // No lanzar excepción, continuar sin thumbnails
+                }
+            }
+            
             for (Map<String, Object> historiaData : historiasData) {
                 try {
                     Historia historia = new Historia();
@@ -448,12 +569,29 @@ public class RestoreService {
                     
                     // Copiar archivo de video si existe
                     if (videoFileName != null) {
-                        Path sourceVideo = tempDir.resolve("images").resolve(videoFileName);
-                        if (Files.exists(sourceVideo)) {
-                            Path targetVideo = uploadPath.resolve(videoFileName);
+                        // Buscar video en diferentes ubicaciones posibles
+                        Path sourceVideo = null;
+                        
+                        // 1. Buscar en images/historias/ (ruta principal)
+                        Path historiasPath = tempDir.resolve("images").resolve("historias").resolve(videoFileName);
+                        if (Files.exists(historiasPath)) {
+                            sourceVideo = historiasPath;
+                        }
+                        
+                        // 2. Buscar en images/ (fallback)
+                        if (sourceVideo == null) {
+                            Path fallbackPath = tempDir.resolve("images").resolve(videoFileName);
+                            if (Files.exists(fallbackPath)) {
+                                sourceVideo = fallbackPath;
+                            }
+                        }
+                        
+                        if (sourceVideo != null && Files.exists(sourceVideo)) {
+                            // Copiar a uploads/historias/
+                            Path targetVideo = historiasDir.resolve(videoFileName);
                             Files.copy(sourceVideo, targetVideo, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                            historia.setVideoPath(videoFileName); // Solo el nombre del archivo
-                            System.out.println("Video copiado: " + videoFileName);
+                            historia.setVideoPath("historias/" + videoFileName); // Ruta relativa con subcarpeta
+                            System.out.println("Video copiado: " + videoFileName + " -> historias/");
                         } else {
                             System.err.println("Video no encontrado en backup: " + videoFileName);
                             historia.setVideoPath(videoPath); // Usar ruta original como fallback
@@ -462,12 +600,29 @@ public class RestoreService {
                     
                     // Copiar thumbnail si existe
                     if (thumbnailFileName != null) {
-                        Path sourceThumbnail = tempDir.resolve("images").resolve(thumbnailFileName);
-                        if (Files.exists(sourceThumbnail)) {
-                            Path targetThumbnail = uploadPath.resolve(thumbnailFileName);
+                        // Buscar thumbnail en diferentes ubicaciones posibles
+                        Path sourceThumbnail = null;
+                        
+                        // 1. Buscar en images/thumbnails/historias/
+                        Path thumbnailsPath = tempDir.resolve("images").resolve("thumbnails").resolve("historias").resolve(thumbnailFileName);
+                        if (Files.exists(thumbnailsPath)) {
+                            sourceThumbnail = thumbnailsPath;
+                        }
+                        
+                        // 2. Buscar en images/ (fallback)
+                        if (sourceThumbnail == null) {
+                            Path fallbackPath = tempDir.resolve("images").resolve(thumbnailFileName);
+                            if (Files.exists(fallbackPath)) {
+                                sourceThumbnail = fallbackPath;
+                            }
+                        }
+                        
+                        if (sourceThumbnail != null && Files.exists(sourceThumbnail)) {
+                            // Copiar a uploads/thumbnails/historias/
+                            Path targetThumbnail = historiasThumbnailsDir.resolve(thumbnailFileName);
                             Files.copy(sourceThumbnail, targetThumbnail, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                            historia.setVideoThumbnail(thumbnailFileName); // Solo el nombre del archivo
-                            System.out.println("Thumbnail copiado: " + thumbnailFileName);
+                            historia.setVideoThumbnail("historias/" + thumbnailFileName); // Ruta relativa con subcarpeta
+                            System.out.println("Thumbnail copiado: " + thumbnailFileName + " -> thumbnails/historias/");
                         } else {
                             System.err.println("Thumbnail no encontrado en backup: " + thumbnailFileName);
                             historia.setVideoThumbnail(videoThumbnail); // Usar ruta original como fallback
@@ -583,6 +738,42 @@ public class RestoreService {
             }
         } catch (IOException e) {
             return false;
+        }
+    }
+    
+    /**
+     * Asegura que todas las carpetas necesarias para el funcionamiento del sistema existan
+     */
+    private void ensureRequiredDirectories() {
+        try {
+            Path uploadPath = Paths.get(uploadDir);
+            
+            // Crear directorio principal de uploads
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+                System.out.println("✅ Directorio uploads creado: " + uploadPath.toAbsolutePath());
+            }
+            
+            // Crear subdirectorios necesarios
+            String[] requiredDirs = {
+                "thumbnails",
+                "historias", 
+                "thumbnails/historias"
+            };
+            
+            for (String dir : requiredDirs) {
+                Path dirPath = uploadPath.resolve(dir);
+                if (!Files.exists(dirPath)) {
+                    Files.createDirectories(dirPath);
+                    System.out.println("✅ Directorio creado: " + dirPath.toAbsolutePath());
+                }
+            }
+            
+            System.out.println("✅ Todas las carpetas necesarias están disponibles");
+            
+        } catch (IOException e) {
+            System.err.println("❌ Error creando directorios necesarios: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
