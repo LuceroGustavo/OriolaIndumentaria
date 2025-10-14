@@ -1,14 +1,18 @@
 package com.orioladenim.service;
 
 import com.orioladenim.entity.Category;
+import com.orioladenim.entity.Product;
 import com.orioladenim.repo.CategoryRepository;
+import com.orioladenim.repo.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -21,6 +25,9 @@ public class CategoryService {
     
     @Autowired
     private CategoryRepository categoryRepository;
+    
+    @Autowired
+    private ProductRepository productRepository;
     
     /**
      * Obtener todas las categorías activas ordenadas
@@ -89,7 +96,17 @@ public class CategoryService {
             category.setProductCount(0);
         }
         
-        return categoryRepository.save(category);
+        Category savedCategory = categoryRepository.save(category);
+        
+        // Si se especificó un orden, aplicar reordenamiento inteligente después de guardar
+        if (category.getDisplayOrder() != null) {
+            reorderCategoriesIntelligently(savedCategory.getId(), category.getDisplayOrder());
+        }
+        
+        // Verificar y corregir duplicados después de guardar
+        fixDuplicateOrders();
+        
+        return savedCategory;
     }
     
     /**
@@ -110,26 +127,47 @@ public class CategoryService {
         existingCategory.setDescription(categoryData.getDescription());
         existingCategory.setImagePath(categoryData.getImagePath());
         existingCategory.setIsActive(categoryData.getIsActive());
-        existingCategory.setDisplayOrder(categoryData.getDisplayOrder());
         
-        return categoryRepository.save(existingCategory);
+        // Manejar el orden de visualización con reordenamiento inteligente
+        Integer newOrder = categoryData.getDisplayOrder();
+        if (newOrder != null && !newOrder.equals(existingCategory.getDisplayOrder())) {
+            System.out.println("🔄 Reordenando categoría '" + existingCategory.getName() + "' a posición " + newOrder);
+            reorderCategoriesIntelligently(id, newOrder);
+            existingCategory.setDisplayOrder(newOrder);
+        }
+        
+        Category savedCategory = categoryRepository.save(existingCategory);
+        
+        return savedCategory;
     }
     
     /**
-     * Eliminar categoría (soft delete)
+     * Eliminar categoría (eliminación en cascada)
      */
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada con ID: " + id));
         
-        // Verificar si tiene productos
-        if (category.hasProducts()) {
-            throw new IllegalStateException("No se puede eliminar la categoría porque tiene productos asociados");
+        System.out.println("🗑️ Eliminando categoría: " + category.getName() + " (ID: " + id + ")");
+        
+        // Obtener todos los productos asociados a esta categoría
+        List<Product> productsWithCategory = productRepository.findAll().stream()
+                .filter(p -> p.getCategories().contains(category))
+                .collect(java.util.stream.Collectors.toList());
+        
+        System.out.println("📦 Productos asociados encontrados: " + productsWithCategory.size());
+        
+        // Remover la categoría de todos los productos asociados
+        for (Product product : productsWithCategory) {
+            System.out.println("  - Removiendo categoría de producto: " + product.getName());
+            product.getCategories().remove(category);
+            productRepository.save(product);
         }
         
-        // Soft delete
-        category.setIsActive(false);
-        categoryRepository.save(category);
+        // Ahora eliminar la categoría físicamente de la base de datos
+        categoryRepository.delete(category);
+        
+        System.out.println("✅ Categoría eliminada exitosamente y removida de todos los productos");
     }
     
     /**
@@ -174,7 +212,26 @@ public class CategoryService {
      */
     @Transactional(readOnly = true)
     public List<Category> getCategoriesWithProducts() {
-        return categoryRepository.findCategoriesWithActiveProducts();
+        // Usar fallback seguro para evitar problemas de transacción
+        System.out.println("🔄 Obteniendo categorías con productos (modo seguro)");
+        List<Category> allActiveCategories = categoryRepository.findActiveCategoriesOrdered();
+        List<Category> categoriesWithProducts = new ArrayList<>();
+        
+        for (Category category : allActiveCategories) {
+            // Verificar si la categoría tiene productos asociados
+            boolean hasProducts = productRepository.findAll().stream()
+                    .anyMatch(p -> p.getActivo() && p.getCategories().contains(category));
+            
+            if (hasProducts) {
+                categoriesWithProducts.add(category);
+                System.out.println("  ✅ " + category.getName() + " - Tiene productos");
+            } else {
+                System.out.println("  ❌ " + category.getName() + " - Sin productos");
+            }
+        }
+        
+        System.out.println("📊 Total categorías con productos: " + categoriesWithProducts.size());
+        return categoriesWithProducts;
     }
     
     /**
@@ -210,6 +267,29 @@ public class CategoryService {
      */
     public void updateProductCount(Long categoryId) {
         categoryRepository.updateProductCount(categoryId);
+    }
+    
+    /**
+     * Actualizar contador de productos de todas las categorías
+     */
+    @Transactional
+    public void updateAllProductCounts() {
+        System.out.println("🔄 Actualizando contadores de productos de todas las categorías...");
+        
+        List<Category> allCategories = categoryRepository.findAll();
+        for (Category category : allCategories) {
+            // Contar productos activos asociados a esta categoría
+            long productCount = productRepository.findAll().stream()
+                    .filter(p -> p.getActivo() && p.getCategories().contains(category))
+                    .count();
+            
+            category.setProductCount((int) productCount);
+            categoryRepository.save(category);
+            
+            System.out.println("  - " + category.getName() + ": " + productCount + " productos");
+        }
+        
+        System.out.println("✅ Contadores actualizados");
     }
     
     /**
@@ -277,5 +357,141 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public long getCategoryCount() {
         return categoryRepository.count();
+    }
+    
+    /**
+     * Verificar si un orden de visualización ya está ocupado por otra categoría
+     */
+    @Transactional(readOnly = true)
+    private boolean isDisplayOrderTaken(Integer order, Long excludeId) {
+        return categoryRepository.findAll().stream()
+                .anyMatch(c -> c.getDisplayOrder() != null && 
+                              c.getDisplayOrder().equals(order) && 
+                              !c.getId().equals(excludeId));
+    }
+    
+    /**
+     * Obtener el siguiente orden disponible
+     */
+    @Transactional(readOnly = true)
+    private Integer getNextAvailableOrder() {
+        Integer maxOrder = categoryRepository.getNextDisplayOrder();
+        return maxOrder != null ? maxOrder : 1;
+    }
+    
+    /**
+     * Reordenamiento inteligente: cuando se asigna una posición específica,
+     * mueve las demás categorías hacia abajo automáticamente
+     */
+    @Transactional
+    public void reorderCategoriesIntelligently(Long categoryId, Integer newPosition) {
+        try {
+            System.out.println("🔧 Iniciando reordenamiento inteligente - Categoría ID: " + categoryId + ", Posición: " + newPosition);
+            
+            // Obtener todas las categorías excepto la que se está editando
+            List<Category> allCategories = categoryRepository.findAll().stream()
+                    .filter(c -> c.getDisplayOrder() != null && !c.getId().equals(categoryId))
+                    .sorted((c1, c2) -> Integer.compare(c1.getDisplayOrder(), c2.getDisplayOrder()))
+                    .collect(java.util.stream.Collectors.toList());
+            
+            System.out.println("📋 Categorías a reordenar: " + allCategories.size());
+            
+            // Mover categorías que están en la nueva posición o después
+            boolean movedAny = false;
+            for (Category category : allCategories) {
+                Integer currentOrder = category.getDisplayOrder();
+                if (currentOrder >= newPosition) {
+                    Integer newOrder = currentOrder + 1;
+                    System.out.println("⬇️ " + category.getName() + ": " + currentOrder + " → " + newOrder);
+                    category.setDisplayOrder(newOrder);
+                    categoryRepository.save(category);
+                    movedAny = true;
+                }
+            }
+            
+            if (movedAny) {
+                System.out.println("✅ Reordenamiento inteligente completado - Se movieron categorías");
+            } else {
+                System.out.println("ℹ️ Reordenamiento inteligente completado - No se movieron categorías");
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Error en reordenamiento inteligente: " + e.getMessage());
+            // No lanzar excepción para evitar rollback
+        }
+    }
+    
+    /**
+     * Corregir órdenes duplicados reordenando automáticamente
+     */
+    @Transactional
+    public void fixDuplicateOrders() {
+        try {
+            List<Category> allCategories = categoryRepository.findAll();
+            
+            // Agrupar por orden y encontrar duplicados
+            Map<Integer, List<Category>> orderGroups = allCategories.stream()
+                    .filter(c -> c.getDisplayOrder() != null)
+                    .collect(java.util.stream.Collectors.groupingBy(Category::getDisplayOrder));
+            
+            boolean hasDuplicates = orderGroups.values().stream().anyMatch(list -> list.size() > 1);
+            
+            if (hasDuplicates) {
+                System.out.println("🔧 Detectados órdenes duplicados. Reordenando automáticamente...");
+                
+                // Reordenar todas las categorías secuencialmente
+                List<Category> sortedCategories = allCategories.stream()
+                        .filter(c -> c.getDisplayOrder() != null)
+                        .sorted((c1, c2) -> {
+                            // Primero por orden, luego por ID para mantener consistencia
+                            int orderCompare = Integer.compare(c1.getDisplayOrder(), c2.getDisplayOrder());
+                            return orderCompare != 0 ? orderCompare : Long.compare(c1.getId(), c2.getId());
+                        })
+                        .collect(java.util.stream.Collectors.toList());
+                
+                // Asignar nuevos órdenes secuenciales
+                for (int i = 0; i < sortedCategories.size(); i++) {
+                    Category category = sortedCategories.get(i);
+                    Integer newOrder = i + 1;
+                    if (!newOrder.equals(category.getDisplayOrder())) {
+                        System.out.println("🔄 " + category.getName() + ": " + category.getDisplayOrder() + " → " + newOrder);
+                        category.setDisplayOrder(newOrder);
+                        categoryRepository.save(category);
+                    }
+                }
+                
+                System.out.println("✅ Reordenamiento completado");
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Error en corrección de duplicados: " + e.getMessage());
+            // No lanzar excepción para evitar rollback
+        }
+    }
+    
+    /**
+     * Obtener estadísticas de categorías
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Object> getCategoryOrderStatistics() {
+        List<Category> allCategories = categoryRepository.findAll();
+        Map<Integer, List<Category>> orderGroups = allCategories.stream()
+                .filter(c -> c.getDisplayOrder() != null)
+                .collect(java.util.stream.Collectors.groupingBy(Category::getDisplayOrder));
+        
+        Map<String, Object> stats = new java.util.HashMap<>();
+        stats.put("totalCategories", allCategories.size());
+        stats.put("duplicateOrders", orderGroups.values().stream()
+                .filter(list -> list.size() > 1)
+                .mapToInt(List::size)
+                .sum());
+        stats.put("maxOrder", orderGroups.keySet().stream()
+                .mapToInt(Integer::intValue)
+                .max()
+                .orElse(0));
+        stats.put("minOrder", orderGroups.keySet().stream()
+                .mapToInt(Integer::intValue)
+                .min()
+                .orElse(0));
+        
+        return stats;
     }
 }

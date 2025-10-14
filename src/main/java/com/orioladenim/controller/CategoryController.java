@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -260,5 +261,30 @@ public class CategoryController {
     @ResponseBody
     public List<Category> searchCategories(@RequestParam String search) {
         return categoryService.searchCategories(search);
+    }
+    
+    
+    /**
+     * API REST - Obtener estadísticas de ordenamiento
+     */
+    @GetMapping("/api/order-stats")
+    @ResponseBody
+    public Map<String, Object> getOrderStatistics() {
+        return categoryService.getCategoryOrderStatistics();
+    }
+    
+    /**
+     * Actualizar contadores de productos de todas las categorías
+     */
+    @PostMapping("/update-product-counts")
+    public String updateProductCounts(RedirectAttributes redirectAttributes) {
+        try {
+            categoryService.updateAllProductCounts();
+            redirectAttributes.addFlashAttribute("success", "Contadores de productos actualizados exitosamente");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar contadores: " + e.getMessage());
+        }
+        
+        return "redirect:/admin/categories";
     }
 }

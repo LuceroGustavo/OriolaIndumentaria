@@ -73,6 +73,12 @@
                         <i class="bi bi-tags me-2"></i>Gestión de Categorías
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
+                        <form th:action="@{/admin/categories/update-product-counts}" method="post" class="me-2">
+                            <button type="submit" class="btn btn-info" 
+                                    onclick="return confirm('¿Actualizar contadores de productos de todas las categorías?')">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Actualizar Contadores
+                            </button>
+                        </form>
                         <a th:href="@{/admin/categories/new}" class="btn btn-primary">
                             <i class="bi bi-plus-circle me-1"></i>Nueva Categoría
                         </a>

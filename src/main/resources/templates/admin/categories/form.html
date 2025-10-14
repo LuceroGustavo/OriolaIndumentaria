@@ -99,8 +99,15 @@
                                     <div class="mb-3">
                                         <label for="displayOrder" class="form-label">Orden de Visualización</label>
                                         <input type="number" class="form-control" id="displayOrder" th:field="*{displayOrder}" 
-                                               placeholder="1" min="1">
-                                        <div class="form-text">Orden en que aparecerá en el catálogo</div>
+                                               placeholder="1" min="1" onchange="checkOrderAvailability(this.value)">
+                                        <div class="form-text">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            Orden en que aparecerá en el catálogo. Si asignas una posición ocupada, las demás categorías se moverán automáticamente hacia abajo.
+                                        </div>
+                                        <div id="orderInfo" class="alert alert-info mt-2" style="display: none;">
+                                            <i class="bi bi-arrow-down-circle me-1"></i>
+                                            <span id="orderInfoText">Las categorías en posición 3 o superior se moverán automáticamente hacia abajo</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -212,6 +219,33 @@
                 if (placeholder) {
                     placeholder.style.display = 'flex';
                 }
+            }
+        });
+        
+        // Verificar disponibilidad del orden
+        function checkOrderAvailability(order) {
+            const infoDiv = document.getElementById('orderInfo');
+            const infoText = document.getElementById('orderInfoText');
+            
+            if (!order || order < 1) {
+                infoDiv.style.display = 'none';
+                return;
+            }
+            
+            // Mostrar información sobre el reordenamiento automático
+            if (order > 1) {
+                infoText.textContent = `Si asignas la posición ${order}, las categorías en posición ${order} o superior se moverán automáticamente hacia abajo.`;
+                infoDiv.style.display = 'block';
+            } else {
+                infoDiv.style.display = 'none';
+            }
+        }
+        
+        // Ocultar advertencia al cargar la página si no hay duplicados
+        document.addEventListener('DOMContentLoaded', function() {
+            const orderInput = document.getElementById('displayOrder');
+            if (orderInput && orderInput.value) {
+                checkOrderAvailability(orderInput.value);
             }
         });
     </script>

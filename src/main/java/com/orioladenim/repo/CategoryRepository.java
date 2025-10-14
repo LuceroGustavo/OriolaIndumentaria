@@ -64,6 +64,26 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findCategoriesWithActiveProducts();
     
     /**
+     * Buscar categorías con productos (versión alternativa usando subconsulta)
+     */
+    @Query("SELECT c FROM Category c " +
+           "WHERE c.isActive = true " +
+           "AND EXISTS (SELECT 1 FROM Product p JOIN p.categories pc WHERE pc = c AND p.activo = true) " +
+           "ORDER BY c.displayOrder ASC, c.name ASC")
+    List<Category> findCategoriesWithActiveProductsAlternative();
+    
+    /**
+     * Buscar categorías con productos usando consulta nativa (más confiable)
+     */
+    @Query(value = "SELECT DISTINCT c.* FROM categories c " +
+                   "INNER JOIN product_categories pc ON c.id = pc.category_id " +
+                   "INNER JOIN product p ON pc.product_id = p.p_id " +
+                   "WHERE c.is_active = true AND p.activo = true " +
+                   "ORDER BY c.display_order ASC, c.name ASC", 
+           nativeQuery = true)
+    List<Category> findCategoriesWithActiveProductsNative();
+    
+    /**
      * Buscar categorías sin productos
      */
     @Query("SELECT c FROM Category c " +
