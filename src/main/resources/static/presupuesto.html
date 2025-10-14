@@ -321,6 +321,42 @@
                 display: block;
             }
         }
+        
+        /* WhatsApp Button */
+        .whatsapp-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #25d366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .whatsapp-button:hover {
+            transform: scale(1.1);
+            color: white;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .whatsapp-button {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -489,6 +525,12 @@
                 </div>
             </div>
         </div>
+
+        <!-- WhatsApp Button -->
+        <a href="https://wa.me/5491159293920?text=Hola!%20Me%20interesa%20conocer%20más%20sobre%20sus%20productos" 
+           class="whatsapp-button" target="_blank">
+            <i class="bi bi-whatsapp"></i>
+        </a>
 
         <!-- Footer -->
         <div class="footer">

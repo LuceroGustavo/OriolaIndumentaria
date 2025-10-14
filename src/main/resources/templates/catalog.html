@@ -36,14 +36,11 @@
                             <div class="dropdown-menu">
                                 <div class="dropdown-content">
                                     <div class="dropdown-grid">
-                                        <a href="/catalog?category=REMERAS" class="dropdown-item">Remeras</a>
-                                        <a href="/catalog?category=PANTALONES" class="dropdown-item">Pantalones</a>
-                                        <a href="/catalog?category=CAMISAS" class="dropdown-item">Camisas</a>
-                                        <a href="/catalog?category=BUZOS" class="dropdown-item">Buzos</a>
-                                        <a href="/catalog?category=VESTIDOS" class="dropdown-item">Vestidos</a>
-                                        <a href="/catalog?category=SHORTS" class="dropdown-item">Shorts</a>
-                                        <a href="/catalog?category=CHOMBAS" class="dropdown-item">Chombas</a>
                                         <a href="/catalog" class="dropdown-item">Ver Todo</a>
+                                        <a th:each="category : ${categories}" 
+                                           th:href="@{/catalog(category=${category.name})}" 
+                                           class="dropdown-item" 
+                                           th:text="${category.name}">Categoría</a>
                                     </div>
                                 </div>
                             </div>
@@ -56,25 +53,13 @@
                             <a href="/" class="nav-link" onclick="closeMobileMenu()">Inicio</a>
                         </li>
                         <li class="nav-item">
-                            <a href="/catalog?category=REMERAS" class="nav-link" onclick="closeMobileMenu()">Remeras</a>
+                            <a href="/catalog" class="nav-link" onclick="closeMobileMenu()">Ver Todo</a>
                         </li>
-                        <li class="nav-item">
-                            <a href="/catalog?category=PANTALONES" class="nav-link" onclick="closeMobileMenu()">Pantalones</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/catalog?category=CAMISAS" class="nav-link" onclick="closeMobileMenu()">Camisas</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/catalog?category=BUZOS" class="nav-link" onclick="closeMobileMenu()">Buzos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/catalog?category=VESTIDOS" class="nav-link" onclick="closeMobileMenu()">Vestidos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/catalog?category=SHORTS" class="nav-link" onclick="closeMobileMenu()">Shorts</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/catalog?category=CHOMBAS" class="nav-link" onclick="closeMobileMenu()">Chombas</a>
+                        <li class="nav-item" th:each="category : ${categories}">
+                            <a th:href="@{/catalog(category=${category.name})}" 
+                               class="nav-link" 
+                               th:text="${category.name}"
+                               onclick="closeMobileMenu()">Categoría</a>
                         </li>
                     </ul>
                 </div>
@@ -119,29 +104,31 @@
         <div class="filters desktop-filters">
             <div class="filter-group">
                 <span style="font-weight: 600; margin-right: 10px;">Filtros:</span>
-                <button class="filter-btn active" data-category="all">Todos</button>
-                <button class="filter-btn" data-category="REMERAS">Remeras</button>
-                <button class="filter-btn" data-category="BUZOS">Buzos</button>
-                <button class="filter-btn" data-category="CAMISAS">Camisas</button>
-                <button class="filter-btn" data-category="PANTALONES">Pantalones</button>
-                <button class="filter-btn" data-category="VESTIDOS">Vestidos</button>
-                <button class="filter-btn" data-category="SHORTS">Shorts</button>
-                <button class="filter-btn" data-category="CHOMBAS">Chombas</button>
+                <a href="/catalog" 
+                   class="filter-btn" 
+                   th:classappend="${selectedCategory == null} ? 'active' : ''"
+                   style="text-decoration: none; color: inherit;">Todos</a>
+                <a th:each="category : ${categories}" 
+                   th:href="@{/catalog(category=${category.name})}" 
+                   class="filter-btn" 
+                   th:classappend="${selectedCategory != null and selectedCategory.equals(category.name)} ? 'active' : ''"
+                   th:data-category="${category.name}"
+                   th:text="${category.name}"
+                   style="text-decoration: none; color: inherit;">Categoría</a>
                 
                 <div class="search-container" style="margin-left: auto;">
-                    <div class="search-input">
-                        <i class="bi bi-search"></i>
-                        <input type="text" id="searchInput" placeholder="Buscar productos...">
-                    </div>
+                    <form method="GET" action="/catalog" id="searchForm">
+                        <div class="search-input" style="position: relative; display: flex; align-items: center; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 8px 12px; min-width: 250px;">
+                            <input type="text" 
+                                   id="searchInput" 
+                                   name="search" 
+                                   placeholder="Buscar productos..." 
+                                   th:value="${search != null ? search : ''}"
+                                   style="border: none; outline: none; flex: 1; font-size: 14px; background: transparent;">
+                            <i class="bi bi-search" style="color: #666; font-size: 16px; margin-left: 8px;"></i>
+                        </div>
+                    </form>
                 </div>
-                
-                <select class="sort-select" id="sortSelect">
-                    <option value="default">Ordenar por: Recomendados</option>
-                    <option value="price-asc">Precio: Menor a Mayor</option>
-                    <option value="price-desc">Precio: Mayor a Menor</option>
-                    <option value="newest">Novedades</option>
-                    <option value="name">Nombre A-Z</option>
-                </select>
             </div>
         </div>
     </div>
@@ -181,8 +168,6 @@
                     </a>
                 </div>
             </div>
-        </div>
-    </section>
             
             <!-- Mensaje si no hay productos -->
             <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
@@ -197,50 +182,6 @@
             </div>
         </div>
 
-    <!-- Paginación -->
-    <section class="py-4" style="background: white;">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <nav aria-label="Paginación de productos">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1">Anterior</a>
-                            </li>
-                            <li class="page-item active">
-                                <a class="page-link" href="#">1</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">2</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">3</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Siguiente</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="py-5" style="background: var(--gradient-primary); color: white;">
-        <div class="container text-center">
-            <h2 class="mb-4">¿No encuentras lo que buscas?</h2>
-            <p class="lead mb-4">Contáctanos y te ayudaremos a encontrar la prenda perfecta para ti.</p>
-            <div class="cta-buttons">
-                <a href="/contact" class="btn btn-oriola-secondary btn-lg me-3">
-                    <i class="bi bi-whatsapp me-2"></i>Contactar por WhatsApp
-                </a>
-                <a href="/contact" class="btn btn-outline-light btn-lg">
-                    <i class="bi bi-envelope me-2"></i>Enviar Consulta
-                </a>
-            </div>
-        </div>
-    </section>
 
     <!-- WhatsApp Button -->
     <a href="https://wa.me/5491159293920?text=Hola!%20Me%20interesa%20conocer%20más%20sobre%20sus%20productos" 
@@ -345,21 +286,91 @@
     <style>
         /* Responsive Footer */
         @media (max-width: 768px) {
+            .footer {
+                padding: 30px 0 20px !important;
+                margin-top: 60px !important;
+            }
+            
             .footer-content {
                 grid-template-columns: 1fr !important;
-                gap: 30px !important;
+                gap: 20px !important;
+                margin-bottom: 20px !important;
+            }
+            
+            .footer-section {
+                position: relative;
+                padding-bottom: 15px;
+            }
+            
+            .footer-section:not(:last-child)::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent 0%, #333 20%, #333 80%, transparent 100%);
+                margin-top: 15px;
+            }
+            
+            .footer-title {
+                margin-bottom: 12px !important;
+                font-size: 13px !important;
+            }
+            
+            .footer-section p {
+                margin-bottom: 12px !important;
+                font-size: 13px !important;
+            }
+            
+            .social-links {
+                margin-bottom: 0 !important;
+            }
+            
+            .footer-links li {
+                margin-bottom: 8px !important;
+            }
+            
+            .newsletter-form {
+                margin-top: 0 !important;
             }
             
             .footer-bottom {
                 flex-direction: column !important;
-                gap: 10px !important;
+                gap: 8px !important;
                 text-align: center !important;
+                padding-top: 15px !important;
             }
         }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/whatsapp.js"></script>
+    <script>
+        // Búsqueda de productos
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchForm = document.getElementById('searchForm');
+            let searchTimeout;
+            
+            // Búsqueda automática al escribir (con delay)
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    searchForm.submit();
+                }, 500); // Esperar 500ms después de que el usuario deje de escribir
+            });
+            
+            // Búsqueda al presionar Enter
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    clearTimeout(searchTimeout);
+                    searchForm.submit();
+                }
+            });
+        });
+    </script>
     <script>
         // Dropdown functionality
         document.addEventListener('DOMContentLoaded', function() {

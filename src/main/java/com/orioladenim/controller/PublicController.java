@@ -1,6 +1,7 @@
 package com.orioladenim.controller;
 
 import com.orioladenim.entity.Product;
+import com.orioladenim.entity.Category;
 import com.orioladenim.repo.ProductRepository;
 import com.orioladenim.service.CategoryService;
 import com.orioladenim.service.HistoriaService;
@@ -9,6 +10,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Controller
 public class PublicController {
@@ -45,8 +49,51 @@ public class PublicController {
     }
     
     @GetMapping("/catalog")
-    public String catalog(Model model) {
-        model.addAttribute("products", productRepository.findAll());
+    public String catalog(@RequestParam(required = false) String category, 
+                         @RequestParam(required = false) String search, 
+                         Model model) {
+        // Obtener solo productos activos
+        List<Product> products = productRepository.findByActivoTrue();
+        System.out.println("🔍 Productos activos encontrados: " + products.size());
+        
+        // Filtrar por categoría si se especifica
+        if (category != null && !category.trim().isEmpty()) {
+            products = products.stream()
+                    .filter(p -> p.getCategories().stream()
+                            .anyMatch(c -> c.getName().equalsIgnoreCase(category.trim())))
+                    .collect(java.util.stream.Collectors.toList());
+            System.out.println("🔍 Productos filtrados por categoría '" + category + "': " + products.size());
+        }
+        
+        // Filtrar por búsqueda si se especifica
+        if (search != null && !search.trim().isEmpty()) {
+            String searchTerm = search.trim().toLowerCase();
+            products = products.stream()
+                    .filter(p -> p.getName().toLowerCase().contains(searchTerm) ||
+                               p.getCategories().stream().anyMatch(c -> c.getName().toLowerCase().contains(searchTerm)))
+                    .collect(java.util.stream.Collectors.toList());
+            System.out.println("🔍 Productos filtrados por búsqueda '" + search + "': " + products.size());
+        }
+        
+        // Obtener solo categorías que tienen productos activos
+        List<Category> categories = categoryService.getCategoriesWithProducts();
+        System.out.println("🔍 Categorías con productos activos: " + categories.size());
+        for (Category cat : categories) {
+            System.out.println("  - " + cat.getName() + " (productos: " + cat.getProductCount() + ")");
+        }
+        
+        // Fallback: si no hay categorías con productos, mostrar todas las categorías activas
+        if (categories.isEmpty()) {
+            System.out.println("⚠️ No hay categorías con productos activos, mostrando todas las categorías activas");
+            categories = categoryService.getActiveCategories();
+            System.out.println("🔍 Categorías activas totales: " + categories.size());
+        }
+        
+        model.addAttribute("products", products);
+        model.addAttribute("categories", categories);
+        model.addAttribute("selectedCategory", category);
+        model.addAttribute("search", search);
+        
         return "catalog";
     }
     
