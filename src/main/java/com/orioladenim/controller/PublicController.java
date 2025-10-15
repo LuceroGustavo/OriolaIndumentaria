@@ -101,6 +101,7 @@ public class PublicController {
     public String productDetail(@PathVariable Integer id, Model model) {
         Product product = productRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        
         model.addAttribute("product", product);
         return "product-detail";
     }

@@ -192,9 +192,23 @@
                         </h1>
                         
                         <!-- Precio -->
-                        <div class="product-price mb-5">
+                        <div class="product-price mb-4">
                             <span class="current-price" th:text="'$ ' + ${#numbers.formatDecimal(product.price, 0, 0)}" 
                                   style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 400; color: #000;">$ 0</span>
+                        </div>
+                        
+                        <!-- Información de colores disponibles (desktop) -->
+                        <div class="product-colors-info mb-4" th:if="${product.colores != null and !product.colores.isEmpty()}">
+                            <div class="d-flex align-items-center mb-3">
+                                <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; margin-right: 15px;">Color</span>
+                                <div class="color-options d-flex gap-2">
+                                    <span th:each="color : ${product.colores}" 
+                                          th:text="${color.name}"
+                                          class="color-oval" 
+                                          style="padding: 8px 16px; border-radius: 20px; border: 2px solid #e0e0e0; background: white; color: #000; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; display: inline-block;">
+                                    </span>
+                                </div>
+                            </div>
                         </div>
 
         <!-- Información inicial visible en móvil -->
@@ -205,50 +219,27 @@
                         style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 400; color: #000; letter-spacing: 0px; text-transform: uppercase; line-height: 1.2;">
                         Nombre del Producto
                     </h2>
+                    
                 </div>
-                                <div class="mobile-product-price mb-4 d-flex justify-content-between align-items-center">
+                                <div class="mobile-product-price mb-4">
                                     <span class="mobile-current-price" th:text="'$ ' + ${#numbers.formatDecimal(product.price, 0, 0)}" 
                                           style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 400; color: #000;">$ 0</span>
-                                    <!-- Círculos de colores en la fila del precio -->
-                                    <div class="mobile-color-circles-price" th:if="${product.colores != null and !product.colores.isEmpty()}">
-                                        <div class="color-circles d-flex gap-2">
-                                            <div th:each="color, iterStat : ${product.colores}" 
-                                                 th:class="${iterStat.first} ? 'color-circle active' : 'color-circle'"
-                                                 th:data-color-id="${color.id}"
-                                                 th:data-color-name="${color.name}"
-                                                 th:style="'background-color: ' + ${color.hexCode} + ';'"
-                                                 class="color-circle" 
-                                                 style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: pointer; transition: all 0.3s ease; position: relative;">
-                                                <div class="color-check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 10px; opacity: 0; transition: opacity 0.3s ease;">
-                                                    <i class="bi bi-check"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                                 
-                                <!-- Selector de variantes -->
+                                <!-- Información de colores y talles -->
                                 <div class="mobile-variant-selector mb-3">
-                                    <h6 class="mb-2" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #000; text-transform: uppercase; letter-spacing: 1px;">
-                                        SELECCIONÁ UNA VARIANTE
-                                    </h6>
                                     
                                     
                                     <!-- Colores -->
                                     <div class="mobile-color-section mb-3" th:if="${product.colores != null and !product.colores.isEmpty()}">
                                         <div class="d-flex align-items-center mb-2">
                                             <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; margin-right: 10px;">Color:</span>
-                                            <div class="color-circles d-flex gap-2">
-                                                <div th:each="color, iterStat : ${product.colores}" 
-                                                     th:class="${iterStat.first} ? 'color-circle active' : 'color-circle'"
-                                                     th:data-color-id="${color.id}"
-                                                     th:data-color-name="${color.name}"
+                                            <div class="color-squares d-flex gap-2">
+                                                <div th:each="color : ${product.colores}" 
                                                      th:style="'background-color: ' + ${color.hexCode} + ';'"
-                                                     class="color-circle" 
-                                                     style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: pointer; transition: all 0.3s ease; position: relative;">
-                                                    <div class="color-check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px; opacity: 0; transition: opacity 0.3s ease;">
-                                                        <i class="bi bi-check"></i>
-                                                    </div>
+                                                     class="color-square" 
+                                                     style="width: 32px; height: 32px; border-radius: 4px; border: 2px solid #e0e0e0; cursor: default; transition: all 0.3s ease;"
+                                                     th:title="${color.name}">
                                                 </div>
                                             </div>
                                         </div>
@@ -259,11 +250,10 @@
                                         <div class="d-flex align-items-center mb-2">
                                             <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; margin-right: 10px;">Talle:</span>
                                             <div class="size-options d-flex gap-2">
-                                                <button th:each="talle, iterStat : ${product.talles}" 
-                                                        th:class="${iterStat.first} ? 'size-btn active' : 'size-btn'"
+                                                <button th:each="talle : ${product.talles}" 
                                                         th:text="${talle.displayName}"
                                                         class="size-btn" 
-                                                        style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #e0e0e0; background: white; color: #000; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.3s ease;">
+                                                        style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #e0e0e0; background: white; color: #000; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; cursor: default; transition: all 0.3s ease;">
                                                 </button>
                                             </div>
                                         </div>
@@ -286,42 +276,19 @@
                             </div>
                         </div>
 
-                        <!-- Selector de variantes para PC -->
+                        <!-- Información de colores y talles para PC -->
                         <div class="variant-selector-desktop d-none d-lg-block mb-5">
-                            <h6 class="mb-4" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #000; text-transform: uppercase; letter-spacing: 1px;">
-                                SELECCIONÁ UNA VARIANTE
-                            </h6>
                             
-                            <!-- Colores -->
-                            <div class="color-section mb-4" th:if="${product.colores != null and !product.colores.isEmpty()}">
-                                <div class="d-flex align-items-center mb-3">
-                                    <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; margin-right: 15px;">Color</span>
-                                    <div class="color-circles d-flex gap-3">
-                                        <div th:each="color, iterStat : ${product.colores}" 
-                                             th:class="${iterStat.first} ? 'color-circle active' : 'color-circle'"
-                                             th:data-color-id="${color.id}"
-                                             th:data-color-name="${color.name}"
-                                             th:style="'background-color: ' + ${color.hexCode} + ';'"
-                                             class="color-circle" 
-                                             style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: pointer; transition: all 0.3s ease; position: relative;">
-                                            <div class="color-check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px; opacity: 0; transition: opacity 0.3s ease;">
-                                                <i class="bi bi-check"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             
                             <!-- Talles -->
                             <div class="size-section mb-4" th:if="${product.talles != null and !product.talles.isEmpty()}">
                                 <div class="d-flex align-items-center mb-3">
                                     <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; margin-right: 15px;">Talle</span>
                                     <div class="size-options d-flex gap-2">
-                                        <button th:each="talle, iterStat : ${product.talles}" 
-                                                th:class="${iterStat.first} ? 'size-btn active' : 'size-btn'"
+                                        <button th:each="talle : ${product.talles}" 
                                                 th:text="${talle.displayName}"
                                                 class="size-btn" 
-                                                style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #e0e0e0; background: white; color: #000; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.3s ease;">
+                                                style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #e0e0e0; background: white; color: #000; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; cursor: default; transition: all 0.3s ease;">
                                     </button>
                                     </div>
                                 </div>
@@ -354,37 +321,6 @@
 
                         <div class="product-specs mb-4">
                             <div class="row">
-                                <!-- Colores disponibles -->
-                                <div class="col-md-6 mb-3" th:if="${product.colores != null and !product.colores.isEmpty()}">
-                                    <div class="spec-item">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <i class="bi bi-palette me-2" style="color: #666; font-size: 14px;"></i>
-                                            <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Colores: </span>
-                                        </div>
-                                        <div class="color-options d-flex flex-wrap gap-2">
-                                            <span th:each="color : ${product.colores}" 
-                                                  th:text="${color.name}" 
-                                                  class="badge bg-light text-dark border"
-                                                  style="font-size: 11px; padding: 4px 8px;"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Talles disponibles -->
-                                <div class="col-md-6 mb-3" th:if="${product.talles != null and !product.talles.isEmpty()}">
-                                    <div class="spec-item">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <i class="bi bi-rulers me-2" style="color: #666; font-size: 14px;"></i>
-                                            <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Talles: </span>
-                                        </div>
-                                        <div class="size-options d-flex flex-wrap gap-2">
-                                            <span th:each="talle : ${product.talles}" 
-                                                  th:text="${talle.displayName}" 
-                                                  class="badge bg-light text-dark border"
-                                                  style="font-size: 11px; padding: 4px 8px;"></span>
-                                        </div>
-                                    </div>
-                                </div>
                                 
                                 <!-- Medidas -->
                                 <div class="col-md-6 mb-3" th:if="${product.medidas}">
@@ -424,15 +360,6 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Stock -->
-                                <div class="col-md-6 mb-3">
-                                    <div class="spec-item d-flex align-items-center">
-                                        <i class="bi bi-box me-2" style="color: #666; font-size: 14px;"></i>
-                                        <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Stock: </span>
-                                        <span th:if="${product.qty > 0}" style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" th:text="${product.qty + ' unidades'}"></span>
-                                        <span th:if="${product.qty == 0}" style="font-family: 'Inter', sans-serif; font-size: 13px; color: #999;">Sin stock</span>
-                                    </div>
-                                </div>
                                 
                                 <!-- Edad recomendada -->
                                 <div class="col-md-6 mb-3" th:if="${product.edadRecomendada}">
@@ -1371,47 +1298,9 @@
                 mobileMainImage.addEventListener('click', zoomMobileImage);
             }
 
-            // Selector de colores (PC y móvil)
-            document.querySelectorAll('.color-circle').forEach((circle, index) => {
-                circle.addEventListener('click', () => {
-                    // Remover active de todos los círculos del mismo grupo
-                    const colorGroup = circle.closest('.color-circles');
-                    if (colorGroup) {
-                        colorGroup.querySelectorAll('.color-circle').forEach(c => {
-                        c.classList.remove('active');
-                        c.style.borderColor = '#e0e0e0';
-                        c.querySelector('.color-check').style.opacity = '0';
-                    });
-                    }
-                    
-                    // Activar el seleccionado
-                    circle.classList.add('active');
-                    circle.style.borderColor = '#151414';
-                    circle.querySelector('.color-check').style.opacity = '1';
-                });
-            });
+            // Los colores ahora son solo informativos (sin funcionalidad de selección)
 
-            // Selector de talles (PC y móvil)
-            document.querySelectorAll('.size-btn').forEach((btn, index) => {
-                btn.addEventListener('click', () => {
-                    // Remover active de todos los botones del mismo grupo
-                    const sizeGroup = btn.closest('.size-options');
-                    if (sizeGroup) {
-                        sizeGroup.querySelectorAll('.size-btn').forEach(b => {
-                            b.classList.remove('active');
-                            b.style.borderColor = '#e0e0e0';
-                            b.style.background = 'white';
-                            b.style.color = '#000';
-                        });
-                    }
-                    
-                    // Activar el seleccionado
-                    btn.classList.add('active');
-                    btn.style.borderColor = '#151414';
-                    btn.style.background = '#151414';
-                    btn.style.color = 'white';
-                });
-            });
+            // Los talles ahora son solo informativos (sin funcionalidad de selección)
 
             // Cerrar menú móvil al hacer clic en enlaces
             document.querySelectorAll('.nav-menu-mobile .nav-link').forEach(link => {

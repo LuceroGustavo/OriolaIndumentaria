@@ -61,7 +61,7 @@ public class Product {
     private Double price;
 
     @PositiveOrZero(message = "La cantidad debe ser cero o positiva")
-    @Column(name = "qty", nullable = false)
+    @Column(name = "qty", nullable = true)
     private Integer qty;
 
     @Column(name = "descripcion", columnDefinition = "TEXT")

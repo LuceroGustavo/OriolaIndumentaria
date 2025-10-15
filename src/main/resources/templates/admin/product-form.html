@@ -345,11 +345,14 @@
                                             <input type="number" step="0.01" class="form-control" id="price" th:field="*{price}" required>
                                             <div th:if="${#fields.hasErrors('price')}" class="invalid-feedback" th:errors="*{price}"></div>
                                         </div>
+                                        <!-- Campo de stock comentado - no se utiliza por ahora -->
+                                        <!--
                                         <div class="col-md-6">
                                             <label for="qty" class="form-label">Stock *</label>
                                             <input type="number" class="form-control" id="qty" th:field="*{qty}" required>
                                             <div th:if="${#fields.hasErrors('qty')}" class="invalid-feedback" th:errors="*{qty}"></div>
                                         </div>
+                                        -->
                                     </div>
 
 
@@ -1137,10 +1140,10 @@
         document.querySelector('form').addEventListener('submit', function(e) {
             const name = document.getElementById('name').value;
             const price = document.getElementById('price').value;
-            const qty = document.getElementById('qty').value;
+            // const qty = document.getElementById('qty').value; // Campo comentado
             const medidas = document.getElementById('medidas').value;
 
-            if (!name || selectedCategories.length === 0 || !price || !qty || !medidas) {
+            if (!name || selectedCategories.length === 0 || !price || !medidas) {
                 e.preventDefault();
                 alert('Por favor completa todos los campos obligatorios');
                 return false;
