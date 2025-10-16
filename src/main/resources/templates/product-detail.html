@@ -198,7 +198,7 @@
                         </div>
                         
                         <!-- Información de colores disponibles (desktop) -->
-                        <div class="product-colors-info mb-4" th:if="${product.colores != null and !product.colores.isEmpty()}">
+                        <div class="product-colors-info mb-4 d-none d-lg-block" th:if="${product.colores != null and !product.colores.isEmpty()}">
                             <div class="d-flex align-items-center mb-3">
                                 <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; margin-right: 15px;">Color</span>
                                 <div class="color-options d-flex gap-2">
@@ -231,15 +231,23 @@
                                     
                                     
                                     <!-- Colores -->
-                                    <div class="mobile-color-section mb-3" th:if="${product.colores != null and !product.colores.isEmpty()}">
+                                    <div class="mobile-color-section mb-3" th:if="${(product.colores != null and !product.colores.isEmpty()) or (product.color != null and !product.color.isEmpty())}">
                                         <div class="d-flex align-items-center mb-2">
                                             <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; margin-right: 10px;">Color:</span>
                                             <div class="color-circles d-flex gap-2">
+                                                <!-- Colores del sistema nuevo -->
                                                 <div th:each="color : ${product.colores}" 
                                                      th:style="'background-color: ' + ${color.hexCode} + ';'"
                                                      class="color-circle" 
                                                      style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: default; transition: all 0.3s ease;"
                                                      th:title="${color.name}">
+                                                </div>
+                                                <!-- Fallback: color legacy si no hay colores del sistema nuevo -->
+                                                <div th:if="${(product.colores == null or product.colores.isEmpty()) and (product.color != null and !product.color.isEmpty())}"
+                                                     th:style="'background-color: ' + ${product.color} + ';'"
+                                                     class="color-circle" 
+                                                     style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: default; transition: all 0.3s ease;"
+                                                     th:title="${product.color}">
                                                 </div>
                                             </div>
                                         </div>
