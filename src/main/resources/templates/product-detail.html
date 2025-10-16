@@ -234,11 +234,11 @@
                                     <div class="mobile-color-section mb-3" th:if="${product.colores != null and !product.colores.isEmpty()}">
                                         <div class="d-flex align-items-center mb-2">
                                             <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; margin-right: 10px;">Color:</span>
-                                            <div class="color-squares d-flex gap-2">
+                                            <div class="color-circles d-flex gap-2">
                                                 <div th:each="color : ${product.colores}" 
                                                      th:style="'background-color: ' + ${color.hexCode} + ';'"
-                                                     class="color-square" 
-                                                     style="width: 32px; height: 32px; border-radius: 4px; border: 2px solid #e0e0e0; cursor: default; transition: all 0.3s ease;"
+                                                     class="color-circle" 
+                                                     style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: default; transition: all 0.3s ease;"
                                                      th:title="${color.name}">
                                                 </div>
                                             </div>
@@ -258,6 +258,14 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                
+                                <!-- Descripción del producto -->
+                                <div class="mobile-description mb-4">
+                                    <h6 class="mb-3" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; text-transform: uppercase; letter-spacing: 1px;">
+                                        Descripción
+                                    </h6>
+                                    <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: #666; line-height: 1.6;" th:text="${product.descripcion ?: 'Producto de alta calidad con diseño único y materiales premium. Perfecto para destacar tu personalidad y sentirte cómodo en cualquier ocasión.'}"></p>
                                 </div>
                                 
                                 <!-- Botones de acción -->
