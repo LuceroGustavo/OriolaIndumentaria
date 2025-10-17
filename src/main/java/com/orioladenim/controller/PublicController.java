@@ -35,6 +35,12 @@ public class PublicController {
             // Agregar categorías para el dropdown
             model.addAttribute("categories", categoryService.getActiveCategories());
             
+            // Obtener categorías listas para el carrusel (solo si hay categorías válidas)
+            List<Category> carouselCategories = categoryService.findReadyForCarousel();
+            if (!carouselCategories.isEmpty()) {
+                model.addAttribute("carouselCategories", carouselCategories);
+            }
+            
             // Obtener historia principal (la más reciente y activa)
             model.addAttribute("historiaPrincipal", historiaService.findActivaPrincipal().orElse(null));
             

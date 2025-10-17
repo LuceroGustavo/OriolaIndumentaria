@@ -113,7 +113,10 @@ public class ProductController {
         if (categoryIds != null && !categoryIds.isEmpty()) {
             List<Category> selectedCategories = new ArrayList<>();
             for (Long categoryId : categoryIds) {
-                categoryService.findById(categoryId).ifPresent(selectedCategories::add);
+                Category category = categoryService.findById(categoryId);
+                if (category != null) {
+                    selectedCategories.add(category);
+                }
             }
             product.setCategories(selectedCategories);
         }
@@ -244,7 +247,10 @@ public class ProductController {
         if (categoryIds != null && !categoryIds.isEmpty()) {
             List<Category> selectedCategories = new ArrayList<>();
             for (Long categoryId : categoryIds) {
-                categoryService.findById(categoryId).ifPresent(selectedCategories::add);
+                Category category = categoryService.findById(categoryId);
+                if (category != null) {
+                    selectedCategories.add(category);
+                }
             }
             existingProduct.setCategories(selectedCategories);
         } else {

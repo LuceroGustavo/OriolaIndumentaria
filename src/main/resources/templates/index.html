@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/css/lovely-style.css?v=999">
+    <link rel="stylesheet" href="/css/carousel-styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -104,6 +105,78 @@
                    autoplay muted loop playsinline>
                 Tu navegador no soporta la reproducción de video.
             </video>
+        </div>
+    </section>
+
+    <!-- Categories Carousel Section -->
+    <section th:if="${carouselCategories != null and !carouselCategories.isEmpty()}" class="categories-carousel-section py-5" style="background: #f8f9fa;">
+        <div class="container">
+            <h2 class="text-center mb-4" style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 400; color: #000; text-transform: uppercase; letter-spacing: 1px;">Categorías Destacadas</h2>
+            
+            <div id="categoriesCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+                <!-- Indicadores -->
+                <div class="carousel-indicators" th:if="${#lists.size(carouselCategories) > 1}">
+                    <button th:each="category, iterStat : ${carouselCategories}" 
+                            type="button" 
+                            th:data-bs-target="#categoriesCarousel" 
+                            th:data-bs-slide-to="${iterStat.index}"
+                            th:class="${iterStat.index == 0} ? 'active' : ''"
+                            th:aria-current="${iterStat.index == 0} ? 'true' : 'false'"
+                            aria-label="Slide ${iterStat.index + 1}">
+                    </button>
+                </div>
+                
+                <!-- Contenido del carrusel -->
+                <div class="carousel-inner">
+                    <div th:each="category, iterStat : ${carouselCategories}" 
+                         th:class="${iterStat.index == 0} ? 'carousel-item active' : 'carousel-item'">
+                        <div class="row justify-content-center">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-center flex-wrap gap-4">
+                                    <!-- Mostrar hasta 4 categorías por slide -->
+                                    <div th:each="cat, catIter : ${carouselCategories}" 
+                                         th:if="${catIter.index >= iterStat.index and catIter.index < iterStat.index + 4}"
+                                         class="category-carousel-item text-center" 
+                                         style="max-width: 200px; cursor: pointer;"
+                                         th:onclick="'window.location.href=\'/catalog?category=' + encodeURIComponent('${cat.name}') + '\''">
+                                        <div class="category-image-container mb-3" 
+                                             style="width: 180px; height: 180px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                                            <img th:src="@{/uploads/{imagePath}(imagePath=${cat.imagePath})}" 
+                                                 th:alt="${cat.name}"
+                                                 style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;"
+                                                 onmouseover="this.style.transform='scale(1.05)'"
+                                                 onmouseout="this.style.transform='scale(1)'">
+                                        </div>
+                                        <h5 th:text="${cat.name}" 
+                                            style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Controles de navegación -->
+                <button th:if="${#lists.size(carouselCategories) > 1}" 
+                        class="carousel-control-prev" 
+                        type="button" 
+                        data-bs-target="#categoriesCarousel" 
+                        data-bs-slide="prev"
+                        style="left: -50px; width: 40px; height: 40px; background: rgba(255,255,255,0.9); border-radius: 50%; border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button th:if="${#lists.size(carouselCategories) > 1}" 
+                        class="carousel-control-next" 
+                        type="button" 
+                        data-bs-target="#categoriesCarousel" 
+                        data-bs-slide="next"
+                        style="right: -50px; width: 40px; height: 40px; background: rgba(255,255,255,0.9); border-radius: 50%; border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Siguiente</span>
+                </button>
+            </div>
         </div>
     </section>
 

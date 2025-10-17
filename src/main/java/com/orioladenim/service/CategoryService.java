@@ -62,11 +62,11 @@ public class CategoryService {
     }
     
     /**
-     * Alias para getCategoryById para compatibilidad
+     * Buscar categoría por ID (versión que devuelve Category directamente)
      */
     @Transactional(readOnly = true)
-    public Optional<Category> findById(Long id) {
-        return getCategoryById(id);
+    public Category findById(Long id) {
+        return getCategoryById(id).orElse(null);
     }
     
     /**
@@ -94,6 +94,14 @@ public class CategoryService {
         // Inicializar contador de productos
         if (category.getProductCount() == null) {
             category.setProductCount(0);
+        }
+        
+        // Inicializar campos del carrusel
+        if (category.getShowInCarousel() == null) {
+            category.setShowInCarousel(false);
+        }
+        if (category.getCarouselOrder() == null) {
+            category.setCarouselOrder(0);
         }
         
         Category savedCategory = categoryRepository.save(category);
@@ -205,6 +213,14 @@ public class CategoryService {
             return getActiveCategories();
         }
         return categoryRepository.searchActiveCategories(searchText.trim());
+    }
+    
+    /**
+     * Obtener categorías listas para el carrusel (marcadas para carrusel Y con imagen)
+     */
+    @Transactional(readOnly = true)
+    public List<Category> findReadyForCarousel() {
+        return categoryRepository.findReadyForCarousel();
     }
     
     /**
@@ -377,6 +393,24 @@ public class CategoryService {
     private Integer getNextAvailableOrder() {
         Integer maxOrder = categoryRepository.getNextDisplayOrder();
         return maxOrder != null ? maxOrder : 1;
+    }
+    
+    /**
+     * Obtener el siguiente orden disponible para el carrusel
+     */
+    @Transactional(readOnly = true)
+    public Integer getNextCarouselOrder() {
+        List<Category> carouselCategories = categoryRepository.findReadyForCarousel();
+        if (carouselCategories.isEmpty()) {
+            return 1;
+        }
+        
+        Integer maxOrder = carouselCategories.stream()
+                .mapToInt(c -> c.getCarouselOrder() != null ? c.getCarouselOrder() : 0)
+                .max()
+                .orElse(0);
+        
+        return maxOrder + 1;
     }
     
     /**

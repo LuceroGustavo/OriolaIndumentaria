@@ -119,19 +119,38 @@
                                 <div class="form-text">Descripción opcional para la categoría</div>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="imagePath" class="form-label">Imagen de la Categoría</label>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <input type="text" class="form-control" id="imagePath" th:field="*{imagePath}" 
-                                               placeholder="/img/categories/categoria-ejemplo.jpg">
-                                        <div class="form-text">Ruta de la imagen (ej: /img/categories/remeras.jpg)</div>
+                            <!-- Sección de Imagen -->
+                            <div class="mb-4">
+                                <h6 class="text-primary mb-3">
+                                    <i class="bi bi-image me-2"></i>Imagen de la Categoría
+                                </h6>
+                                
+                                <!-- Upload de imagen -->
+                                <div class="row mb-3">
+                                    <div class="col-md-8">
+                                        <label for="imageFile" class="form-label">Subir Imagen</label>
+                                        <div class="input-group">
+                                            <input type="file" class="form-control" id="imageFile" name="imageFile" 
+                                                   accept="image/*" onchange="handleFileSelection(this)">
+                                            <button type="button" class="btn btn-outline-secondary" id="uploadBtn" 
+                                                    onclick="uploadSelectedImage()" disabled>
+                                                <i class="bi bi-upload"></i> Subir
+                                            </button>
+                                        </div>
+                                        <div class="form-text">
+                                            Formatos: JPG, PNG, WebP. Máximo 3MB. Se optimizará automáticamente.
+                                        </div>
+                                        <button type="button" class="btn btn-warning btn-sm mt-2" onclick="testFunction()">
+                                            🧪 Probar JavaScript
+                                        </button>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="category-image-preview" style="width: 100px; height: 100px; border: 2px dashed #dee2e6; border-radius: 8px; overflow: hidden;">
+                                    <div class="col-md-4">
+                                        <div class="category-image-preview" 
+                                             style="width: 120px; height: 120px; border: 2px dashed #dee2e6; border-radius: 12px; overflow: hidden; margin: 0 auto;">
                                             <img th:if="${category.imagePath != null and !category.imagePath.isEmpty()}"
-                                                 th:src="${category.imagePath}" 
+                                                 th:src="@{/uploads/{imagePath}(imagePath=${category.imagePath})}" 
                                                  th:alt="${category.name}"
+                                                 id="imagePreview"
                                                  style="width: 100%; height: 100%; object-fit: cover;">
                                             <div th:unless="${category.imagePath != null and !category.imagePath.isEmpty()}"
                                                  class="d-flex align-items-center justify-content-center text-muted h-100">
@@ -139,6 +158,56 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                
+                                <!-- Ruta actual (oculta) -->
+                                <input type="hidden" th:field="*{imagePath}" id="imagePath">
+                            </div>
+
+                            <!-- Sección del Carrusel -->
+                            <div class="mb-4">
+                                <h6 class="text-primary mb-3">
+                                    <i class="bi bi-collection me-2"></i>Configuración del Carrusel Principal
+                                </h6>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="showInCarousel" th:field="*{showInCarousel}" 
+                                                   th:disabled="${category.imagePath == null or category.imagePath.isEmpty()}">
+                                            <label class="form-check-label" for="showInCarousel">
+                                                <strong>Mostrar en carrusel principal</strong>
+                                            </label>
+                                            <div class="form-text">
+                                                Esta categoría aparecerá en el carrusel de imágenes del inicio
+                                                <span th:if="${category.imagePath == null or category.imagePath.isEmpty()}" 
+                                                      class="text-warning d-block">
+                                                    <i class="bi bi-exclamation-triangle"></i> 
+                                                    Primero debes subir una imagen
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="carouselOrder" class="form-label">Orden en el carrusel</label>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control" id="carouselOrder" th:field="*{carouselOrder}" 
+                                                       min="0" step="1" placeholder="0">
+                                                <button type="button" class="btn btn-outline-secondary" onclick="setNextCarouselOrder()">
+                                                    <i class="bi bi-arrow-down-circle"></i> Siguiente
+                                                </button>
+                                            </div>
+                                            <div class="form-text">
+                                                Número menor = aparece primero. 0 = al final. Usa "Siguiente" para orden automático.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    <strong>Nota:</strong> Solo las categorías con imagen y marcadas para carrusel aparecerán en el carrusel principal del sitio.
                                 </div>
                             </div>
 
@@ -246,6 +315,270 @@
             const orderInput = document.getElementById('displayOrder');
             if (orderInput && orderInput.value) {
                 checkOrderAvailability(orderInput.value);
+            }
+        });
+
+        // ===== FUNCIONES PARA MANEJO DE IMÁGENES =====
+        
+        // Variables globales para manejo de archivos
+        let selectedFile = null;
+
+        // Función simple para manejar selección de archivo (basada en product-images.html)
+        function handleFileSelection(input) {
+            console.log('handleFileSelection called');
+            
+            if (input.files && input.files.length > 0) {
+                selectedFile = input.files[0];
+                console.log('File selected:', selectedFile.name);
+                
+                // Habilitar botón inmediatamente
+                const uploadBtn = document.getElementById('uploadBtn');
+                if (uploadBtn) {
+                    uploadBtn.disabled = false;
+                    uploadBtn.classList.remove('btn-outline-secondary');
+                    uploadBtn.classList.add('btn-outline-primary');
+                    console.log('Upload button enabled');
+                }
+                
+                // Mostrar vista previa usando FileReader (como en product-images.html)
+                displaySelectedFile();
+                
+                // Mostrar mensaje
+                showAlert('📁 Archivo seleccionado: ' + selectedFile.name, 'info');
+            } else {
+                console.log('No file selected');
+                selectedFile = null;
+                const uploadBtn = document.getElementById('uploadBtn');
+                if (uploadBtn) {
+                    uploadBtn.disabled = true;
+                    uploadBtn.classList.remove('btn-outline-primary');
+                    uploadBtn.classList.add('btn-outline-secondary');
+                }
+            }
+        }
+        
+        // Función para mostrar vista previa (basada en product-images.html)
+        function displaySelectedFile() {
+            if (!selectedFile) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('imagePreview');
+                const placeholder = preview.parentElement.querySelector('.d-flex.align-items-center.justify-content-center');
+                
+                if (preview) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    preview.style.maxWidth = '100%';
+                    preview.style.maxHeight = '100%';
+                    preview.style.objectFit = 'contain';
+                    
+                    if (placeholder) {
+                        placeholder.style.display = 'none';
+                    }
+                    console.log('Preview image updated');
+                }
+            };
+            reader.readAsDataURL(selectedFile);
+        }
+
+        // Función para subir imagen seleccionada manualmente (basada en product-images.html)
+        async function uploadSelectedImage() {
+            const categoryId = document.querySelector('input[name="category.id"]')?.value;
+            
+            if (!selectedFile) {
+                showAlert('Por favor selecciona un archivo primero', 'warning');
+                return;
+            }
+            
+            if (!categoryId) {
+                showAlert('No se pudo obtener el ID de la categoría', 'danger');
+                return;
+            }
+            
+            console.log('Uploading file:', selectedFile.name, 'for category:', categoryId);
+            
+            try {
+                await uploadImage(categoryId, selectedFile);
+            } catch (error) {
+                showAlert('Error al subir la imagen: ' + error.message, 'danger');
+            }
+        }
+
+        // Función para subir imagen
+        async function uploadImage(categoryId, file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`/admin/categories/${categoryId}/upload-image`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Actualizar el campo oculto con la nueva ruta
+                    document.getElementById('imagePath').value = result.imagePath;
+                    
+                    // Actualizar la vista previa con la imagen subida
+                    const preview = document.getElementById('imagePreview');
+                    if (preview) {
+                        preview.src = '/uploads/' + result.imagePath;
+                        preview.style.display = 'block';
+                        const placeholder = preview.parentElement.querySelector('.d-flex.align-items-center.justify-content-center');
+                        if (placeholder) {
+                            placeholder.style.display = 'none';
+                        }
+                    }
+                    
+                    // Mostrar mensaje de éxito con detalles
+                    showAlert('✅ Imagen subida correctamente: ' + result.imagePath, 'success');
+                    
+                    // Habilitar el checkbox del carrusel
+                    const carouselCheckbox = document.getElementById('showInCarousel');
+                    if (carouselCheckbox) {
+                        carouselCheckbox.disabled = false;
+                        const warningElement = carouselCheckbox.parentElement.querySelector('.text-warning');
+                        if (warningElement) {
+                            warningElement.style.display = 'none';
+                        }
+                    }
+                    
+                    // Mostrar la sección del carrusel
+                    toggleCarouselSection();
+                    
+                    // Deshabilitar botón de subir y limpiar selección
+                    const uploadBtn = document.getElementById('uploadBtn');
+                    const fileInput = document.getElementById('imageFile');
+                    if (uploadBtn) {
+                        uploadBtn.disabled = true;
+                        uploadBtn.classList.remove('btn-outline-primary');
+                        uploadBtn.classList.add('btn-outline-secondary');
+                    }
+                    if (fileInput) {
+                        fileInput.value = '';
+                    }
+                    
+                    // Limpiar variable global y vista previa
+                    selectedFile = null;
+                    const preview = document.getElementById('imagePreview');
+                    const placeholder = preview.parentElement.querySelector('.d-flex.align-items-center.justify-content-center');
+                    if (preview) {
+                        preview.src = '';
+                        preview.style.display = 'none';
+                    }
+                    if (placeholder) {
+                        placeholder.style.display = 'flex';
+                    }
+                } else {
+                    showAlert('Error al subir la imagen: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('Error al subir la imagen: ' + error.message, 'danger');
+            }
+        }
+
+        // Función para mostrar alertas
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            const container = document.querySelector('.container-fluid');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            // Auto-dismiss después de 5 segundos
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Mostrar/ocultar sección del carrusel según si hay imagen
+        function toggleCarouselSection() {
+            const imagePath = document.getElementById('imagePath').value;
+            const carouselSection = document.querySelector('.mb-4[th\\:if]');
+            
+            if (carouselSection) {
+                if (imagePath && imagePath.trim() !== '') {
+                    carouselSection.style.display = 'block';
+                } else {
+                    carouselSection.style.display = 'none';
+                }
+            }
+        }
+
+        // Manejar envío del formulario para categorías existentes
+        document.querySelector('form').addEventListener('submit', async function(e) {
+            const imageFile = document.getElementById('imageFile');
+            const categoryId = document.querySelector('input[name="category.id"]')?.value;
+            
+            // Si hay una imagen nueva y es una categoría existente, subirla primero
+            if (imageFile.files.length > 0 && categoryId) {
+                e.preventDefault();
+                
+                try {
+                    await uploadImage(categoryId, imageFile.files[0]);
+                    // Después de subir la imagen, enviar el formulario
+                    this.submit();
+                } catch (error) {
+                    showAlert('Error al procesar la imagen: ' + error.message, 'danger');
+                }
+            }
+        });
+
+        // Función para establecer el siguiente orden del carrusel
+        async function setNextCarouselOrder() {
+            try {
+                const response = await fetch('/admin/categories/next-carousel-order');
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('carouselOrder').value = result.nextOrder;
+                    showAlert(`Orden establecido en ${result.nextOrder}`, 'info');
+                } else {
+                    showAlert('Error al obtener el siguiente orden: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('Error al obtener el siguiente orden: ' + error.message, 'danger');
+            }
+        }
+
+        // Función alternativa para habilitar botón (más simple)
+        function enableUploadButton() {
+            const uploadBtn = document.getElementById('uploadBtn');
+            if (uploadBtn) {
+                uploadBtn.disabled = false;
+                uploadBtn.classList.remove('btn-outline-secondary');
+                uploadBtn.classList.add('btn-outline-primary');
+                console.log('Upload button enabled via alternative method');
+            }
+        }
+
+        // Función de prueba
+        function testFunction() {
+            console.log('JavaScript is working!');
+            alert('JavaScript está funcionando!');
+        }
+
+        // Inicializar al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, JavaScript is working');
+            toggleCarouselSection();
+            
+            // Agregar listener adicional al input de archivo
+            const fileInput = document.getElementById('imageFile');
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    console.log('File input changed via event listener');
+                    if (this.files && this.files.length > 0) {
+                        enableUploadButton();
+                    }
+                });
             }
         });
     </script>

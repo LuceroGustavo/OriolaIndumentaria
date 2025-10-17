@@ -128,6 +128,12 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findCategoriesWithImages();
     
     /**
+     * Buscar categorías listas para el carrusel (marcadas para carrusel Y con imagen)
+     */
+    @Query("SELECT c FROM Category c WHERE c.showInCarousel = true AND c.imagePath IS NOT NULL AND c.imagePath != '' AND c.isActive = true ORDER BY c.carouselOrder ASC, c.name ASC")
+    List<Category> findReadyForCarousel();
+    
+    /**
      * Estadísticas de categorías
      */
     @Query("SELECT " +

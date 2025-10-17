@@ -43,6 +43,12 @@ public class Category {
     @Column(name = "product_count")
     private Integer productCount = 0; // Contador de productos en esta categoría
     
+    @Column(name = "show_in_carousel")
+    private Boolean showInCarousel = false; // Si aparece en el carrusel principal
+    
+    @Column(name = "carousel_order")
+    private Integer carouselOrder = 0; // Orden de aparición en el carrusel
+    
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -101,6 +107,16 @@ public class Category {
     
     public String getImagePathOrDefault() {
         return this.imagePath != null ? this.imagePath : "/img/categories/default-category.jpg";
+    }
+    
+    /**
+     * Verifica si la categoría está lista para aparecer en el carrusel
+     * (debe estar marcada para carrusel Y tener imagen)
+     */
+    public boolean isReadyForCarousel() {
+        return Boolean.TRUE.equals(this.showInCarousel) && 
+               this.imagePath != null && 
+               !this.imagePath.trim().isEmpty();
     }
     
     // Métodos para manejar la relación Many-to-Many
@@ -183,6 +199,22 @@ public class Category {
         this.productCount = productCount;
     }
     
+    public Boolean getShowInCarousel() {
+        return showInCarousel;
+    }
+    
+    public void setShowInCarousel(Boolean showInCarousel) {
+        this.showInCarousel = showInCarousel;
+    }
+    
+    public Integer getCarouselOrder() {
+        return carouselOrder;
+    }
+    
+    public void setCarouselOrder(Integer carouselOrder) {
+        this.carouselOrder = carouselOrder;
+    }
+    
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -226,6 +258,8 @@ public class Category {
                 ", isActive=" + isActive +
                 ", displayOrder=" + displayOrder +
                 ", productCount=" + productCount +
+                ", showInCarousel=" + showInCarousel +
+                ", carouselOrder=" + carouselOrder +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
