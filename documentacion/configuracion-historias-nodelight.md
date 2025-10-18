@@ -1,7 +1,7 @@
-# Configuración de Historias en Railway - ORIOLA Indumentaria
+# Configuración de Historias en Servidor NodeLight - ORIOLA Indumentaria
 
 ## 🎯 **RESUMEN**
-Esta documentación explica cómo configurar el sistema de historias tipo Instagram en Railway para el proyecto ORIOLA Indumentaria.
+Esta documentación explica cómo configurar el sistema de historias tipo Instagram en el servidor NodeLight para el proyecto ORIOLA Indumentaria.
 
 ## 📋 **FUNCIONALIDADES IMPLEMENTADAS**
 
@@ -18,16 +18,18 @@ Esta documentación explica cómo configurar el sistema de historias tipo Instag
 - **Diseño Responsive**: Optimizado para móvil y desktop
 - **Controles de Video**: Play/pause automático
 
-## 🚀 **CONFIGURACIÓN EN RAILWAY**
+## 🚀 **CONFIGURACIÓN EN SERVIDOR NODELIGHT**
 
 ### **1. Variables de Entorno Requeridas:**
 
 ```bash
 # Perfil de Spring Boot
-SPRING_PROFILES_ACTIVE=railway
+SPRING_PROFILES_ACTIVE=prod
 
-# Base de datos (generada automáticamente por Railway)
-MYSQL_URL=jdbc:mysql://...
+# Base de datos (configurada localmente)
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/oriola_indumentaria
+SPRING_DATASOURCE_USERNAME=root
+SPRING_DATASOURCE_PASSWORD=[configurada_localmente]
 
 # Administración
 ADMIN_USERNAME=admin
@@ -40,34 +42,20 @@ MAIL_PASSWORD=kmqh ktkl lhyj gwlf
 
 ### **2. Archivos de Configuración:**
 
-#### **application-railway.properties**
+#### **application-prod.properties**
 ```properties
-# Configuración específica para Railway
-server.port=${PORT:8080}
-spring.datasource.url=${MYSQL_URL}
-upload.path=/app/uploads
-upload.thumbnail.path=/app/uploads/thumbnails
+# Configuración específica para servidor NodeLight
+server.port=8080
+spring.datasource.url=jdbc:mysql://localhost:3306/oriola_indumentaria
+upload.path=/var/www/oriola/uploads
+upload.thumbnail.path=/var/www/oriola/uploads/thumbnails
 spring.servlet.multipart.max-file-size=10MB
 ```
 
-#### **railway.json**
-```json
-{
-  "build": {
-    "builder": "NIXPACKS"
-  },
-  "deploy": {
-    "startCommand": "java -jar target/oriola-denim-0.0.1-SNAPSHOT.jar --spring.profiles.active=railway",
-    "healthcheckPath": "/",
-    "healthcheckTimeout": 300
-  }
-}
-```
-
-## 📁 **ESTRUCTURA DE ARCHIVOS EN RAILWAY**
+## 📁 **ESTRUCTURA DE ARCHIVOS EN SERVIDOR NODELIGHT**
 
 ```
-/app/
+/var/www/oriola/
 ├── uploads/
 │   ├── historias/          # Videos de historias
 │   └── thumbnails/

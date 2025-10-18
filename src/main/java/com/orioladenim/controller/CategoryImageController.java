@@ -34,34 +34,61 @@ public class CategoryImageController {
         Map<String, Object> response = new HashMap<>();
         
         try {
+            System.out.println("🔄 Iniciando subida de imagen para categoría ID: " + categoryId);
+            System.out.println("📁 Archivo: " + file.getOriginalFilename() + " (" + file.getSize() + " bytes)");
+            
             // Buscar la categoría
             Category category = categoryService.findById(categoryId);
             if (category == null) {
+                System.out.println("❌ Categoría no encontrada con ID: " + categoryId);
                 response.put("success", false);
                 response.put("message", "Categoría no encontrada");
                 return ResponseEntity.badRequest().body(response);
             }
             
-            // Procesar y guardar la imagen
+            System.out.println("✅ Categoría encontrada: " + category.getName());
+            
+            // Eliminar imagen anterior si existe
+            if (category.getImagePath() != null && !category.getImagePath().isEmpty()) {
+                System.out.println("🗑️ Eliminando imagen anterior: " + category.getImagePath());
+                try {
+                    boolean deleted = categoryImageService.deleteCategoryImage(category.getImagePath());
+                    if (deleted) {
+                        System.out.println("✅ Imagen anterior eliminada correctamente");
+                    } else {
+                        System.out.println("⚠️ No se pudo eliminar la imagen anterior, pero continuando con la nueva");
+                    }
+                } catch (Exception e) {
+                    System.out.println("⚠️ Error al eliminar imagen anterior: " + e.getMessage() + ", continuando con la nueva");
+                }
+            }
+            
+            // Procesar y guardar la nueva imagen
             String imagePath = categoryImageService.saveCategoryImage(file, categoryId);
+            System.out.println("✅ Nueva imagen procesada y guardada: " + imagePath);
             
             // Actualizar la categoría con la nueva imagen
             category.setImagePath(imagePath);
             categoryService.updateCategory(categoryId, category);
+            System.out.println("✅ Categoría actualizada con nueva imagen");
             
             response.put("success", true);
             response.put("message", "Imagen subida correctamente");
             response.put("imagePath", imagePath);
             response.put("categoryId", categoryId);
+            // No devolver la entidad completa para evitar referencias circulares
             
             return ResponseEntity.ok(response);
             
         } catch (IllegalArgumentException e) {
+            System.out.println("❌ Error de validación: " + e.getMessage());
             response.put("success", false);
             response.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(response);
             
         } catch (Exception e) {
+            System.out.println("❌ Error al procesar la imagen: " + e.getMessage());
+            e.printStackTrace();
             response.put("success", false);
             response.put("message", "Error al procesar la imagen: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);

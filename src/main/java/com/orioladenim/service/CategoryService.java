@@ -121,8 +121,13 @@ public class CategoryService {
      * Actualizar categoría existente
      */
     public Category updateCategory(Long id, Category categoryData) {
+        System.out.println("🔄 [Service] Actualizando categoría ID: " + id);
+        System.out.println("🔄 [Service] Datos recibidos - showInCarousel: " + categoryData.getShowInCarousel());
+        
         Category existingCategory = categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada con ID: " + id));
+        
+        System.out.println("✅ [Service] Categoría encontrada - showInCarousel actual: " + existingCategory.getShowInCarousel());
         
         // Validar que el nuevo nombre no exista en otra categoría
         if (!existingCategory.getName().equalsIgnoreCase(categoryData.getName()) &&
@@ -136,6 +141,10 @@ public class CategoryService {
         existingCategory.setImagePath(categoryData.getImagePath());
         existingCategory.setIsActive(categoryData.getIsActive());
         
+        // Actualizar campos del carrusel
+        existingCategory.setShowInCarousel(categoryData.getShowInCarousel());
+        existingCategory.setCarouselOrder(categoryData.getCarouselOrder());
+        
         // Manejar el orden de visualización con reordenamiento inteligente
         Integer newOrder = categoryData.getDisplayOrder();
         if (newOrder != null && !newOrder.equals(existingCategory.getDisplayOrder())) {
@@ -144,7 +153,11 @@ public class CategoryService {
             existingCategory.setDisplayOrder(newOrder);
         }
         
+        System.out.println("🔄 [Service] Después de actualizar - showInCarousel: " + existingCategory.getShowInCarousel());
+        
         Category savedCategory = categoryRepository.save(existingCategory);
+        
+        System.out.println("✅ [Service] Categoría guardada - showInCarousel final: " + savedCategory.getShowInCarousel());
         
         return savedCategory;
     }

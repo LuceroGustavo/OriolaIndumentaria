@@ -246,7 +246,7 @@ Se desarrollará un **sistema de catálogo online** completo para ORIOLA Indumen
 - **Backend:** Java 17, Spring Boot 3.4.4
 - **Frontend:** HTML5, CSS3, JavaScript, Bootstrap 5
 - **Base de datos:** MySQL 8.0
-- **Hosting:** Railway.app
+- **Hosting:** Servidor NodeLight
 - **Dominio:** orioladenim.com.ar
 
 ---
@@ -282,19 +282,19 @@ Se desarrollará un **sistema de catálogo online** completo para ORIOLA Indumen
 ## 💰 **COSTOS DE HOSTING Y DOMINIO**
 
 ### **Costo Anual Estimado:**
-- **Hosting (Railway.app):** $60-240 USD/año
+- **Hosting (Servidor NodeLight):** Según plan del servidor
 - **Dominio (.com.ar):** $15-25 USD/año
-- **SSL (Seguridad):** $0 USD (incluido)
-- **Base de datos MySQL:** $0 USD (incluida)
-- **TOTAL:** $75-265 USD/año
+- **SSL (Seguridad):** Configurable
+- **Base de datos MySQL:** Incluida en el servidor
+- **TOTAL:** Variable según plan del servidor
 
 ### **¿Qué incluye el hosting?**
 - **Sitio web funcionando** 24/7
 - **Base de datos** para productos y consultas
 - **Almacenamiento** para imágenes
-- **Certificado SSL** (sitio seguro)
-- **Backup automático** de datos
-- **Soporte técnico** incluido
+- **Certificado SSL** configurable
+- **Backup** configurable
+- **Control total** del servidor
 
 ---
 

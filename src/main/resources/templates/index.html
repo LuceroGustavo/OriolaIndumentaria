@@ -114,34 +114,25 @@
             <h2 class="text-center mb-4" style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 400; color: #000; text-transform: uppercase; letter-spacing: 1px;">Categorías Destacadas</h2>
             
             <div id="categoriesCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-                <!-- Indicadores -->
-                <div class="carousel-indicators" th:if="${#lists.size(carouselCategories) > 1}">
-                    <button th:each="category, iterStat : ${carouselCategories}" 
-                            type="button" 
-                            th:data-bs-target="#categoriesCarousel" 
-                            th:data-bs-slide-to="${iterStat.index}"
-                            th:class="${iterStat.index == 0} ? 'active' : ''"
-                            th:aria-current="${iterStat.index == 0} ? 'true' : 'false'"
-                            aria-label="Slide ${iterStat.index + 1}">
-                    </button>
+                <!-- Indicadores (ocultos ya que solo hay un slide) -->
+                <div class="carousel-indicators" style="display: none;">
                 </div>
                 
                 <!-- Contenido del carrusel -->
                 <div class="carousel-inner">
-                    <div th:each="category, iterStat : ${carouselCategories}" 
-                         th:class="${iterStat.index == 0} ? 'carousel-item active' : 'carousel-item'">
+                    <div class="carousel-item active">
                         <div class="row justify-content-center">
                             <div class="col-12">
                                 <div class="d-flex justify-content-center flex-wrap gap-4">
-                                    <!-- Mostrar hasta 4 categorías por slide -->
-                                    <div th:each="cat, catIter : ${carouselCategories}" 
-                                         th:if="${catIter.index >= iterStat.index and catIter.index < iterStat.index + 4}"
+                                    <!-- Mostrar todas las categorías en un solo slide -->
+                                    <div th:each="cat : ${carouselCategories}" 
                                          class="category-carousel-item text-center" 
                                          style="max-width: 200px; cursor: pointer;"
-                                         th:onclick="'window.location.href=\'/catalog?category=' + encodeURIComponent('${cat.name}') + '\''">
+                                         th:data-category-name="${cat.name}"
+                                         onclick="goToCategory(this)">
                                         <div class="category-image-container mb-3" 
                                              style="width: 180px; height: 180px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease, box-shadow 0.3s ease;">
-                                            <img th:src="@{/uploads/{imagePath}(imagePath=${cat.imagePath})}" 
+                                            <img th:src="${cat.imagePath != null and !cat.imagePath.isEmpty()} ? @{/uploads/{imagePath}(imagePath=${cat.imagePath})} : @{/img/categories/default-category.jpg}" 
                                                  th:alt="${cat.name}"
                                                  style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;"
                                                  onmouseover="this.style.transform='scale(1.05)'"
@@ -157,22 +148,20 @@
                     </div>
                 </div>
                 
-                <!-- Controles de navegación -->
-                <button th:if="${#lists.size(carouselCategories) > 1}" 
-                        class="carousel-control-prev" 
+                <!-- Controles de navegación (ocultos ya que solo hay un slide) -->
+                <button class="carousel-control-prev" 
                         type="button" 
                         data-bs-target="#categoriesCarousel" 
                         data-bs-slide="prev"
-                        style="left: -50px; width: 40px; height: 40px; background: rgba(255,255,255,0.9); border-radius: 50%; border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+                        style="display: none;">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Anterior</span>
                 </button>
-                <button th:if="${#lists.size(carouselCategories) > 1}" 
-                        class="carousel-control-next" 
+                <button class="carousel-control-next" 
                         type="button" 
                         data-bs-target="#categoriesCarousel" 
                         data-bs-slide="next"
-                        style="right: -50px; width: 40px; height: 40px; background: rgba(255,255,255,0.9); border-radius: 50%; border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+                        style="display: none;">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Siguiente</span>
                 </button>
@@ -711,6 +700,33 @@
         document.addEventListener('DOMContentLoaded', function() {
             handleVideoVisibility();
         });
+        
+        // Función para ir a la categoría del carrusel
+        function goToCategory(element) {
+            const categoryName = element.getAttribute('data-category-name');
+            console.log('🔄 [CARRUSEL] Clic en categoría:', categoryName);
+            
+            if (categoryName) {
+                // Efecto visual de clic
+                element.style.transform = 'scale(0.95)';
+                element.style.opacity = '0.8';
+                
+                setTimeout(() => {
+                    element.style.transform = 'scale(1)';
+                    element.style.opacity = '1';
+                }, 150);
+                
+                const url = '/catalog?category=' + encodeURIComponent(categoryName);
+                console.log('🔄 [CARRUSEL] Redirigiendo a:', url);
+                
+                // Pequeño delay para mostrar el efecto visual
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 200);
+            } else {
+                console.error('❌ [CARRUSEL] No se encontró el nombre de la categoría');
+            }
+        }
     </script>
 </body>
 </html>

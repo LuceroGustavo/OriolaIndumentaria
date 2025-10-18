@@ -34,7 +34,7 @@ public class CategoryController {
     @GetMapping
     public String listCategories(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "50") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(required = false) String search,
@@ -55,6 +55,22 @@ public class CategoryController {
         } else {
             // Obtener todas las categorías paginadas
             categories = categoryService.getCategoriesPaginated(pageable);
+            
+            // Debug: mostrar información de las categorías cargadas
+            System.out.println("🔍 [DEBUG] Total de categorías en BD: " + categories.getTotalElements());
+            System.out.println("🔍 [DEBUG] Categorías en esta página: " + categories.getContent().size());
+            System.out.println("🔍 [DEBUG] Página actual: " + page + " de " + categories.getTotalPages());
+            
+            for (Category cat : categories.getContent()) {
+                System.out.println("  - " + cat.getName() + " (ID: " + cat.getId() + ", Activa: " + cat.getIsActive() + ", Orden: " + cat.getDisplayOrder() + ")");
+            }
+        }
+        
+        // Debug: obtener todas las categorías para comparar
+        List<Category> allCategories = categoryService.getAllCategories();
+        System.out.println("🔍 [DEBUG] Todas las categorías en BD (sin paginación):");
+        for (Category cat : allCategories) {
+            System.out.println("  - " + cat.getName() + " (ID: " + cat.getId() + ", Activa: " + cat.getIsActive() + ", Orden: " + cat.getDisplayOrder() + ")");
         }
         
         model.addAttribute("title", "Gestión de Categorías");
@@ -112,6 +128,85 @@ public class CategoryController {
         } catch (IllegalArgumentException e) {
             bindingResult.rejectValue("name", "error.category", e.getMessage());
             return "admin/categories/form";
+        }
+    }
+    
+    /**
+     * Crear nueva categoría (API JSON)
+     */
+    @PostMapping("/create-json")
+    @ResponseBody
+    public java.util.Map<String, Object> createCategoryJson(
+            @Valid @ModelAttribute("category") Category category,
+            BindingResult bindingResult) {
+        
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        
+        System.out.println("🔄 Creando categoría JSON: " + category.getName());
+        
+        if (bindingResult.hasErrors()) {
+            System.out.println("❌ Errores de validación: " + bindingResult.getAllErrors());
+            response.put("success", false);
+            response.put("message", "Errores de validación");
+            response.put("errors", bindingResult.getAllErrors());
+            return response;
+        }
+        
+        try {
+            Category savedCategory = categoryService.createCategory(category);
+            System.out.println("✅ Categoría creada exitosamente con ID: " + savedCategory.getId());
+            
+            response.put("success", true);
+            response.put("message", "Categoría creada exitosamente");
+            response.put("categoryId", savedCategory.getId());
+            // No devolver la entidad completa para evitar referencias circulares
+            return response;
+        } catch (IllegalArgumentException e) {
+            System.out.println("❌ Error al crear categoría: " + e.getMessage());
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return response;
+        }
+    }
+    
+    @PostMapping("/{id}/update-carousel-status")
+    @ResponseBody
+    public java.util.Map<String, Object> updateCarouselStatus(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, Object> request) {
+        
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        
+        try {
+            Boolean showInCarousel = (Boolean) request.get("showInCarousel");
+            System.out.println("🔄 [Backend] Actualizando estado del carrusel para categoría ID: " + id + " -> " + showInCarousel);
+            
+            Category category = categoryService.findById(id);
+            if (category == null) {
+                System.out.println("❌ [Backend] Categoría no encontrada con ID: " + id);
+                response.put("success", false);
+                response.put("message", "Categoría no encontrada");
+                return response;
+            }
+            
+            System.out.println("✅ [Backend] Categoría encontrada: " + category.getName() + " (showInCarousel actual: " + category.getShowInCarousel() + ")");
+            
+            category.setShowInCarousel(showInCarousel);
+            Category updatedCategory = categoryService.updateCategory(id, category);
+            
+            System.out.println("✅ [Backend] Estado del carrusel actualizado: " + updatedCategory.getShowInCarousel());
+            
+            response.put("success", true);
+            response.put("message", "Estado del carrusel actualizado correctamente");
+            // No devolver la entidad completa para evitar referencias circulares
+            return response;
+            
+        } catch (Exception e) {
+            System.out.println("❌ [Backend] Error al actualizar estado del carrusel: " + e.getMessage());
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "Error al actualizar estado del carrusel: " + e.getMessage());
+            return response;
         }
     }
     
@@ -250,8 +345,23 @@ public class CategoryController {
      */
     @GetMapping("/api/active")
     @ResponseBody
-    public List<Category> getActiveCategories() {
-        return categoryService.getActiveCategories();
+    public List<Map<String, Object>> getActiveCategories() {
+        List<Category> categories = categoryService.getActiveCategories();
+        return categories.stream()
+                .map(cat -> {
+                    Map<String, Object> categoryData = new java.util.HashMap<>();
+                    categoryData.put("id", cat.getId());
+                    categoryData.put("name", cat.getName());
+                    categoryData.put("description", cat.getDescription());
+                    categoryData.put("imagePath", cat.getImagePath());
+                    categoryData.put("isActive", cat.getIsActive());
+                    categoryData.put("displayOrder", cat.getDisplayOrder());
+                    categoryData.put("productCount", cat.getProductCount());
+                    categoryData.put("showInCarousel", cat.getShowInCarousel());
+                    categoryData.put("carouselOrder", cat.getCarouselOrder());
+                    return categoryData;
+                })
+                .collect(java.util.stream.Collectors.toList());
     }
     
     /**
@@ -259,8 +369,23 @@ public class CategoryController {
      */
     @GetMapping("/api/search")
     @ResponseBody
-    public List<Category> searchCategories(@RequestParam String search) {
-        return categoryService.searchCategories(search);
+    public List<Map<String, Object>> searchCategories(@RequestParam String search) {
+        List<Category> categories = categoryService.searchCategories(search);
+        return categories.stream()
+                .map(cat -> {
+                    Map<String, Object> categoryData = new java.util.HashMap<>();
+                    categoryData.put("id", cat.getId());
+                    categoryData.put("name", cat.getName());
+                    categoryData.put("description", cat.getDescription());
+                    categoryData.put("imagePath", cat.getImagePath());
+                    categoryData.put("isActive", cat.getIsActive());
+                    categoryData.put("displayOrder", cat.getDisplayOrder());
+                    categoryData.put("productCount", cat.getProductCount());
+                    categoryData.put("showInCarousel", cat.getShowInCarousel());
+                    categoryData.put("carouselOrder", cat.getCarouselOrder());
+                    return categoryData;
+                })
+                .collect(java.util.stream.Collectors.toList());
     }
     
     

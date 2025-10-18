@@ -37,8 +37,15 @@ public class PublicController {
             
             // Obtener categorías listas para el carrusel (solo si hay categorías válidas)
             List<Category> carouselCategories = categoryService.findReadyForCarousel();
+            System.out.println("🔄 [INDEX] Categorías del carrusel encontradas: " + carouselCategories.size());
+            for (Category cat : carouselCategories) {
+                System.out.println("  - " + cat.getName() + " (showInCarousel: " + cat.getShowInCarousel() + ", imagePath: " + cat.getImagePath() + ")");
+            }
             if (!carouselCategories.isEmpty()) {
                 model.addAttribute("carouselCategories", carouselCategories);
+                System.out.println("✅ [INDEX] Categorías del carrusel agregadas al modelo");
+            } else {
+                System.out.println("⚠️ [INDEX] No hay categorías para el carrusel");
             }
             
             // Obtener historia principal (la más reciente y activa)
@@ -58,17 +65,28 @@ public class PublicController {
     public String catalog(@RequestParam(required = false) String category, 
                          @RequestParam(required = false) String search, 
                          Model model) {
+        System.out.println("🔍 [CATALOG] Parámetros recibidos - category: '" + category + "', search: '" + search + "'");
+        
         // Obtener solo productos activos
         List<Product> products = productRepository.findByActivoTrue();
         System.out.println("🔍 Productos activos encontrados: " + products.size());
         
         // Filtrar por categoría si se especifica
         if (category != null && !category.trim().isEmpty()) {
+            System.out.println("🔍 [CATALOG] Filtrando por categoría: '" + category + "'");
+            System.out.println("🔍 [CATALOG] Productos antes del filtro: " + products.size());
+            
+            // Mostrar todas las categorías de los productos para debug
+            for (Product p : products) {
+                System.out.println("  - Producto: " + p.getName() + " - Categorías: " + 
+                    p.getCategories().stream().map(Category::getName).collect(java.util.stream.Collectors.joining(", ")));
+            }
+            
             products = products.stream()
                     .filter(p -> p.getCategories().stream()
                             .anyMatch(c -> c.getName().equalsIgnoreCase(category.trim())))
                     .collect(java.util.stream.Collectors.toList());
-            System.out.println("🔍 Productos filtrados por categoría '" + category + "': " + products.size());
+            System.out.println("🔍 [CATALOG] Productos filtrados por categoría '" + category + "': " + products.size());
         }
         
         // Filtrar por búsqueda si se especifica

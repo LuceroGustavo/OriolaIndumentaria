@@ -1,6 +1,5 @@
 package com.orioladenim.service;
 
-import com.orioladenim.entity.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -60,24 +59,18 @@ public class CategoryImageService {
     public String saveCategoryImage(MultipartFile file, Long categoryId) {
         try {
             // Validar archivo
-            if (file.isEmpty()) {
-                throw new IllegalArgumentException("El archivo está vacío");
-            }
+            validateFile(file);
             
             // Generar nombre único
             String originalName = file.getOriginalFilename();
             String extension = getFileExtension(originalName);
-            String uniqueName = "category_" + categoryId + "_" + UUID.randomUUID().toString() + ".webp";
+            String uniqueName = "category_" + categoryId + "_" + UUID.randomUUID().toString();
             
             // Crear directorios si no existen
             Path categoryUploadDir = Paths.get(uploadPath, "categories");
             Path categoryThumbnailDir = Paths.get(thumbnailPath, "categories");
             Files.createDirectories(categoryUploadDir);
             Files.createDirectories(categoryThumbnailDir);
-            
-            // Guardar archivo original
-            Path originalPath = categoryUploadDir.resolve(uniqueName);
-            Files.copy(file.getInputStream(), originalPath);
             
             // Procesar imagen para WebP
             BufferedImage originalImage = ImageIO.read(file.getInputStream());
@@ -90,9 +83,12 @@ public class CategoryImageService {
             // Convertir a WebP y guardar imagen principal
             String imagePath = saveAsWebP(resizedImage, uniqueName, "categories", extension);
             
-            // Crear y guardar thumbnail
+            // Crear y guardar thumbnail en la carpeta correcta
             BufferedImage thumbnail = createThumbnail(resizedImage, THUMBNAIL_SIZE);
-            saveAsWebP(thumbnail, uniqueName, "categories", extension);
+            String thumbnailPath = saveThumbnailAsWebP(thumbnail, uniqueName, extension);
+            
+            System.out.println("✅ Imagen de categoría guardada: " + imagePath);
+            System.out.println("✅ Thumbnail guardado: " + thumbnailPath);
             
             return imagePath;
             
@@ -219,10 +215,13 @@ public class CategoryImageService {
     }
     
     /**
-     * Guarda la imagen como WebP
+     * Guarda el thumbnail como WebP en la carpeta correcta
      */
-    private String saveAsWebP(BufferedImage image, String uniqueName, String subdirectory, String originalExtension) throws IOException {
-        Path directoryPath = Paths.get(uploadPath, subdirectory);
+    private String saveThumbnailAsWebP(BufferedImage image, String uniqueName, String originalExtension) throws IOException {
+        Path directoryPath = Paths.get(thumbnailPath, "categories");
+        
+        // Asegurar que el directorio existe
+        Files.createDirectories(directoryPath);
         
         try {
             // Convertir BufferedImage a byte array con alta calidad
@@ -250,20 +249,81 @@ public class CategoryImageService {
                 String webpFilename = uniqueName + ".webp";
                 Path webpPath = directoryPath.resolve(webpFilename);
                 Files.write(webpPath, webpBytes);
+                System.out.println("✅ Thumbnail WebP guardado en: " + webpPath.toString());
+                return "thumbnails/categories/" + webpFilename;
+            } else {
+                // Fallback a PNG
+                String pngFilename = uniqueName + ".png";
+                Path pngPath = directoryPath.resolve(pngFilename);
+                Files.write(pngPath, imageBytes);
+                System.out.println("✅ Thumbnail PNG guardado en: " + pngPath.toString());
+                return "thumbnails/categories/" + pngFilename;
+            }
+            
+        } catch (Exception e) {
+            System.out.println("⚠️ Error en conversión WebP del thumbnail, usando PNG: " + e.getMessage());
+            // Si todo falla, guardar como PNG
+            String pngFilename = uniqueName + ".png";
+            Path pngPath = directoryPath.resolve(pngFilename);
+            ImageIO.write(image, "png", pngPath.toFile());
+            System.out.println("✅ Thumbnail PNG de fallback guardado en: " + pngPath.toString());
+            return "thumbnails/categories/" + pngFilename;
+        }
+    }
+    
+    /**
+     * Guarda la imagen como WebP
+     */
+    private String saveAsWebP(BufferedImage image, String uniqueName, String subdirectory, String originalExtension) throws IOException {
+        Path directoryPath = Paths.get(uploadPath, subdirectory);
+        
+        // Asegurar que el directorio existe
+        Files.createDirectories(directoryPath);
+        
+        try {
+            // Convertir BufferedImage a byte array con alta calidad
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            
+            // Usar PNG con compresión mínima para mejor calidad
+            ImageWriter writer = ImageIO.getImageWritersByFormatName("png").next();
+            ImageWriteParam param = writer.getDefaultWriteParam();
+            if (param.canWriteCompressed()) {
+                param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                param.setCompressionQuality(0.85f); // Balance calidad/rendimiento
+            }
+            
+            writer.setOutput(ImageIO.createImageOutputStream(baos));
+            writer.write(null, new IIOImage(image, null, null), param);
+            writer.dispose();
+            
+            byte[] imageBytes = baos.toByteArray();
+            
+            // Intentar convertir a WebP
+            byte[] webpBytes = webPConversionService.convertToWebP(imageBytes, originalExtension);
+            
+            if (webpBytes != null) {
+                // Guardar como WebP
+                String webpFilename = uniqueName + ".webp";
+                Path webpPath = directoryPath.resolve(webpFilename);
+                Files.write(webpPath, webpBytes);
+                System.out.println("✅ WebP guardado en: " + webpPath.toString());
                 return subdirectory + "/" + webpFilename;
             } else {
                 // Fallback a PNG
                 String pngFilename = uniqueName + ".png";
                 Path pngPath = directoryPath.resolve(pngFilename);
                 Files.write(pngPath, imageBytes);
+                System.out.println("✅ PNG guardado en: " + pngPath.toString());
                 return subdirectory + "/" + pngFilename;
             }
             
         } catch (Exception e) {
+            System.out.println("⚠️ Error en conversión WebP, usando PNG: " + e.getMessage());
             // Si todo falla, guardar como PNG
             String pngFilename = uniqueName + ".png";
             Path pngPath = directoryPath.resolve(pngFilename);
             ImageIO.write(image, "png", pngPath.toFile());
+            System.out.println("✅ PNG de fallback guardado en: " + pngPath.toString());
             return subdirectory + "/" + pngFilename;
         }
     }
