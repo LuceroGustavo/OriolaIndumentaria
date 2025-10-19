@@ -1,16 +1,383 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es-AR">
 <head>
-    <title>Orioladenim - Indumentaria Premium</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MENORCA STORIES - Orioladenim</title>
+    
+    <!-- CSS de Lovely Denim -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/css/lovely-style.css?v=999">
-    <link rel="stylesheet" href="/css/carousel-styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/lovelydenim-replica.css">
+
+    <style>
+        /* Estilos base de Lovely Denim */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fff;
+            color: #000;
+            line-height: 1.6;
+        }
+        
+        .bg-base {
+            background-color: #fff;
+        }
+        
+        
+        /* Título principal */
+        .lovely-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 400;
+            color: #000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 40px 0 30px 0;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Grid de categorías - Réplica exacta de Lovely Denim */
+        .lovely-categories {
+            max-width: 1330px;
+            margin: 0 auto;
+            padding: 0 20px;
+            margin-bottom: 60px;
+        }
+        
+        .lovely-categories-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .lovely-category-item {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .lovely-category-item:hover {
+            transform: scale(1.02);
+        }
+        
+        .lovely-category-image {
+            width: 100%;
+            height: 280px;
+            object-fit: contain;
+            object-position: center;
+            transition: transform 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        
+        .lovely-category-item:hover .lovely-category-image {
+            transform: scale(1.05);
+        }
+        
+        .lovely-category-title {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 4px;
+        }
+        
+        /* Grid de productos - Réplica exacta */
+        .lovely-products {
+            max-width: 1330px;
+            margin: 0 auto;
+            padding: 0 20px;
+            margin-bottom: 80px;
+        }
+        
+        .lovely-products-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .product-card {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .product-image-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            transition: transform 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+        
+        .product-info {
+            padding: 20px;
+        }
+        
+        .product-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .product-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 5px;
+        }
+        
+        .product-price-original {
+            font-size: 14px;
+            color: #999;
+            text-decoration: line-through;
+            margin-right: 8px;
+        }
+        
+        .product-discount {
+            background: #ff4757;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        /* Responsive */
+        /* Mobile Carousel Styles */
+        .lovely-categories-mobile {
+            display: none;
+        }
+        
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            margin: 0 5px;
+        }
+        
+        .carousel-track {
+            display: flex;
+            transition: transform 0.3s ease;
+        }
+        
+        .carousel-slide {
+            min-width: calc(50% - 2px);
+            margin-right: 4px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .carousel-slide .lovely-category-image {
+            height: 200px;
+            width: 100%;
+        }
+        
+        .carousel-slide:last-child {
+            margin-right: 0;
+        }
+        
+        .carousel-slide:hover {
+            transform: scale(1.02);
+        }
+        
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 8px;
+        }
+        
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #c1c1c1;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .carousel-dot.active {
+            background-color: #171717;
+        }
+        
+        @media (max-width: 1024px) {
+            .lovely-categories-desktop,
+            .lovely-products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .product-image-container {
+                height: 220px;
+            }
+            
+            .lovely-title {
+                font-size: 36px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .lovely-categories-desktop {
+                display: none;
+            }
+            
+            .lovely-categories-mobile {
+                display: block;
+            }
+            
+            .lovely-products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                padding: 0 20px;
+            }
+            
+            .product-image-container {
+                height: 200px;
+            }
+            
+            .lovely-title {
+                font-size: 24px;
+                margin: 30px 0 20px 0;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .lovely-categories-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .lovely-products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 0 15px;
+            }
+            
+            .product-image-container {
+                height: 200px;
+            }
+            
+            .product-card {
+                margin-bottom: 15px;
+            }
+            
+            .product-name {
+                font-size: 14px;
+            }
+            
+            .product-price {
+                font-size: 14px;
+            }
+            
+            .lovely-title {
+                font-size: 20px;
+            }
+        }
+        
+        /* Responsive Footer */
+        @media (max-width: 768px) {
+            .footer {
+                padding: 30px 0 20px !important;
+                margin-top: 60px !important;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+                margin-bottom: 20px !important;
+            }
+            
+            .footer-section {
+                position: relative;
+                padding-bottom: 15px;
+            }
+            
+            .footer-section:not(:last-child)::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent 0%, #333 20%, #333 80%, transparent 100%);
+                margin-top: 15px;
+            }
+            
+            .footer-title {
+                margin-bottom: 12px !important;
+                font-size: 13px !important;
+            }
+            
+            .footer-section p {
+                margin-bottom: 12px !important;
+                font-size: 13px !important;
+            }
+            
+            .social-links {
+                margin-bottom: 0 !important;
+            }
+            
+            .footer-links li {
+                margin-bottom: 8px !important;
+            }
+            
+            .newsletter-form {
+                margin-top: 0 !important;
+            }
+            
+            .footer-bottom {
+                flex-direction: column !important;
+                gap: 8px !important;
+                text-align: center !important;
+                padding-top: 15px !important;
+            }
+        }
+    </style>
 </head>
-<body>
+<body class="bg-base">
     <!-- Header -->
     <header class="header-container">
         <div class="header-content">
@@ -23,6 +390,7 @@
                     </button>
                     <!-- Overlay para el menú móvil -->
                     <div class="nav-overlay" id="navOverlay" onclick="closeMobileMenu()"></div>
+                    
                     <!-- Menú para PC (≥ 769px) -->
                     <ul class="nav-menu nav-menu-desktop" id="navMenuDesktop">
                         <li class="nav-item">
@@ -35,13 +403,12 @@
                             <a href="javascript:void(0)" class="nav-link dropdown-toggle">Categorías</a>
                             <div class="dropdown-menu">
                                 <div class="dropdown-content">
-                                <div class="dropdown-grid">
-                                        <a href="/catalog?category=Remeras" class="dropdown-item">Remeras</a>
-                                        <a href="/catalog?category=Pantalones" class="dropdown-item">Pantalones</a>
-                                        <a href="/catalog?category=Buzos" class="dropdown-item">Buzos</a>
-                                        <a href="/catalog?category=Shorts" class="dropdown-item">Shorts</a>
-                                        <a href="/catalog?category=Camisas" class="dropdown-item">Camisas</a>
+                                    <div class="dropdown-grid">
                                         <a href="/catalog" class="dropdown-item">Ver Todo</a>
+                                        <a th:each="category : ${categories}" 
+                                           th:href="@{/catalog(category=${category.name})}" 
+                                           class="dropdown-item" 
+                                           th:text="${category.name}">Categoría</a>
                                     </div>
                                 </div>
                             </div>
@@ -51,19 +418,16 @@
                     <!-- Menú para Móvil (≤ 768px) -->
                     <ul class="nav-menu nav-menu-mobile" id="navMenuMobile">
                         <li class="nav-item">
-                            <a href="/" class="nav-link active" onclick="closeMobileMenu()">Inicio</a>
+                            <a href="/" class="nav-link" onclick="closeMobileMenu()">Inicio</a>
                         </li>
                         <li class="nav-item">
-                            <a href="/catalog" class="nav-link" onclick="closeMobileMenu()">Novedades</a>
+                            <a href="/catalog" class="nav-link" onclick="closeMobileMenu()">Ver Todo</a>
                         </li>
-                        <li class="nav-item">
-                            <a href="/catalog" class="nav-link" onclick="closeMobileMenu()">Catálogo</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/contact" class="nav-link" onclick="closeMobileMenu()">Consulta</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/about" class="nav-link" onclick="closeMobileMenu()">Quiénes Somos</a>
+                        <li class="nav-item" th:each="category : ${categories}">
+                            <a th:href="@{/catalog(category=${category.name})}" 
+                               class="nav-link" 
+                               th:text="${category.name}"
+                               onclick="closeMobileMenu()">Categoría</a>
                         </li>
                     </ul>
                 </div>
@@ -81,9 +445,11 @@
                         <a href="https://www.instagram.com/oriolaindumentaria" class="header-icon" title="Instagram" target="_blank">
                             <i class="bi bi-instagram"></i>
                         </a>
+                        <!-- Facebook comentado temporalmente
                         <a href="https://www.facebook.com/oriolaindumentaria" class="header-icon" title="Facebook" target="_blank">
                             <i class="bi bi-facebook"></i>
                         </a>
+                        -->
                         <a href="https://wa.me/5491159293920" class="header-icon" title="WhatsApp" target="_blank">
                             <i class="bi bi-whatsapp"></i>
                         </a>
@@ -96,125 +462,75 @@
         </div>
     </header>
 
-    <!-- Historia Section - Solo visible en móviles -->
-    <section th:if="${historiaPrincipal != null}" class="historia-section d-block d-md-none" style="padding: 20px 0; background: #000;">
-        <div class="historia-video-container" style="position: relative; width: 90%; max-width: 500px; height: 60vh; overflow: hidden; border: 2px solid #333; border-radius: 10px; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
-            <video th:src="${historiaPrincipal.videoUrl}" 
-                   class="historia-video" 
-                   style="width: 100%; height: 100%; object-fit: contain;"
-                   autoplay muted loop playsinline>
-                Tu navegador no soporta la reproducción de video.
-            </video>
-        </div>
-    </section>
+    <!-- Título principal -->
+    <h1 class="lovely-title">CATEGORÍAS</h1>
 
-    <!-- Categories Carousel Section -->
-    <section th:if="${carouselCategories != null and !carouselCategories.isEmpty()}" class="categories-carousel-section py-5" style="background: #f8f9fa;">
-        <div class="container">
-            <h2 class="text-center mb-4" style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 400; color: #000; text-transform: uppercase; letter-spacing: 1px;">Categorías Destacadas</h2>
-            
-            <div id="categoriesCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-                <!-- Indicadores (ocultos ya que solo hay un slide) -->
-                <div class="carousel-indicators" style="display: none;">
-                </div>
-                
-                <!-- Contenido del carrusel -->
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <div class="row justify-content-center">
-                            <div class="col-12">
-                                <div class="d-flex justify-content-center flex-wrap gap-4">
-                                    <!-- Mostrar todas las categorías en un solo slide -->
-                                    <div th:each="cat : ${carouselCategories}" 
-                                         class="category-carousel-item text-center" 
-                                         style="max-width: 200px; cursor: pointer;"
-                                         th:data-category-name="${cat.name}"
-                                         onclick="goToCategory(this)">
-                                        <div class="category-image-container mb-3" 
-                                             style="width: 180px; height: 180px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease, box-shadow 0.3s ease;">
-                                            <img th:src="${cat.imagePath != null and !cat.imagePath.isEmpty()} ? @{/uploads/{imagePath}(imagePath=${cat.imagePath})} : @{/img/categories/default-category.jpg}" 
-                                                 th:alt="${cat.name}"
-                                                 style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;"
-                                                 onmouseover="this.style.transform='scale(1.05)'"
-                                                 onmouseout="this.style.transform='scale(1)'">
-                                        </div>
-                                        <h5 th:text="${cat.name}" 
-                                            style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
-                                        </h5>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <!-- Grid de categorías - Conectado con tu backend -->
+    <section class="lovely-categories" th:if="${carouselCategories != null and !carouselCategories.isEmpty()}">
+        <!-- Desktop Grid -->
+        <div class="lovely-categories-grid lovely-categories-desktop">
+            <!-- Categorías dinámicas desde tu backend -->
+            <div th:each="cat : ${carouselCategories}" 
+                 class="lovely-category-item" 
+                 th:data-category-name="${cat.name}"
+                 onclick="goToCategory(this)">
+                <img th:src="${cat.imagePath != null and !cat.imagePath.isEmpty()} ? @{/uploads/{imagePath}(imagePath=${cat.imagePath})} : 'https://via.placeholder.com/300x280/000000/ffffff?text=' + ${cat.name}" 
+                     th:alt="${cat.name}" 
+                     class="lovely-category-image">
+                <div class="lovely-category-title" th:text="${cat.name}"></div>
+            </div>
+        </div>
+        
+        <!-- Mobile Carousel -->
+        <div class="lovely-categories-carousel lovely-categories-mobile">
+            <div class="carousel-container">
+                <div class="carousel-track" id="categoryCarousel">
+                    <!-- Categorías dinámicas desde tu backend -->
+                    <div th:each="cat : ${carouselCategories}" 
+                         class="carousel-slide" 
+                         th:data-category-name="${cat.name}"
+                         onclick="goToCategory(this)">
+                        <img th:src="${cat.imagePath != null and !cat.imagePath.isEmpty()} ? @{/uploads/{imagePath}(imagePath=${cat.imagePath})} : 'https://via.placeholder.com/300x280/000000/ffffff?text=' + ${cat.name}" 
+                             th:alt="${cat.name}" 
+                             class="lovely-category-image">
+                        <div class="lovely-category-title" th:text="${cat.name}"></div>
                     </div>
                 </div>
-                
-                <!-- Controles de navegación (ocultos ya que solo hay un slide) -->
-                <button class="carousel-control-prev" 
-                        type="button" 
-                        data-bs-target="#categoriesCarousel" 
-                        data-bs-slide="prev"
-                        style="display: none;">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Anterior</span>
-                </button>
-                <button class="carousel-control-next" 
-                        type="button" 
-                        data-bs-target="#categoriesCarousel" 
-                        data-bs-slide="next"
-                        style="display: none;">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Siguiente</span>
-                </button>
             </div>
+            <!-- Navigation Dots -->
+            <div class="carousel-dots" id="categoryDots"></div>
         </div>
     </section>
 
-    <!-- Products Section -->
-    <section class="products-section">
-        <div class="container">
-            <h2 class="section-title">Novedades</h2>
-            <div class="products-grid">
-                <div th:each="product : ${products}" class="product-card">
-                    <a th:href="@{/product/{id}(id=${product.pId})}" class="text-decoration-none text-dark">
-                        <div class="product-image-container">
-                            <img th:if="${product.images != null and !product.images.empty}" 
-                                 th:src="${product.getImagenPrincipalUrl()}" 
-                                 th:alt="${product.name}" 
-                                 class="product-image">
-                            <img th:if="${product.images == null or product.images.empty}" 
-                                 src="https://via.placeholder.com/350x350/f8f9fa/666666?text=ORIOLA" 
-                                 th:alt="${product.name}" 
-                                 class="product-image">
-                        </div>
-                        <div class="product-info">
-                            <h3 class="product-name" th:text="${product.name}">Nombre del Producto</h3>
-                            <div class="product-price">
-                                <span th:if="${product.precioOriginal != null and product.precioOriginal > product.price}" 
-                                      class="product-price-original" th:text="'$' + ${#numbers.formatDecimal(product.precioOriginal, 0, 0)}">$0</span>
-                                <span th:text="'$' + ${#numbers.formatDecimal(product.price, 0, 0)}">$0</span>
-                                <span th:if="${product.descuentoPorcentaje != null and product.descuentoPorcentaje > 0}" 
-                                      class="product-discount" th:text="'-' + ${#numbers.formatDecimal(product.descuentoPorcentaje, 0, 0)} + '%'">-0%</span>
-                            </div>
-                            <div class="product-colors" th:if="${product.coloresDisponibles != null and !#strings.isEmpty(product.coloresDisponibles)}">
-                                <div th:each="color : ${#strings.arraySplit(product.coloresDisponibles, ',')}" 
-                                     class="color-dot" 
-                                     th:style="'background-color: ' + ${color.trim()}" 
-                                     th:title="${color.trim()}"></div>
-                            </div>
-                        </div>
-                    </a>
+    <!-- Grid de productos - Conectado con tu backend -->
+    <section class="lovely-products" th:if="${products != null and !products.isEmpty()}">
+        <div class="lovely-products-grid">
+            <!-- Productos dinámicos desde tu backend -->
+            <div th:each="product : ${products}" 
+                 class="product-card"
+                 th:data-product-id="${product.pId}"
+                 onclick="goToProduct(this)">
+                <div class="product-image-container">
+                    <img th:if="${product.images != null and !product.images.empty}" 
+                         th:src="${product.getImagenPrincipalUrl()}" 
+                         th:alt="${product.name}" 
+                         class="product-image">
+                    <img th:if="${product.images == null or product.images.empty}" 
+                         src="https://via.placeholder.com/350x350/f8f9fa/666666?text=Orioladenim" 
+                         th:alt="${product.name}" 
+                         class="product-image">
                 </div>
-            </div>
-            
-            <!-- Mensaje si no hay productos de novedades -->
-            <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
-                <div class="empty-state">
-                    <i class="bi bi-box-seam" style="font-size: 5rem; color: #667eea; margin-bottom: 2rem;"></i>
-                    <h3>No hay novedades disponibles</h3>
-                    <p class="text-muted">Pronto agregaremos nuevos productos a nuestro catálogo.</p>
-                    <a href="/catalog" class="btn btn-oriola mt-3">
-                        <i class="bi bi-arrow-right me-2"></i>Ver Catálogo Completo
-                    </a>
+                <div class="product-info">
+                    <h3 class="product-name" th:text="${product.name}"></h3>
+                    <div class="product-price">
+                        <span th:if="${product.precioOriginal != null and product.precioOriginal > product.price}" 
+                              class="product-price-original" 
+                              th:text="'$' + ${#numbers.formatDecimal(product.precioOriginal, 0, 0)}"></span>
+                        <span th:text="'$' + ${#numbers.formatDecimal(product.price, 0, 0)}"></span>
+                        <span th:if="${product.descuentoPorcentaje != null and product.descuentoPorcentaje > 0}" 
+                              class="product-discount" 
+                              th:text="'-' + ${#numbers.formatDecimal(product.descuentoPorcentaje, 0, 0)} + '%'"></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -240,9 +556,11 @@
                         <a href="https://www.instagram.com/oriolaindumentaria" target="_blank" style="color: #ccc; font-size: 18px; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ccc'">
                             <i class="bi bi-instagram"></i>
                         </a>
+                        <!-- Facebook - Comentado temporalmente
                         <a href="https://www.facebook.com/oriolaindumentaria" target="_blank" style="color: #ccc; font-size: 18px; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ccc'">
                             <i class="bi bi-facebook"></i>
                         </a>
+                        -->
                         <a href="https://wa.me/5491159293920" target="_blank" style="color: #ccc; font-size: 18px; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ccc'">
                             <i class="bi bi-whatsapp"></i>
                         </a>
@@ -317,415 +635,167 @@
         </div>
     </footer>
 
-    <style>
-        /* Responsive Footer */
-        @media (max-width: 768px) {
-            .footer {
-                padding: 30px 0 20px !important;
-                margin-top: 60px !important;
-            }
-            
-            .footer-content {
-                grid-template-columns: 1fr !important;
-                gap: 20px !important;
-                margin-bottom: 20px !important;
-            }
-            
-            .footer-section {
-                position: relative;
-                padding-bottom: 15px;
-            }
-            
-            .footer-section:not(:last-child)::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 1px;
-                background: linear-gradient(90deg, transparent 0%, #333 20%, #333 80%, transparent 100%);
-                margin-top: 15px;
-            }
-            
-            .footer-title {
-                margin-bottom: 12px !important;
-                font-size: 13px !important;
-            }
-            
-            .footer-section p {
-                margin-bottom: 12px !important;
-                font-size: 13px !important;
-            }
-            
-            .social-links {
-                margin-bottom: 0 !important;
-            }
-            
-            .footer-links li {
-                margin-bottom: 8px !important;
-            }
-            
-            .newsletter-form {
-                margin-top: 0 !important;
-            }
-            
-            .footer-bottom {
-                flex-direction: column !important;
-                gap: 8px !important;
-                text-align: center !important;
-                padding-top: 15px !important;
-            }
-        }
-        
-        /* Estilos para tarjetas de productos - igual que catálogo */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 3rem;
-        }
-
-        @media (max-width: 1024px) {
-            .products-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 15px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .products-grid {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 15px !important;
-                padding: 0 20px !important;
-            }
-        }
-
-        .product-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            position: relative;
-            cursor: pointer;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .product-image-container {
-            position: relative;
-            width: 100%;
-            height: 400px;
-            overflow: hidden;
-            background: #f8f9fa;
-            flex-shrink: 0;
-        }
-
-        @media (max-width: 1024px) {
-            .product-image-container {
-                height: 350px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .product-image-container {
-                height: 300px !important;
-            }
-        }
-
-        .product-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-
-        .product-card:hover .product-image {
-            transform: scale(1.05);
-        }
-
-        .product-info {
-            padding: 16px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .product-name {
-            font-size: 15px;
-            font-weight: 600;
-            color: #333;
-            line-height: 1.4;
-            margin-bottom: 8px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            min-height: 42px;
-        }
-
-        .product-price {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .product-price span {
-            font-size: 16px;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .product-price .product-price-original {
-            font-size: 14px;
-            color: #999;
-            text-decoration: line-through;
-        }
-
-        .product-price .product-discount {
-            background: #ff4757;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .product-colors {
-            display: flex;
-            gap: 6px;
-        }
-
-        .color-dot {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: 2px solid #e0e0e0;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .color-dot:hover {
-            border-color: #667eea;
-            transform: scale(1.1);
-        }
-
-        .empty-state {
-            padding: 3rem 0;
-        }
-
-        .empty-state h3 {
-            color: #333;
-            margin-bottom: 1rem;
-        }
-
-        .empty-state p {
-            color: #666;
-            margin-bottom: 2rem;
-        }
-
-        .btn-oriola {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-oriola:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-            color: white;
-            text-decoration: none;
-        }
-    </style>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Versión ultra-simplificada del menú móvil
-        let isMobileMenuOpen = false;
-        
+        // Función para toggle del menú móvil
         function toggleMobileMenu() {
-            const navMenu = document.getElementById('navMenuMobile');
+            const mobileMenu = document.getElementById('navMenuMobile');
             const overlay = document.getElementById('navOverlay');
-            const toggle = document.querySelector('.mobile-menu-toggle');
             
-            if (!navMenu || !overlay || !toggle) return;
-            
-            // Prevenir múltiples ejecuciones simultáneas
-            if (toggle.disabled) return;
-            toggle.disabled = true;
-            
-            if (isMobileMenuOpen) {
-                // Cerrar menú
-                navMenu.classList.remove('active');
-                overlay.classList.remove('active');
-                toggle.innerHTML = '<i class="bi bi-list"></i>';
-                isMobileMenuOpen = false;
-            } else {
-                // Abrir menú
-                navMenu.classList.add('active');
-                overlay.classList.add('active');
-                toggle.innerHTML = '<i class="bi bi-x"></i>';
-                isMobileMenuOpen = true;
-            }
-            
-            // Rehabilitar después de un breve delay
-                    setTimeout(() => {
-                toggle.disabled = false;
-            }, 50);
+            mobileMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
         }
-
-        function closeSubmenu() {
-            const dropdown = document.querySelector('.dropdown.active');
-            if (dropdown) {
-                        dropdown.classList.remove('active');
-            }
-        }
-
-        function toggleSearch() {
-            const searchBar = document.getElementById('searchBar');
-            const searchToggle = document.getElementById('searchToggle');
-            
-            if (searchBar.classList.contains('active')) {
-                searchBar.classList.remove('active');
-                searchToggle.innerHTML = '<i class="bi bi-search"></i>';
-            } else {
-                searchBar.classList.add('active');
-                searchToggle.innerHTML = '<i class="bi bi-x"></i>';
-                // Focus on search input when opened
-                searchBar.querySelector('.search-input').focus();
-            }
-        }
-
-        // Función de búsqueda simple
-        function toggleSearch() {
-            const searchBar = document.getElementById('searchBar');
-            if (searchBar) {
-                searchBar.classList.toggle('active');
-                if (searchBar.classList.contains('active')) {
-                    const searchInput = searchBar.querySelector('.search-input');
-                    if (searchInput) searchInput.focus();
-                }
-            }
-        }
-
-        // Cerrar menú móvil
-        function closeMobileMenu() {
-            const navMenu = document.getElementById('navMenuMobile');
-            const overlay = document.getElementById('navOverlay');
-            const toggle = document.querySelector('.mobile-menu-toggle');
-            
-            if (navMenu && overlay && toggle) {
-                navMenu.classList.remove('active');
-                overlay.classList.remove('active');
-                toggle.innerHTML = '<i class="bi bi-list"></i>';
-                isMobileMenuOpen = false;
-            }
-        }
-
-        // Event listeners simplificados
-        document.addEventListener('DOMContentLoaded', function() {
-            // Search functionality
-            const searchToggle = document.getElementById('searchToggle');
-            if (searchToggle) {
-                searchToggle.addEventListener('click', toggleSearch);
-            }
-
-            // Dropdown functionality - Solo en PC
-            const dropdownToggle = document.querySelector('.dropdown-toggle');
-            if (dropdownToggle) {
-                dropdownToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const dropdown = this.closest('.dropdown');
-                    
-                    // Solo funcionar en PC (≥ 769px)
-                    if (window.innerWidth >= 769) {
-                        dropdown.classList.toggle('active');
-                    }
-                });
-            }
-
-            // Cerrar menú móvil al hacer clic en enlaces
-            document.querySelectorAll('.nav-menu-mobile .nav-link').forEach(link => {
-                link.addEventListener('click', closeMobileMenu);
-            });
-
-            // Cerrar menú móvil al hacer clic en el overlay
-            const overlay = document.getElementById('navOverlay');
-            if (overlay) {
-                overlay.addEventListener('click', closeMobileMenu);
-            }
-
-            // Cerrar menú móvil en resize
-            window.addEventListener('resize', function() {
-                if (window.innerWidth > 768) {
-                    closeMobileMenu();
-                }
-            });
-        });
-
-        // Auto-pause video when not in viewport (solo para móviles)
-        function handleVideoVisibility() {
-            const video = document.querySelector('.historia-video');
-            if (video && window.innerWidth < 768) {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            video.play();
-                        } else {
-                            video.pause();
-                        }
-                    });
-                });
-                observer.observe(video);
-            }
-        }
-
-        // Initialize video controls when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            handleVideoVisibility();
-        });
         
-        // Función para ir a la categoría del carrusel
+        // Función para cerrar el menú móvil
+        function closeMobileMenu() {
+            const mobileMenu = document.getElementById('navMenuMobile');
+            const overlay = document.getElementById('navOverlay');
+            
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+        
+        // Función para ir a la categoría
         function goToCategory(element) {
             const categoryName = element.getAttribute('data-category-name');
             console.log('🔄 [CARRUSEL] Clic en categoría:', categoryName);
             
-            if (categoryName) {
-                // Efecto visual de clic
-                element.style.transform = 'scale(0.95)';
-                element.style.opacity = '0.8';
+            // Efecto visual de clic
+            element.style.transform = 'scale(0.95)';
+            element.style.opacity = '0.8';
+            
+            setTimeout(() => {
+                element.style.transform = 'scale(1)';
+                element.style.opacity = '1';
+            }, 150);
+            
+            const url = '/catalog?category=' + encodeURIComponent(categoryName);
+            console.log('🔄 [CARRUSEL] Redirigiendo a:', url);
+            
+            // Pequeño delay para mostrar el efecto visual
+            setTimeout(() => {
+                window.location.href = url;
+            }, 200);
+        }
+        
+        // Función para ir al detalle del producto
+        function goToProduct(element) {
+            const productId = element.getAttribute('data-product-id');
+            console.log('🔄 [PRODUCTO] Clic en producto:', productId);
+            
+            // Efecto visual de clic
+            element.style.transform = 'scale(0.95)';
+            element.style.opacity = '0.8';
+            
+            setTimeout(() => {
+                element.style.transform = 'scale(1)';
+                element.style.opacity = '1';
+            }, 150);
+            
+            const url = '/product/' + productId;
+            console.log('🔄 [PRODUCTO] Redirigiendo a:', url);
+            
+            // Pequeño delay para mostrar el efecto visual
+            setTimeout(() => {
+                window.location.href = url;
+            }, 200);
+        }
+        
+        // Efectos hover para productos
+        document.addEventListener('DOMContentLoaded', function() {
+            const productItems = document.querySelectorAll('.product-card');
+            
+            productItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.1)';
+                });
                 
-                setTimeout(() => {
-                    element.style.transform = 'scale(1)';
-                    element.style.opacity = '1';
-                }, 150);
-                
-                const url = '/catalog?category=' + encodeURIComponent(categoryName);
-                console.log('🔄 [CARRUSEL] Redirigiendo a:', url);
-                
-                // Pequeño delay para mostrar el efecto visual
-                setTimeout(() => {
-                    window.location.href = url;
-                }, 200);
-            } else {
-                console.error('❌ [CARRUSEL] No se encontró el nombre de la categoría');
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.08)';
+                });
+            });
+            
+            // Inicializar carrusel móvil
+            initMobileCarousel();
+        });
+        
+        // Función para inicializar el carrusel móvil
+        function initMobileCarousel() {
+            const carousel = document.getElementById('categoryCarousel');
+            const dotsContainer = document.getElementById('categoryDots');
+            
+            if (!carousel || !dotsContainer) return;
+            
+            const slides = carousel.querySelectorAll('.carousel-slide');
+            const totalSlides = slides.length;
+            const slidesPerView = 2;
+            const totalPages = Math.ceil(totalSlides / slidesPerView);
+            let currentPage = 0;
+            
+            // Crear dots
+            for (let i = 0; i < totalPages; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'carousel-dot';
+                if (i === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => goToPage(i));
+                dotsContainer.appendChild(dot);
             }
+            
+            // Función para ir a una página específica
+            function goToPage(page) {
+                currentPage = page;
+                const translateX = -page * 100;
+                carousel.style.transform = `translateX(${translateX}%)`;
+                
+                // Actualizar dots
+                const dots = dotsContainer.querySelectorAll('.carousel-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === page);
+                });
+            }
+            
+            // Touch/swipe support
+            let startX = 0;
+            let isDragging = false;
+            
+            carousel.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                isDragging = true;
+            });
+            
+            carousel.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+            });
+            
+            carousel.addEventListener('touchend', (e) => {
+                if (!isDragging) return;
+                isDragging = false;
+                
+                const endX = e.changedTouches[0].clientX;
+                const diffX = startX - endX;
+                
+                if (Math.abs(diffX) > 50) { // Minimum swipe distance
+                    if (diffX > 0 && currentPage < totalPages - 1) {
+                        goToPage(currentPage + 1);
+                    } else if (diffX < 0 && currentPage > 0) {
+                        goToPage(currentPage - 1);
+                    }
+                }
+            });
+            
+            // Auto-advance (opcional)
+            setInterval(() => {
+                if (currentPage < totalPages - 1) {
+                    goToPage(currentPage + 1);
+                } else {
+                    goToPage(0); // Loop back to start
+                }
+            }, 5000); // Change slide every 5 seconds
         }
     </script>
 </body>
