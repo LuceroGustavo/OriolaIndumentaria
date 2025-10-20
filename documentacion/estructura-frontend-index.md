@@ -245,6 +245,22 @@ function goToProduct(element) {
 
 ---
 
+## 🚀 **TAREAS PENDIENTES**
+
+### **Implementación en Catálogo**
+- **Objetivo:** Aplicar el mismo diseño de tarjetas del index en la página de catálogo
+- **Archivo objetivo:** `src/main/resources/templates/catalog.html`
+- **Elementos a replicar:**
+  - Grid de 4 columnas con espaciado de 8px
+  - Imágenes de productos con altura de 480px
+  - `object-fit: cover` para mejor visualización
+  - Efectos hover consistentes
+  - Responsive design para móviles
+- **Prioridad:** Alta
+- **Fecha estimada:** Próxima iteración
+
+---
+
 ## 📊 **MÉTRICAS DE RENDIMIENTO**
 
 ### **Optimizaciones Implementadas**
