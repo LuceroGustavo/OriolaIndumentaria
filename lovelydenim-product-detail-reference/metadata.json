@@ -1,0 +1,13 @@
+{
+  "source_url": "https://www.lovelydenim.com.ar/camisa-larga-spotlight/p?skuId=1008283",
+  "download_date": "2025-10-20 21:50:49",
+  "description": "Referencia de página de detalle de producto Lovely Denim",
+  "product_name": "Camisa Larga Spotlight",
+  "files": {
+    "html_original": "lovelydenim-product-detail.html",
+    "html_clean": "product-detail-reference.html",
+    "css_folder": "css/",
+    "js_folder": "js/",
+    "images_folder": "images/"
+  }
+}
