@@ -44,6 +44,32 @@
             font-family: 'Inter', sans-serif;
         }
         
+        /* Sección de Historias - Solo móvil */
+        .lovely-stories {
+            display: none;
+            max-width: 100%;
+            margin: 0 auto 40px auto;
+            padding: 0 10px;
+        }
+        
+        .lovely-story-video {
+            width: 100%;
+            height: 60vh;
+            object-fit: cover;
+            object-position: center;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background-color: #000;
+        }
+        
+        .lovely-story-container {
+            position: relative;
+            width: 100%;
+            height: 60vh;
+            margin: 0 auto;
+            max-width: 400px;
+        }
+        
         /* Grid de categorías - Réplica exacta de Lovely Denim */
         .lovely-categories {
             max-width: 1330px;
@@ -288,6 +314,10 @@
         }
         
         @media (max-width: 768px) {
+            .lovely-stories {
+                display: block;
+            }
+            
             .lovely-categories-desktop {
                 display: none;
             }
@@ -488,6 +518,20 @@
             </div>
         </div>
     </header>
+
+    <!-- Sección de Historias - Solo móvil -->
+    <section class="lovely-stories" th:if="${historiaPrincipal != null}">
+        <div class="lovely-story-container">
+            <video th:src="@{/uploads/{videoPath}(videoPath=${historiaPrincipal.videoPath})}" 
+                   class="lovely-story-video"
+                   autoplay 
+                   muted 
+                   loop 
+                   playsinline>
+                Tu navegador no soporta videos.
+            </video>
+        </div>
+    </section>
 
     <!-- Título principal -->
     <h1 class="lovely-title">CATEGORÍAS</h1>
