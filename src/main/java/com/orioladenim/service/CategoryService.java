@@ -306,16 +306,26 @@ public class CategoryService {
         System.out.println("🔄 Actualizando contadores de productos de todas las categorías...");
         
         List<Category> allCategories = categoryRepository.findAll();
+        
+        // Primero, resetear todos los contadores a 0
         for (Category category : allCategories) {
-            // Contar productos activos asociados a esta categoría
-            long productCount = productRepository.findAll().stream()
-                    .filter(p -> p.getActivo() && p.getCategories().contains(category))
-                    .count();
-            
-            category.setProductCount((int) productCount);
-            categoryRepository.save(category);
-            
-            System.out.println("  - " + category.getName() + ": " + productCount + " productos");
+            category.setProductCount(0);
+        }
+        
+        // Luego, contar productos activos por categoría
+        List<Product> activeProducts = productRepository.findByActivoTrue();
+        for (Product product : activeProducts) {
+            for (Category category : product.getCategories()) {
+                category.incrementProductCount();
+            }
+        }
+        
+        // Guardar todos los cambios
+        categoryRepository.saveAll(allCategories);
+        
+        // Mostrar resultados
+        for (Category category : allCategories) {
+            System.out.println("  - " + category.getName() + ": " + category.getProductCount() + " productos");
         }
         
         System.out.println("✅ Contadores actualizados");

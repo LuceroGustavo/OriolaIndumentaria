@@ -178,6 +178,42 @@
             background: #f8f9fa;
         }
         
+        /* Etiqueta promocional */
+        .product-promo-label {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            max-width: 80px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        .product-promo-label.sale {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+        
+        .product-promo-label.new {
+            background: linear-gradient(135deg, #2ed573, #1e90ff);
+        }
+        
+        .product-promo-label.hot {
+            background: linear-gradient(135deg, #ff9ff3, #f368e0);
+        }
+        
+        .product-promo-label.offer {
+            background: linear-gradient(135deg, #ffa726, #ff7043);
+        }
+        
         .product-image {
             width: 100%;
             height: 100%;
@@ -586,6 +622,12 @@
                  th:data-product-id="${product.pId}"
                  onclick="goToProduct(this)">
                 <div class="product-image-container">
+                    <!-- Etiqueta promocional -->
+                    <div th:if="${product.etiquetaPromocional != null and !product.etiquetaPromocional.isEmpty()}" 
+                         class="product-promo-label"
+                         th:text="${product.etiquetaPromocional}">
+                    </div>
+                    
                     <img th:if="${product.images != null and !product.images.empty}" 
                          th:src="${product.getImagenPrincipalUrl()}" 
                          th:alt="${product.name}" 
@@ -874,4 +916,790 @@
         }
     </script>
 </body>
+</html>
+
+                    <ul class="nav-menu nav-menu-mobile" id="navMenuMobile">
+
+                        <li class="nav-item">
+
+                            <a href="/" class="nav-link" onclick="closeMobileMenu()">Inicio</a>
+
+                        </li>
+
+                        <li class="nav-item">
+
+                            <a href="/catalog" class="nav-link" onclick="closeMobileMenu()">Ver Todo</a>
+
+                        </li>
+
+                        <li class="nav-item" th:each="category : ${categories}">
+
+                            <a th:href="@{/catalog(category=${category.name})}" 
+
+                               class="nav-link" 
+
+                               th:text="${category.name}"
+
+                               onclick="closeMobileMenu()">Categoría</a>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                
+
+                <div class="header-actions">
+
+                    <!-- Search bar - hidden on desktop, shown on mobile when search icon is clicked -->
+
+                    <div class="search-bar" id="searchBar">
+
+                        <input type="text" class="search-input" placeholder="Buscar productos...">
+
+                    </div>
+
+                    <div class="header-icons">
+
+                        <!-- Search icon - only visible on mobile -->
+
+                        <button class="header-icon search-toggle" id="searchToggle" title="Buscar">
+
+                            <i class="bi bi-search"></i>
+
+                        </button>
+
+                        <a href="https://www.instagram.com/oriolaindumentaria" class="header-icon" title="Instagram" target="_blank">
+
+                            <i class="bi bi-instagram"></i>
+
+                        </a>
+
+                        <!-- Facebook comentado temporalmente
+
+                        <a href="https://www.facebook.com/oriolaindumentaria" class="header-icon" title="Facebook" target="_blank">
+
+                            <i class="bi bi-facebook"></i>
+
+                        </a>
+
+                        -->
+
+                        <a href="https://wa.me/5491159293920" class="header-icon" title="WhatsApp" target="_blank">
+
+                            <i class="bi bi-whatsapp"></i>
+
+                        </a>
+
+                        <a href="/admin/login" class="header-icon" title="Administración">
+
+                            <i class="bi bi-gear"></i>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- Sección de Historias - Solo móvil -->
+    <section class="lovely-stories" th:if="${historiaPrincipal != null}">
+        <div class="lovely-story-container">
+            <video th:src="@{/uploads/{videoPath}(videoPath=${historiaPrincipal.videoPath})}" 
+                   class="lovely-story-video"
+                   autoplay 
+                   muted 
+                   loop 
+                   playsinline>
+                Tu navegador no soporta videos.
+            </video>
+        </div>
+    </section>
+
+
+    <!-- Título principal -->
+
+    <h1 class="lovely-title">CATEGORÍAS</h1>
+
+
+
+    <!-- Grid de categorías - Conectado con tu backend -->
+
+    <section class="lovely-categories" th:if="${carouselCategories != null and !carouselCategories.isEmpty()}">
+
+        <!-- Desktop Grid -->
+
+        <div class="lovely-categories-grid lovely-categories-desktop">
+
+            <!-- Categorías dinámicas desde tu backend -->
+
+            <div th:each="cat : ${carouselCategories}" 
+
+                 class="lovely-category-item" 
+
+                 th:data-category-name="${cat.name}"
+
+                 onclick="goToCategory(this)">
+
+                <div class="lovely-category-image-container">
+                <img th:src="${cat.imagePath != null and !cat.imagePath.isEmpty()} ? @{/uploads/{imagePath}(imagePath=${cat.imagePath})} : 'https://via.placeholder.com/300x280/000000/ffffff?text=' + ${cat.name}" 
+
+                     th:alt="${cat.name}" 
+
+                     class="lovely-category-image">
+
+                </div>
+                <div class="lovely-category-title" th:text="${cat.name}"></div>
+
+            </div>
+
+        </div>
+
+        
+
+        <!-- Mobile Carousel -->
+
+        <div class="lovely-categories-carousel lovely-categories-mobile">
+
+            <div class="carousel-container">
+
+                <div class="carousel-track" id="categoryCarousel">
+
+                    <!-- Categorías dinámicas desde tu backend -->
+
+                    <div th:each="cat : ${carouselCategories}" 
+
+                         class="carousel-slide" 
+
+                         th:data-category-name="${cat.name}"
+
+                         onclick="goToCategory(this)">
+
+                        <div class="lovely-category-image-container">
+                        <img th:src="${cat.imagePath != null and !cat.imagePath.isEmpty()} ? @{/uploads/{imagePath}(imagePath=${cat.imagePath})} : 'https://via.placeholder.com/300x280/000000/ffffff?text=' + ${cat.name}" 
+
+                             th:alt="${cat.name}" 
+
+                             class="lovely-category-image">
+
+                        </div>
+                        <div class="lovely-category-title" th:text="${cat.name}"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Navigation Dots -->
+
+            <div class="carousel-dots" id="categoryDots"></div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- Grid de productos - Conectado con tu backend -->
+
+    <section class="lovely-products" th:if="${products != null and !products.isEmpty()}">
+
+        <div class="lovely-products-grid">
+
+            <!-- Productos dinámicos desde tu backend -->
+
+            <div th:each="product : ${products}" 
+
+                 class="product-card"
+
+                 th:data-product-id="${product.pId}"
+
+                 onclick="goToProduct(this)">
+
+                <div class="product-image-container">
+
+                    <img th:if="${product.images != null and !product.images.empty}" 
+
+                         th:src="${product.getImagenPrincipalUrl()}" 
+
+                         th:alt="${product.name}" 
+
+                         class="product-image">
+
+                    <img th:if="${product.images == null or product.images.empty}" 
+
+                         src="https://via.placeholder.com/350x350/f8f9fa/666666?text=Orioladenim" 
+
+                         th:alt="${product.name}" 
+
+                         class="product-image">
+
+                </div>
+
+                <div class="product-info">
+
+                    <h3 class="product-name" th:text="${product.name}"></h3>
+
+                    <div class="product-price">
+
+                        <span th:if="${product.precioOriginal != null and product.precioOriginal > product.price}" 
+
+                              class="product-price-original" 
+
+                              th:text="'$' + ${#numbers.formatDecimal(product.precioOriginal, 0, 0)}"></span>
+
+                        <span th:text="'$' + ${#numbers.formatDecimal(product.price, 0, 0)}"></span>
+
+                        <span th:if="${product.descuentoPorcentaje != null and product.descuentoPorcentaje > 0}" 
+
+                              class="product-discount" 
+
+                              th:text="'-' + ${#numbers.formatDecimal(product.descuentoPorcentaje, 0, 0)} + '%'"></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- WhatsApp Button -->
+
+    <a href="https://wa.me/5491159293920?text=Hola!%20Me%20interesa%20conocer%20más%20sobre%20sus%20productos" 
+
+       class="whatsapp-button" target="_blank">
+
+        <i class="bi bi-whatsapp"></i>
+
+    </a>
+
+
+
+    <!-- Footer -->
+
+    <footer class="footer" style="background: #000; padding: 50px 0 25px; margin-top: 80px;">
+
+        <div class="container">
+
+            <div class="footer-content" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 30px;">
+
+                <!-- Brand Section -->
+
+                <div class="footer-section">
+
+                    <h3 class="footer-title" style="font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 20px; letter-spacing: 1px;">Orioladenim</h3>
+
+                    <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: #ccc; line-height: 1.6; margin-bottom: 20px;">
+
+                        Indumentaria con estilo y personalidad. Cada prenda está diseñada para que te sientas único y cómodo.
+
+                    </p>
+
+                    <div class="social-links" style="display: flex; gap: 15px;">
+
+                        <a href="https://www.instagram.com/oriolaindumentaria" target="_blank" style="color: #ccc; font-size: 18px; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ccc'">
+
+                            <i class="bi bi-instagram"></i>
+
+                        </a>
+
+                        <!-- Facebook - Comentado temporalmente
+
+                        <a href="https://www.facebook.com/oriolaindumentaria" target="_blank" style="color: #ccc; font-size: 18px; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ccc'">
+
+                            <i class="bi bi-facebook"></i>
+
+                        </a>
+
+                        -->
+
+                        <a href="https://wa.me/5491159293920" target="_blank" style="color: #ccc; font-size: 18px; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ccc'">
+
+                            <i class="bi bi-whatsapp"></i>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+                
+
+                <!-- Navigation Links -->
+
+                <div class="footer-section">
+
+                    <h4 class="footer-title" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;">Enlaces</h4>
+
+                    <ul class="footer-links" style="list-style: none; padding: 0; margin: 0;">
+
+                        <li style="margin-bottom: 10px;">
+
+                            <a href="/" style="font-family: 'Inter', sans-serif; font-size: 13px; color: #ccc; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ccc'">Inicio</a>
+
+                        </li>
+
+                        <li style="margin-bottom: 10px;">
+
+                            <a href="/catalog" style="font-family: 'Inter', sans-serif; font-size: 13px; color: #ccc; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ccc'">Catálogo</a>
+
+                        </li>
+
+                        <li style="margin-bottom: 10px;">
+
+                            <a href="/about" style="font-family: 'Inter', sans-serif; font-size: 13px; color: #ccc; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ccc'">Sobre Nosotros</a>
+
+                        </li>
+
+                        <li style="margin-bottom: 10px;">
+
+                            <a href="/contact" style="font-family: 'Inter', sans-serif; font-size: 13px; color: #ccc; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ccc'">Contacto</a>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                
+
+                <!-- Contact Info -->
+
+                <div class="footer-section">
+
+                    <h4 class="footer-title" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;">Contacto</h4>
+
+                    <ul class="footer-links" style="list-style: none; padding: 0; margin: 0;">
+
+                        <li style="margin-bottom: 10px; display: flex; align-items: center;">
+
+                            <i class="bi bi-geo-alt" style="color: #ccc; margin-right: 8px; font-size: 12px;"></i>
+
+                            <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #ccc;">Buenos Aires, Argentina</span>
+
+                        </li>
+
+                        <li style="margin-bottom: 10px; display: flex; align-items: center;">
+
+                            <i class="bi bi-telephone" style="color: #ccc; margin-right: 8px; font-size: 12px;"></i>
+
+                            <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #ccc;">+54 9 11 5929-3920</span>
+
+                        </li>
+
+                        <li style="margin-bottom: 10px; display: flex; align-items: center;">
+
+                            <i class="bi bi-envelope" style="color: #ccc; margin-right: 8px; font-size: 12px;"></i>
+
+                            <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #ccc;">info@orioladenim.com</span>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                
+
+                <!-- Newsletter -->
+
+                <div class="footer-section">
+
+                    <h4 class="footer-title" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;">Newsletter</h4>
+
+                    <p style="font-family: 'Inter', sans-serif; font-size: 13px; color: #ccc; margin-bottom: 15px;">
+
+                        Suscríbete para recibir ofertas exclusivas
+
+                    </p>
+
+                    <div class="newsletter-form" style="display: flex; gap: 0;">
+
+                        <input type="email" placeholder="Tu email" style="flex: 1; padding: 10px 12px; border: 1px solid #333; border-right: none; background: #111; color: #fff; font-family: 'Inter', sans-serif; font-size: 13px; outline: none;">
+
+                        <button type="button" style="padding: 10px 15px; background: #fff; color: #000; border: 1px solid #fff; cursor: pointer; transition: background 0.3s ease;" onmouseover="this.style.background='#ccc'" onmouseout="this.style.background='#fff'">
+
+                            <i class="bi bi-send" style="font-size: 12px;"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            
+
+            <!-- Footer Bottom -->
+
+            <div class="footer-bottom" style="border-top: 1px solid #333; padding-top: 5px; display: flex; justify-content: space-between; align-items: center;">
+
+                <p style="font-family: 'Inter', sans-serif; font-size: 12px; color: #999; margin: 0;">
+
+                    © 2025 Orioladenim. Todos los derechos reservados.
+
+                </p>
+
+                <div style="display: flex; align-items: center; gap: 8px;">
+
+                    <p style="font-family: 'Inter', sans-serif; font-size: 12px; color: #999; margin: 0;">
+
+                        Desarrollado por Lucero SI
+
+                    </p>
+
+                    <img src="/img/Logo footer.png" alt="Lucero SI" style="height: 50px; width: auto;">
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- Scripts -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+    <script>
+
+        // Función para toggle del menú móvil
+
+        function toggleMobileMenu() {
+
+            const mobileMenu = document.getElementById('navMenuMobile');
+
+            const overlay = document.getElementById('navOverlay');
+
+            
+
+            mobileMenu.classList.toggle('active');
+
+            overlay.classList.toggle('active');
+
+        }
+
+        
+
+        // Función para cerrar el menú móvil
+
+        function closeMobileMenu() {
+
+            const mobileMenu = document.getElementById('navMenuMobile');
+
+            const overlay = document.getElementById('navOverlay');
+
+            
+
+            mobileMenu.classList.remove('active');
+
+            overlay.classList.remove('active');
+
+        }
+
+        
+
+        // Función para ir a la categoría
+
+        function goToCategory(element) {
+
+            const categoryName = element.getAttribute('data-category-name');
+
+            console.log('🔄 [CARRUSEL] Clic en categoría:', categoryName);
+
+            
+
+            // Efecto visual de clic
+
+            element.style.transform = 'scale(0.95)';
+
+            element.style.opacity = '0.8';
+
+            
+
+            setTimeout(() => {
+
+                element.style.transform = 'scale(1)';
+
+                element.style.opacity = '1';
+
+            }, 150);
+
+            
+
+            const url = '/catalog?category=' + encodeURIComponent(categoryName);
+
+            console.log('🔄 [CARRUSEL] Redirigiendo a:', url);
+
+            
+
+            // Pequeño delay para mostrar el efecto visual
+
+            setTimeout(() => {
+
+                window.location.href = url;
+
+            }, 200);
+
+        }
+
+        
+
+        // Función para ir al detalle del producto
+
+        function goToProduct(element) {
+
+            const productId = element.getAttribute('data-product-id');
+
+            console.log('🔄 [PRODUCTO] Clic en producto:', productId);
+
+            
+
+            // Efecto visual de clic
+
+            element.style.transform = 'scale(0.95)';
+
+            element.style.opacity = '0.8';
+
+            
+
+            setTimeout(() => {
+
+                element.style.transform = 'scale(1)';
+
+                element.style.opacity = '1';
+
+            }, 150);
+
+            
+
+            const url = '/product/' + productId;
+
+            console.log('🔄 [PRODUCTO] Redirigiendo a:', url);
+
+            
+
+            // Pequeño delay para mostrar el efecto visual
+
+            setTimeout(() => {
+
+                window.location.href = url;
+
+            }, 200);
+
+        }
+
+        
+
+        // Efectos hover para productos
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const productItems = document.querySelectorAll('.product-card');
+
+            
+
+            productItems.forEach(item => {
+
+                item.addEventListener('mouseenter', function() {
+
+                    this.style.transform = 'translateY(-5px)';
+
+                    this.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.1)';
+
+                });
+
+                
+
+                item.addEventListener('mouseleave', function() {
+
+                    this.style.transform = 'translateY(0)';
+
+                    this.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.08)';
+
+                });
+
+            });
+
+            
+
+            // Inicializar carrusel móvil
+
+            initMobileCarousel();
+
+        });
+
+        
+
+        // Función para inicializar el carrusel móvil
+
+        function initMobileCarousel() {
+
+            const carousel = document.getElementById('categoryCarousel');
+
+            const dotsContainer = document.getElementById('categoryDots');
+
+            
+
+            if (!carousel || !dotsContainer) return;
+
+            
+
+            const slides = carousel.querySelectorAll('.carousel-slide');
+
+            const totalSlides = slides.length;
+
+            const slidesPerView = 2;
+
+            const totalPages = Math.ceil(totalSlides / slidesPerView);
+
+            let currentPage = 0;
+
+            
+
+            // Crear dots
+
+            for (let i = 0; i < totalPages; i++) {
+
+                const dot = document.createElement('div');
+
+                dot.className = 'carousel-dot';
+
+                if (i === 0) dot.classList.add('active');
+
+                dot.addEventListener('click', () => goToPage(i));
+
+                dotsContainer.appendChild(dot);
+
+            }
+
+            
+
+            // Función para ir a una página específica
+
+            function goToPage(page) {
+
+                currentPage = page;
+
+                const translateX = -page * 100;
+
+                carousel.style.transform = `translateX(${translateX}%)`;
+
+                
+
+                // Actualizar dots
+
+                const dots = dotsContainer.querySelectorAll('.carousel-dot');
+
+                dots.forEach((dot, index) => {
+
+                    dot.classList.toggle('active', index === page);
+
+                });
+
+            }
+
+            
+
+            // Touch/swipe support
+
+            let startX = 0;
+
+            let isDragging = false;
+
+            
+
+            carousel.addEventListener('touchstart', (e) => {
+
+                startX = e.touches[0].clientX;
+
+                isDragging = true;
+
+            });
+
+            
+
+            carousel.addEventListener('touchmove', (e) => {
+
+                if (!isDragging) return;
+
+                e.preventDefault();
+
+            });
+
+            
+
+            carousel.addEventListener('touchend', (e) => {
+
+                if (!isDragging) return;
+
+                isDragging = false;
+
+                
+
+                const endX = e.changedTouches[0].clientX;
+
+                const diffX = startX - endX;
+
+                
+
+                if (Math.abs(diffX) > 50) { // Minimum swipe distance
+
+                    if (diffX > 0 && currentPage < totalPages - 1) {
+
+                        goToPage(currentPage + 1);
+
+                    } else if (diffX < 0 && currentPage > 0) {
+
+                        goToPage(currentPage - 1);
+
+                    }
+
+                }
+
+            });
+
+            
+
+            // Auto-advance (opcional)
+
+            setInterval(() => {
+
+                if (currentPage < totalPages - 1) {
+
+                    goToPage(currentPage + 1);
+
+                } else {
+
+                    goToPage(0); // Loop back to start
+
+                }
+
+            }, 5000); // Change slide every 5 seconds
+
+        }
+
+    </script>
+
+</body>
+
 </html>

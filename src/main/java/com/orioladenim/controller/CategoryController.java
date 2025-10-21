@@ -412,4 +412,47 @@ public class CategoryController {
         
         return "redirect:/admin/categories";
     }
+    
+    /**
+     * Toggle del estado de carrusel de una categoría
+     */
+    @PostMapping("/{id}/toggle-carrusel")
+    @ResponseBody
+    public Map<String, Object> toggleCarrusel(@PathVariable Long id) {
+        try {
+            Category category = categoryService.findById(id);
+            if (category == null) {
+                Map<String, Object> response = new java.util.HashMap<>();
+                response.put("success", false);
+                response.put("message", "Categoría no encontrada");
+                return response;
+            }
+            
+            // Verificar que la categoría tenga imagen
+            if (category.getImagePath() == null || category.getImagePath().trim().isEmpty()) {
+                Map<String, Object> response = new java.util.HashMap<>();
+                response.put("success", false);
+                response.put("message", "La categoría debe tener una imagen asociada para aparecer en el carrusel");
+                return response;
+            }
+            
+            // Cambiar el estado del carrusel
+            category.setShowInCarousel(!category.getShowInCarousel());
+            categoryService.updateCategory(category.getId(), category);
+            
+            Map<String, Object> response = new java.util.HashMap<>();
+            response.put("success", true);
+            response.put("message", category.getShowInCarousel() ? 
+                "Categoría agregada al carrusel del inicio" : 
+                "Categoría removida del carrusel del inicio");
+            response.put("showInCarousel", category.getShowInCarousel());
+            
+            return response;
+        } catch (Exception e) {
+            Map<String, Object> response = new java.util.HashMap<>();
+            response.put("success", false);
+            response.put("message", "Error al cambiar el estado del carrusel: " + e.getMessage());
+            return response;
+        }
+    }
 }

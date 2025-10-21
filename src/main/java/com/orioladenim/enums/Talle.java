@@ -8,6 +8,8 @@ public enum Talle {
     XL("XL"),
     XXL("XXL"),
     XXXL("XXXL"),
+    T32("32"),
+    T34("34"),
     T36("36"),
     T38("38"),
     T40("40"),
@@ -16,7 +18,9 @@ public enum Talle {
     T46("46"),
     T48("48"),
     T50("50"),
-    T52("52");
+    T52("52"),
+    T54("54"),
+    T56("56");
 
     private final String displayName;
 

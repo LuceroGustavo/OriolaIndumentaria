@@ -140,6 +140,12 @@
                 <div th:each="product : ${products}" class="product-card">
                     <a th:href="@{/product/{id}(id=${product.pId})}" class="text-decoration-none text-dark">
                         <div class="product-image-container">
+                            <!-- Etiqueta promocional -->
+                            <div th:if="${product.etiquetaPromocional != null and !product.etiquetaPromocional.isEmpty()}" 
+                                 class="product-promo-label"
+                                 th:text="${product.etiquetaPromocional}">
+                            </div>
+                            
                             <img th:if="${product.images != null and !product.images.empty}" 
                                  th:src="${product.getImagenPrincipalUrl()}" 
                                  th:alt="${product.name}" 
@@ -705,6 +711,42 @@
             overflow: hidden;
             background: #f8f9fa;
             flex-shrink: 0;
+        }
+        
+        /* Etiqueta promocional */
+        .product-promo-label {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            max-width: 80px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        .product-promo-label.sale {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+        
+        .product-promo-label.new {
+            background: linear-gradient(135deg, #2ed573, #1e90ff);
+        }
+        
+        .product-promo-label.hot {
+            background: linear-gradient(135deg, #ff9ff3, #f368e0);
+        }
+        
+        .product-promo-label.offer {
+            background: linear-gradient(135deg, #ffa726, #ff7043);
         }
 
         .product-image {

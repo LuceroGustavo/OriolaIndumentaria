@@ -19,7 +19,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -236,6 +235,7 @@ public class ProductController {
         existingProduct.setColoresDisponibles(product.getColoresDisponibles());
         existingProduct.setEsDestacado(product.getEsDestacado());
         existingProduct.setEsNuevo(product.getEsNuevo());
+        existingProduct.setEtiquetaPromocional(product.getEtiquetaPromocional());
         existingProduct.setDescuentoPorcentaje(product.getDescuentoPorcentaje());
         existingProduct.setPrecioOriginal(product.getPrecioOriginal());
         existingProduct.setActivo(product.getActivo());
@@ -392,6 +392,31 @@ public class ProductController {
             java.util.Map<String, Object> response = new java.util.HashMap<>();
             response.put("success", false);
             response.put("message", "Error al cambiar el estado del producto: " + e.getMessage());
+            return response;
+        }
+    }
+    
+    @PostMapping("/{pId}/toggle-vista-inicio")
+    @ResponseBody
+    public java.util.Map<String, Object> toggleVistaInicio(@PathVariable Integer pId) {
+        try {
+            Product product = productRepository.findById(pId)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            
+            // Cambiar el estado de vista en inicio
+            product.setEsNuevo(!product.getEsNuevo());
+            productRepository.save(product);
+            
+            java.util.Map<String, Object> response = new java.util.HashMap<>();
+            response.put("success", true);
+            response.put("message", product.getEsNuevo() ? "Producto agregado a la vista de inicio" : "Producto removido de la vista de inicio");
+            response.put("esNuevo", product.getEsNuevo());
+            
+            return response;
+        } catch (Exception e) {
+            java.util.Map<String, Object> response = new java.util.HashMap<>();
+            response.put("success", false);
+            response.put("message", "Error al cambiar la vista en inicio: " + e.getMessage());
             return response;
         }
     }

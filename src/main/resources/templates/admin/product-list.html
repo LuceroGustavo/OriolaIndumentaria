@@ -258,6 +258,24 @@
             color: #660000;
         }
 
+        .promo-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            color: white;
+        }
+
+        .form-check-input:checked {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -357,9 +375,9 @@
                                     </option>
                                 </select>
                             </th>
-                            <th>Talle</th>
                             <th>Precio</th>
-                            <th>Stock</th>
+                            <th>Etiqueta Promocional</th>
+                            <th>Vista en Inicio</th>
                             <th>
                                 Publicado
                                 <select class="filter-select" name="activo">
@@ -389,21 +407,24 @@
                                       class="text-muted">Sin categoría</span>
                             </td>
                             <td>
-                                <span th:if="${product.talles != null and !product.talles.empty}" 
-                                      class="talle-badge" 
-                                      th:text="${product.getTallesComoTexto()}"></span>
-                                <span th:unless="${product.talles != null and !product.talles.empty}" 
-                                      class="text-muted">-</span>
-                            </td>
-                            <td>
                                 <span class="price">$<span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}"></span></span>
                             </td>
                             <td>
-                                <span th:if="${product.qty > 0}" 
-                                      class="stock-badge stock-success" 
-                                      th:text="${product.qty}"></span>
-                                <span th:if="${product.qty == 0}" 
-                                      class="stock-badge stock-danger">Sin stock</span>
+                                <span th:if="${product.etiquetaPromocional != null and !product.etiquetaPromocional.isEmpty()}" 
+                                      class="promo-badge" 
+                                      th:text="${product.etiquetaPromocional}"></span>
+                                <span th:unless="${product.etiquetaPromocional != null and !product.etiquetaPromocional.isEmpty()}" 
+                                      class="text-muted">-</span>
+                            </td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           th:id="'vistaInicio_' + ${product.pId}"
+                                           th:checked="${product.esNuevo}"
+                                           th:onchange="'toggleVistaInicio(' + ${product.pId} + ', this)'"
+                                           title="Mostrar en página de inicio">
+                                </div>
                             </td>
                             <td>
                                 <span th:if="${product.activo}" 
@@ -499,6 +520,38 @@
                 .catch(error => {
                     showMessage('error', 'Error al cambiar el estado del producto: ' + error.message);
                 });
+            }
+        }
+
+        function toggleVistaInicio(productId, checkbox) {
+            const isChecked = checkbox.checked;
+            const action = isChecked ? 'activar' : 'desactivar';
+            
+            if (confirm(`¿Estás seguro de que quieres ${action} la vista en inicio de este producto?`)) {
+                fetch(`/admin/products/${productId}/toggle-vista-inicio`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage('success', data.message);
+                    } else {
+                        showMessage('error', data.message || 'Error al cambiar la vista en inicio');
+                        // Revertir el checkbox si hay error
+                        checkbox.checked = !isChecked;
+                    }
+                })
+                .catch(error => {
+                    showMessage('error', 'Error al cambiar la vista en inicio: ' + error.message);
+                    // Revertir el checkbox si hay error
+                    checkbox.checked = !isChecked;
+                });
+            } else {
+                // Revertir el checkbox si el usuario cancela
+                checkbox.checked = !isChecked;
             }
         }
 

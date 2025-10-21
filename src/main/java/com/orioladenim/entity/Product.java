@@ -104,6 +104,9 @@ public class Product {
     @Column(name = "es_nuevo")
     private Boolean esNuevo = false;
 
+    @Column(name = "etiqueta_promocional", length = 50)
+    private String etiquetaPromocional;
+
     @Column(name = "descuento_porcentaje")
     private Double descuentoPorcentaje = 0.0;
 
@@ -328,6 +331,9 @@ public class Product {
     
     public Boolean getEsNuevo() { return esNuevo; }
     public void setEsNuevo(Boolean esNuevo) { this.esNuevo = esNuevo; }
+    
+    public String getEtiquetaPromocional() { return etiquetaPromocional; }
+    public void setEtiquetaPromocional(String etiquetaPromocional) { this.etiquetaPromocional = etiquetaPromocional; }
     
     public Double getDescuentoPorcentaje() { return descuentoPorcentaje; }
     public void setDescuentoPorcentaje(Double descuentoPorcentaje) { this.descuentoPorcentaje = descuentoPorcentaje; }
