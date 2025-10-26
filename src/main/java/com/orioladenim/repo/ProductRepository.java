@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
@@ -59,5 +60,17 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     // Buscar productos por categoría (sin filtro de activo para admin)
     @Query("SELECT p FROM Product p JOIN p.categories c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :categoria, '%'))")
     List<Product> findByCategoriesNameContainingIgnoreCase(@Param("categoria") String categoria);
+    
+    // Obtener producto con colores (primera consulta)
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.colores WHERE p.pId = :id")
+    Optional<Product> findByIdWithColors(@Param("id") Integer id);
+    
+    // Obtener producto con categorías
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.categories WHERE p.pId = :id")
+    Optional<Product> findByIdWithCategories(@Param("id") Integer id);
+    
+    // Obtener producto con imágenes
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images WHERE p.pId = :id")
+    Optional<Product> findByIdWithImages(@Param("id") Integer id);
 }
 

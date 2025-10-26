@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class PublicController {
@@ -123,8 +124,36 @@ public class PublicController {
     
     @GetMapping("/product/{id}")
     public String productDetail(@PathVariable Integer id, Model model) {
-        Product product = productRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        // Cargar producto con colores usando consulta optimizada
+        java.util.Optional<Product> productOpt = productRepository.findByIdWithColors(id);
+        
+        if (!productOpt.isPresent()) {
+            throw new RuntimeException("Producto no encontrado");
+        }
+        
+        Product product = productOpt.get();
+        
+        // Debug: Verificar colores
+        System.out.println("🔍 [PRODUCT-DETAIL] Producto: " + product.getName());
+        if (product.getColores() != null) {
+            System.out.println("🔍 [PRODUCT-DETAIL] Cantidad de colores: " + product.getColores().size());
+            for (com.orioladenim.entity.Color color : product.getColores()) {
+                System.out.println("  - Color: " + color.getName() + " (Hex: " + color.getHexCode() + ")");
+            }
+        } else {
+            System.out.println("⚠️ [PRODUCT-DETAIL] Lista de colores es NULL");
+        }
+        
+        // Forzar carga de imágenes (separada para evitar MultipleBagFetchException)
+        java.util.Optional<Product> productWithImagesOpt = productRepository.findByIdWithImages(id);
+        if (productWithImagesOpt.isPresent()) {
+            product.setImages(productWithImagesOpt.get().getImages());
+        }
+        
+        // Forzar carga de categorías si no están cargadas
+        if (product.getCategories() != null) {
+            product.getCategories().size(); // Force lazy loading
+        }
         
         model.addAttribute("product", product);
         return "product-detail";
