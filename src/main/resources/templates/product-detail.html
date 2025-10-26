@@ -282,6 +282,62 @@
                                         <i class="bi bi-envelope me-2"></i>Enviar Consulta
                                     </a>
                                 </div>
+                                
+                                <!-- Especificaciones del producto -->
+                                <div class="mobile-specs mb-4">
+                                    <!-- Medidas -->
+                                    <div class="mb-3" th:if="${product.medidas}">
+                                        <div class="spec-item d-flex align-items-center">
+                                            <i class="bi bi-arrows-expand me-2" style="color: #666; font-size: 14px;"></i>
+                                            <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Medidas: </span>
+                                            <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" th:text="${product.medidas}"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Material -->
+                                    <div class="mb-3" th:if="${product.material}">
+                                        <div class="spec-item d-flex align-items-center">
+                                            <i class="bi bi-shield-check me-2" style="color: #666; font-size: 14px;"></i>
+                                            <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Material: </span>
+                                            <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" th:text="${product.material}"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Géneros -->
+                                    <div class="mb-3" th:if="${product.generos != null and !product.generos.isEmpty()}">
+                                        <div class="spec-item d-flex align-items-center">
+                                            <i class="bi bi-person me-2" style="color: #666; font-size: 14px;"></i>
+                                            <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Género: </span>
+                                            <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" 
+                                                  th:text="${#strings.listJoin(product.generos, ', ')}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Características del Producto -->
+                                <div class="mobile-features mb-4">
+                                    <h6 class="mb-3" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 400; color: #000; letter-spacing: 1px; text-transform: uppercase;">
+                                        Características del Producto
+                                    </h6>
+                                    <ul class="list-unstyled" style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666;">
+                                        <li class="mb-2">
+                                            <i class="bi bi-check me-2" style="color: #000; font-size: 12px;"></i>
+                                            Material de alta calidad
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-check me-2" style="color: #000; font-size: 12px;"></i>
+                                            Diseño único y exclusivo
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-check me-2" style="color: #000; font-size: 12px;"></i>
+                                            Corte clásico y elegante
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-check me-2" style="color: #000; font-size: 12px;"></i>
+                                            Perfecto para ocasiones especiales
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
@@ -304,11 +360,8 @@
                             </div>
                         </div>
 
-                        <div class="product-description mb-4">
-                            <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: #666; line-height: 1.6;" th:text="${product.descripcion ?: 'Producto de alta calidad con diseño único y materiales premium. Perfecto para destacar tu personalidad y sentirte cómodo en cualquier ocasión.'}"></p>
-                        </div>
-
-                        <div class="product-specs mb-4">
+                        <!-- Sección de especificaciones para desktop -->
+                        <div class="product-specs mb-4 d-none d-lg-block">
                             <div class="row">
                                 
                                 <!-- Medidas -->
@@ -361,7 +414,8 @@
                             </div>
                         </div>
 
-                        <div class="product-actions mb-5">
+                        <!-- Botones de acción para desktop -->
+                        <div class="product-actions mb-5 d-none d-lg-block">
                             <div class="d-grid gap-3">
                                 <button class="btn btn-dark btn-lg" 
                                         th:data-product-name="${product.name}"
@@ -376,7 +430,8 @@
                             </div>
                         </div>
 
-                        <div class="product-features mb-4">
+                        <!-- Características del producto para desktop -->
+                        <div class="product-features mb-4 d-none d-lg-block">
                             <h6 class="mb-3" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 400; color: #000; letter-spacing: 1px; text-transform: uppercase;">
                                 Características del Producto
                             </h6>
