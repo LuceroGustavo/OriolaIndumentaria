@@ -174,4 +174,63 @@ public class VideoProcessingService {
             return String.format("%.1f MB", mb);
         }
     }
+    
+    /**
+     * Procesa y guarda un video de producto
+     * Similar a procesarVideo pero guarda en directorio de productos
+     */
+    public String procesarVideoProducto(MultipartFile video, Integer productId) throws IOException {
+        // Validar formato
+        if (!esFormatoValido(video)) {
+            throw new IllegalArgumentException("Formato de video no válido. Use MP4, WebM, MOV o AVI.");
+        }
+        
+        // Validar tamaño (productos pueden tener videos más largos)
+        long tamanoMaximoProducto = 50 * 1024 * 1024; // 50MB
+        if (video.getSize() > tamanoMaximoProducto) {
+            throw new IllegalArgumentException("El video no puede superar los 50MB.");
+        }
+        
+        // Crear directorio de videos de productos
+        Path productosDir = Paths.get(uploadPath, "productos", "videos");
+        Files.createDirectories(productosDir);
+        
+        // Generar nombre único
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        String extension = obtenerExtension(video.getOriginalFilename());
+        String fileName = "producto_" + productId + "_" + timestamp + extension;
+        
+        // Guardar archivo
+        Path filePath = productosDir.resolve(fileName);
+        Files.copy(video.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        
+        return "productos/videos/" + fileName;
+    }
+    
+    /**
+     * Genera un thumbnail para el video de producto
+     */
+    public String generarThumbnailProducto(String videoPath, Integer productId) {
+        try {
+            // Crear directorio de thumbnails
+            Path thumbnailsDir = Paths.get(thumbnailPath, "productos", "videos");
+            Files.createDirectories(thumbnailsDir);
+            
+            // Generar nombre del thumbnail
+            String videoFileName = Paths.get(videoPath).getFileName().toString();
+            String thumbnailFileName = "thumb_" + videoFileName.replaceFirst("[.][^.]+$", ".jpg");
+            
+            // Por ahora, creamos un placeholder
+            // En una implementación real, usarías FFmpeg para extraer un frame
+            Path thumbnailPath = thumbnailsDir.resolve(thumbnailFileName);
+            
+            // Crear un archivo placeholder (en producción usar FFmpeg)
+            Files.write(thumbnailPath, "thumbnail placeholder".getBytes());
+            
+            return "productos/videos/" + thumbnailFileName;
+        } catch (IOException e) {
+            // Si falla la generación del thumbnail, retornar null
+            return null;
+        }
+    }
 }

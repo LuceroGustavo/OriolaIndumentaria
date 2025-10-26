@@ -125,9 +125,12 @@
                                  th:class="${iterStat.first} ? 'thumbnail-vertical active' : 'thumbnail-vertical'"
                                  th:data-image-url="${image.getImageUrl()}"
                                  th:data-image-id="${image.id}"
+                                 th:data-is-video="${image.isVideo}"
                                  class="thumbnail-vertical" 
                                  style="width: 120px; height: 188px; margin-bottom: 16px; cursor: pointer; overflow: hidden; border: 1.5px solid transparent; transition: all 0.3s ease; text-align: center;">
-                                <img th:src="${image.getThumbnailUrl()}" 
+                                <!-- Mostrar video o imagen -->
+                                <video th:if="${image.isVideo}" th:src="${image.getImageUrl()}" muted loop style="width: 100%; height: 100%; object-fit: cover;"></video>
+                                <img th:unless="${image.isVideo}" th:src="${image.getThumbnailUrl()}" 
                                      class="img-fluid" 
                                      style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
@@ -137,7 +140,12 @@
                         <div class="main-image-container" style="flex: 1; display: flex; justify-content: center; align-items: center; min-width: 0; overflow: hidden;">
                             <div class="product-image-large" id="mainImageContainer" style="width: 100%; max-width: 520px; height: 600px; background: #fff; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 4rem; position: relative; overflow: hidden; cursor: pointer; border: 1px solid #e9ecef;" data-bs-toggle="modal" data-bs-target="#imageModal">
                                 <i class="bi bi-image" th:if="${product.images == null or product.images.isEmpty()}"></i>
-                                <img th:if="${product.images != null and !product.images.isEmpty()}" 
+                                <video th:if="${product.images != null and !product.images.isEmpty() and product.getImagenPrincipalIsVideo()}" 
+                                     th:src="${product.getImagenPrincipalUrl()}" 
+                                     id="mainVideo"
+                                     autoplay muted loop
+                                     style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; background: white; object-position: center;"></video>
+                                <img th:if="${product.images != null and !product.images.isEmpty() and !product.getImagenPrincipalIsVideo()}" 
                                      th:src="${product.getImagenPrincipalUrl()}" 
                                      id="mainImage" 
                                      class="img-fluid" 
@@ -157,9 +165,14 @@
                 <!-- Imagen Principal Móvil -->
                 <div class="mobile-main-image" id="mobileMainImage" style="width: 85%; min-width: 300px; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; padding: 0;">
                     <i class="bi bi-image" th:if="${product.images == null or product.images.isEmpty()}" style="font-size: 4rem; color: #ccc;"></i>
-                    <img th:if="${product.images != null and !product.images.isEmpty()}" 
+                    <video th:if="${product.images != null and !product.images.isEmpty() and product.getImagenPrincipalIsVideo()}" 
                          th:src="${product.getImagenPrincipalUrl()}" 
-                         id="mobileImage" 
+                         id="mobileVideo"
+                         autoplay muted loop
+                         style="width: 100%; height: 100%; object-fit: contain; background: white; border-radius: 0; margin: 0; padding: 0;"></video>
+                    <img th:if="${product.images != null and !product.images.isEmpty() and !product.getImagenPrincipalIsVideo()}" 
+                         th:src="${product.getImagenPrincipalUrl()}" 
+                         id="mobileImage"
                          class="img-fluid" 
                          style="width: 100%; height: 100%; object-fit: contain; background: white; border-radius: 0; margin: 0; padding: 0;">
                     
@@ -676,16 +689,39 @@
                 
                 // Obtener URL de la imagen de alta calidad
                 const imageUrl = this.getAttribute('data-image-url');
+                const isVideo = this.getAttribute('data-is-video') === 'true';
+                
                 if (imageUrl) {
-                    // Cambiar imagen principal
+                    // Obtener elementos de video e imagen
                     const mainImage = document.getElementById('mainImage');
+                    const mainVideo = document.getElementById('mainVideo');
                     const modalImage = document.getElementById('modalImage');
                     
-                    if (mainImage) {
-                        mainImage.src = imageUrl;
-                    }
-                    if (modalImage) {
-                        modalImage.src = imageUrl;
+                    if (isVideo) {
+                        // Es un video, mostrar video y ocultar imagen
+                        if (mainVideo) {
+                            mainVideo.src = imageUrl;
+                            mainVideo.classList.remove('d-none');
+                        }
+                        if (mainImage) {
+                            mainImage.classList.add('d-none');
+                        }
+                        if (modalImage) {
+                            modalImage.classList.add('d-none');
+                        }
+                    } else {
+                        // Es una imagen, mostrar imagen y ocultar video
+                        if (mainImage) {
+                            mainImage.src = imageUrl;
+                            mainImage.classList.remove('d-none');
+                        }
+                        if (mainVideo) {
+                            mainVideo.classList.add('d-none');
+                        }
+                        if (modalImage) {
+                            modalImage.src = imageUrl;
+                            modalImage.classList.remove('d-none');
+                        }
                     }
                 }
             });

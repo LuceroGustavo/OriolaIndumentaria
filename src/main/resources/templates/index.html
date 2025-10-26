@@ -750,7 +750,15 @@
                          th:text="${product.etiquetaPromocional}">
                     </div>
                     
-                    <img th:if="${product.images != null and !product.images.empty}" 
+                    <!-- Mostrar video si es video -->
+                    <video th:if="${product.images != null and !product.images.empty and product.getImagenPrincipalIsVideo()}" 
+                         th:src="${product.getImagenPrincipalUrl()}" 
+                         th:title="${product.name}" 
+                         class="product-image"
+                         muted loop autoplay
+                         style="width: 100%; height: 100%; object-fit: cover;"></video>
+                    <!-- Mostrar imagen si no es video -->
+                    <img th:if="${product.images != null and !product.images.empty and !product.getImagenPrincipalIsVideo()}" 
                          th:src="${product.getImagenPrincipalUrl()}" 
                          th:alt="${product.name}" 
                          class="product-image">

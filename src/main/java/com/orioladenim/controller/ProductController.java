@@ -4,6 +4,7 @@ import com.orioladenim.entity.Product;
 import com.orioladenim.entity.Category;
 import com.orioladenim.entity.Color;
 import com.orioladenim.entity.ProductImage;
+import com.orioladenim.entity.ProductVideo;
 import com.orioladenim.enums.Talle;
 import com.orioladenim.enums.Genero;
 import com.orioladenim.enums.Temporada;
@@ -12,6 +13,7 @@ import com.orioladenim.repo.ProductImageRepository;
 import com.orioladenim.service.CategoryService;
 import com.orioladenim.service.ColorService;
 import com.orioladenim.service.ImageProcessingService;
+import com.orioladenim.service.VideoProcessingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.ArrayList;
+import java.nio.file.Paths;
 
 @Controller
 @RequestMapping("/admin/products")
@@ -34,6 +37,9 @@ public class ProductController {
     
     @Autowired
     private ImageProcessingService imageProcessingService;
+    
+    @Autowired
+    private VideoProcessingService videoProcessingService;
     
     @Autowired
     private CategoryService categoryService;
@@ -343,13 +349,61 @@ public class ProductController {
             Product product = productRepository.findById(pId)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
             
+            // Si hay imágenes nuevas, desactivar todas las imágenes principales existentes
+            boolean shouldClearPrimary = false;
+            if (images.length > 0 && !images[0].isEmpty()) {
+                shouldClearPrimary = true;
+            }
+            
             int savedCount = 0;
+            boolean isFirstImage = true;
+            
             for (int i = 0; i < images.length; i++) {
                 MultipartFile file = images[i];
                 if (!file.isEmpty()) {
-                    // Usar el servicio de procesamiento de imágenes existente
-                    ProductImage productImage = imageProcessingService.processAndSaveImage(file, pId, i == 0);
+                    // Detectar si es video
+                    boolean isVideo = file.getContentType() != null && 
+                                    (file.getContentType().startsWith("video/"));
+                    
+                    ProductImage productImage;
+                    
+                    if (isVideo) {
+                        // Procesar video
+                        String videoPath = videoProcessingService.procesarVideoProducto(file, pId);
+                        @SuppressWarnings("unused")
+                        String _thumbnailPath = videoProcessingService.generarThumbnailProducto(videoPath, pId);
+                        
+                        productImage = new ProductImage();
+                        productImage.setFileName(Paths.get(videoPath).getFileName().toString());
+                        productImage.setImagePath(videoPath);
+                        productImage.setOriginalName(file.getOriginalFilename());
+                        productImage.setFileSize(file.getSize());
+                        productImage.setIsVideo(true);
+                    } else {
+                        // Procesar imagen normalmente
+                        productImage = imageProcessingService.processAndSaveImage(file, pId, i == 0);
+                        productImage.setIsVideo(false);
+                    }
+                    
                     productImage.setProduct(product);
+                    
+                    // Si es la primera imagen de la nueva subida, limpiar todas las principales existentes y marcar esta como principal
+                    if (isFirstImage && shouldClearPrimary) {
+                        // Desmarcar todas las imágenes principales existentes
+                        java.util.List<ProductImage> existingImages = productImageRepository.findByProductIdOrderByDisplayOrderAsc(pId);
+                        for (ProductImage existingImage : existingImages) {
+                            if (existingImage.getIsPrimary()) {
+                                existingImage.setIsPrimary(false);
+                                productImageRepository.save(existingImage);
+                            }
+                        }
+                        // Marcar esta como principal
+                        productImage.setIsPrimary(true);
+                        isFirstImage = false;
+                    } else {
+                        productImage.setIsPrimary(false);
+                    }
+                    
                     productImage.setDisplayOrder(i);
                     
                     productImageRepository.save(productImage);
@@ -359,14 +413,14 @@ public class ProductController {
             
             java.util.Map<String, Object> response = new java.util.HashMap<>();
             response.put("success", true);
-            response.put("message", "Imágenes asociadas correctamente");
+            response.put("message", "Archivos asociados correctamente");
             response.put("count", savedCount);
             
             return response;
         } catch (Exception e) {
             java.util.Map<String, Object> response = new java.util.HashMap<>();
             response.put("success", false);
-            response.put("message", "Error al procesar las imágenes: " + e.getMessage());
+            response.put("message", "Error al procesar los archivos: " + e.getMessage());
             return response;
         }
     }

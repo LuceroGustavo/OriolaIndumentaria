@@ -122,9 +122,13 @@ public class Product {
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion = LocalDateTime.now();
 
-    // Relación con imágenes
+    // Relación con imágenes/videos unificados
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ProductImage> images = new ArrayList<>();
+    
+    // Relación con videos (legacy - mantener para compatibilidad)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<ProductVideo> videos = new ArrayList<>();
     
     // Relación con categorías (Many-to-Many)
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -148,6 +152,12 @@ public class Product {
     public String getImagenPrincipalUrl() {
         ProductImage imagenPrincipal = getImagenPrincipal();
         return imagenPrincipal != null ? imagenPrincipal.getImageUrl() : "/images/no-image.svg";
+    }
+    
+    // Método para verificar si la imagen principal es un video
+    public Boolean getImagenPrincipalIsVideo() {
+        ProductImage imagenPrincipal = getImagenPrincipal();
+        return imagenPrincipal != null ? imagenPrincipal.getIsVideo() : false;
     }
 
     // Método para obtener el precio con descuento
