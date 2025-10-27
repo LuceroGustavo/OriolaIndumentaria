@@ -140,16 +140,23 @@
                         <div class="main-image-container" style="flex: 1; display: flex; justify-content: center; align-items: center; min-width: 0; overflow: hidden;">
                             <div class="product-image-large" id="mainImageContainer" style="width: 100%; max-width: 520px; height: 600px; background: #fff; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 4rem; position: relative; overflow: hidden; cursor: pointer; border: 1px solid #e9ecef;" data-bs-toggle="modal" data-bs-target="#imageModal">
                                 <i class="bi bi-image" th:if="${product.images == null or product.images.isEmpty()}"></i>
-                                <video th:if="${product.images != null and !product.images.isEmpty() and product.getImagenPrincipalIsVideo()}" 
-                                     th:src="${product.getImagenPrincipalUrl()}" 
-                                     id="mainVideo"
-                                     autoplay muted loop
-                                     style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; background: white; object-position: center;"></video>
-                                <img th:if="${product.images != null and !product.images.isEmpty() and !product.getImagenPrincipalIsVideo()}" 
-                                     th:src="${product.getImagenPrincipalUrl()}" 
-                                     id="mainImage" 
-                                     class="img-fluid" 
-                                     style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; background: white; object-position: center;">
+                                <!-- Calcular si es video usando th:with -->
+                                <div th:with="imagenPrincipal=${product.getImagenPrincipal()}, 
+                                               isVideo=${imagenPrincipal != null ? (imagenPrincipal.isVideo != null ? imagenPrincipal.isVideo : false) : false}">
+                                    <!-- Video - Siempre presente pero oculto si no es video -->
+                                    <video th:if="${product.images != null and !product.images.isEmpty()}" 
+                                         th:src="${product.getImagenPrincipalUrl()}" 
+                                         id="mainVideo"
+                                         th:class="${isVideo} ? '' : 'd-none'"
+                                         autoplay muted loop
+                                         style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; background: white; object-position: center;"></video>
+                                    <!-- Imagen - Siempre presente pero oculto si es video -->
+                                    <img th:if="${product.images != null and !product.images.isEmpty()}" 
+                                         th:src="${product.getImagenPrincipalUrl()}" 
+                                         id="mainImage" 
+                                         th:class="${!isVideo and imagenPrincipal != null} ? 'img-fluid' : 'd-none img-fluid'"
+                                         style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; background: white; object-position: center;">
+                                </div>
                                 <div class="image-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.3s ease;">
                                     <button class="btn btn-light btn-sm" style="background: rgba(255,255,255,0.9); border: none; padding: 8px 16px; border-radius: 4px;">
                                         <i class="bi bi-zoom-in me-1"></i>Ampliar
@@ -165,16 +172,23 @@
                 <!-- Imagen Principal Móvil -->
                 <div class="mobile-main-image" id="mobileMainImage" style="width: 85%; min-width: 300px; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; padding: 0;">
                     <i class="bi bi-image" th:if="${product.images == null or product.images.isEmpty()}" style="font-size: 4rem; color: #ccc;"></i>
-                    <video th:if="${product.images != null and !product.images.isEmpty() and product.getImagenPrincipalIsVideo()}" 
-                         th:src="${product.getImagenPrincipalUrl()}" 
-                         id="mobileVideo"
-                         autoplay muted loop
-                         style="width: 100%; height: 100%; object-fit: contain; background: white; border-radius: 0; margin: 0; padding: 0;"></video>
-                    <img th:if="${product.images != null and !product.images.isEmpty() and !product.getImagenPrincipalIsVideo()}" 
-                         th:src="${product.getImagenPrincipalUrl()}" 
-                         id="mobileImage"
-                         class="img-fluid" 
-                         style="width: 100%; height: 100%; object-fit: contain; background: white; border-radius: 0; margin: 0; padding: 0;">
+                    <!-- Calcular si es video usando th:with -->
+                    <div th:with="imagenPrincipal=${product.getImagenPrincipal()}, 
+                                   isVideo=${imagenPrincipal != null ? (imagenPrincipal.isVideo != null ? imagenPrincipal.isVideo : false) : false}">
+                        <!-- Video móvil - Siempre presente pero oculto si no es video -->
+                        <video th:if="${product.images != null and !product.images.isEmpty()}" 
+                             th:src="${product.getImagenPrincipalUrl()}" 
+                             id="mobileVideo"
+                             th:class="${isVideo} ? '' : 'd-none'"
+                             autoplay muted loop
+                             style="width: 100%; height: 100%; object-fit: contain; background: white; border-radius: 0; margin: 0; padding: 0;"></video>
+                        <!-- Imagen móvil - Siempre presente pero oculto si es video -->
+                        <img th:if="${product.images != null and !product.images.isEmpty()}" 
+                             th:src="${product.getImagenPrincipalUrl()}" 
+                             id="mobileImage"
+                             th:class="${!isVideo and imagenPrincipal != null} ? 'img-fluid' : 'd-none img-fluid'"
+                             style="width: 100%; height: 100%; object-fit: contain; background: white; border-radius: 0; margin: 0; padding: 0;">
+                    </div>
                     
                     <!-- Botón de zoom -->
                     <div class="mobile-zoom-btn" style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;">

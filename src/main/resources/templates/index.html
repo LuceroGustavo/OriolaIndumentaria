@@ -750,18 +750,22 @@
                          th:text="${product.etiquetaPromocional}">
                     </div>
                     
-                    <!-- Mostrar video si es video -->
-                    <video th:if="${product.images != null and !product.images.empty and product.getImagenPrincipalIsVideo()}" 
-                         th:src="${product.getImagenPrincipalUrl()}" 
-                         th:title="${product.name}" 
-                         class="product-image"
-                         muted loop autoplay
-                         style="width: 100%; height: 100%; object-fit: cover;"></video>
-                    <!-- Mostrar imagen si no es video -->
-                    <img th:if="${product.images != null and !product.images.empty and !product.getImagenPrincipalIsVideo()}" 
-                         th:src="${product.getImagenPrincipalUrl()}" 
-                         th:alt="${product.name}" 
-                         class="product-image">
+                    <!-- Calcular si es video usando th:with -->
+                    <div th:with="imagenPrincipal=${product.getImagenPrincipal()}, 
+                                   isVideo=${imagenPrincipal != null ? (imagenPrincipal.isVideo != null ? imagenPrincipal.isVideo : false) : false}">
+                        <!-- Mostrar video si es video -->
+                        <video th:if="${isVideo}" 
+                             th:src="${product.getImagenPrincipalUrl()}" 
+                             th:title="${product.name}" 
+                             class="product-image"
+                             muted loop autoplay
+                             style="width: 100%; height: 100%; object-fit: cover;"></video>
+                        <!-- Mostrar imagen si no es video -->
+                        <img th:if="${!isVideo and imagenPrincipal != null}" 
+                             th:src="${product.getImagenPrincipalUrl()}" 
+                             th:alt="${product.name}" 
+                             class="product-image">
+                    </div>
                     <img th:if="${product.images == null or product.images.empty}" 
                          src="https://via.placeholder.com/350x350/f8f9fa/666666?text=Orioladenim" 
                          th:alt="${product.name}" 

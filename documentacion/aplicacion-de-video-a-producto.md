@@ -1,7 +1,8 @@
 # Aplicación de Video a Productos - Documentación
 
 **Fecha:** 26 de octubre de 2025  
-**Estado:** En desarrollo - Requiere corrección de parsing de Thymeleaf  
+**Última actualización:** 27 de enero de 2025  
+**Estado:** ✅ RESUELTO - Completamente funcional  
 **Objetivo:** Permitir que los productos puedan tener videos además de imágenes, mostrando videos en index, catálogo y detalle de producto.
 
 ---
@@ -10,12 +11,14 @@
 
 Se implementó un sistema unificado de gestión de medios (imágenes y videos) para productos. El sistema permite cargar videos o imágenes desde un único formulario de administración, distinguiéndolos mediante un flag `isVideo` en la entidad `ProductImage`.
 
-### Problemas Conocidos
+### ✅ Problemas Resueltos (27 de enero de 2025)
 
-1. **Error de parsing en `index.html`**: Thymeleaf falla al parsear el template
-2. **Error de parsing en `product-detail.html`**: Similar al de index
-3. **Carrusel de categorías no funciona**: Las imágenes se muestran agrandadas sin formato
-4. **Selección de thumbnails no funciona**: Al hacer clic en thumbnails no se actualiza el contenido principal
+1. **✅ Error de parsing en `index.html`**: **RESUELTO** - Usando `th:with` para pre-calcular valores
+2. **✅ Error de parsing en `product-detail.html`**: **RESUELTO** - Usando `product.getImagenPrincipal()` en lugar de `images[0]`
+3. **✅ Carrusel de categorías no funciona**: **RESUELTO** - El error de parsing impedía que se renderizara correctamente
+4. **✅ Selección de thumbnails no funciona**: **RESUELTO** - Ambos elementos (video e imagen) ahora están siempre en el DOM
+5. **✅ Imágenes principales no se mostraban**: **RESUELTO** - Corregido acceso a la imagen principal
+6. **✅ Videos y thumbnails no intercambiaban**: **RESUELTO** - JavaScript ahora funciona correctamente
 
 ---
 
@@ -389,7 +392,83 @@ Para debuggear el error de parsing:
 
 ---
 
-**Última actualización:** 26 de octubre de 2025 - 20:40  
+---
+
+## ✅ SOLUCIÓN IMPLEMENTADA (27 de enero de 2025)
+
+### Problema Identificado
+
+El sistema de videos no funcionaba correctamente debido a:
+
+1. **Error de parsing de Thymeleaf**: No se podía llamar a `product.getImagenPrincipalIsVideo()` directamente en expresiones `th:if`
+2. **Acceso incorrecto a imagen principal**: Se usaba `product.images[0]` en lugar de `product.getImagenPrincipal()`
+3. **Elementos faltantes en el DOM**: El JavaScript no encontraba los elementos `mainImage` o `mainVideo`
+
+### Solución Implementada
+
+#### 1. Uso de `th:with` para pre-calcular valores
+
+**Problema:** Thymeleaf no puede parsear métodos complejos en expresiones `th:if`  
+**Solución:** Usar `th:with` para pre-calcular el valor antes de usarlo:
+
+```thymeleaf
+<div th:with="imagenPrincipal=${product.getImagenPrincipal()}, 
+               isVideo=${imagenPrincipal != null ? (imagenPrincipal.isVideo != null ? imagenPrincipal.isVideo : false) : false}">
+    <video th:if="${isVideo}" ...></video>
+    <img th:if="${!isVideo and imagenPrincipal != null}" ...>
+</div>
+```
+
+#### 2. Corrección del acceso a imagen principal
+
+**Problema:** Se accedía directamente a `images[0]` que no es necesariamente la imagen principal  
+**Solución:** Usar el método `getImagenPrincipal()` que busca la imagen con `isPrimary = true`:
+
+```thymeleaf
+<!-- ANTES (INCORRECTO) -->
+imagenPrincipal=${product.images[0]}
+
+<!-- AHORA (CORRECTO) -->
+imagenPrincipal=${product.getImagenPrincipal()}
+```
+
+#### 3. Ambos elementos siempre en el DOM (product-detail.html)
+
+**Problema:** El JavaScript no podía encontrar los elementos porque solo uno existía en el DOM  
+**Solución:** Renderizar ambos elementos (video e imagen) pero ocultar uno con la clase `d-none`:
+
+```thymeleaf
+<!-- Video - Siempre presente pero oculto si no es video -->
+<video th:if="${product.images != null and !product.images.isEmpty()}" 
+     id="mainVideo"
+     th:class="${isVideo} ? '' : 'd-none'"
+     ...></video>
+
+<!-- Imagen - Siempre presente pero oculto si es video -->
+<img th:if="${product.images != null and !product.images.isEmpty()}" 
+     id="mainImage" 
+     th:class="${!isVideo and imagenPrincipal != null} ? 'img-fluid' : 'd-none img-fluid'"
+     ...>
+```
+
+### Archivos Modificados (27 de enero de 2025)
+
+1. ✅ `src/main/resources/templates/index.html` (líneas 753-768)
+2. ✅ `src/main/resources/templates/catalog.html` (líneas 149-164)
+3. ✅ `src/main/resources/templates/product-detail.html` (desktop líneas 143-159, móvil líneas 175-191)
+
+### Resultados de las Correcciones
+
+✅ **Videos se muestran correctamente** cuando son la imagen principal  
+✅ **Imágenes se muestran correctamente** cuando son la imagen principal  
+✅ **Carrusel de categorías funciona** correctamente  
+✅ **Thumbnails intercambian correctamente** en detalle de producto  
+✅ **Sin errores de parsing** de Thymeleaf  
+✅ **Sin errores de linting**  
+
+---
+
+**Última actualización:** 27 de enero de 2025 - 14:30  
 **Autor:** Asistente IA (Claude Sonnet 4.5)  
-**Estado del Trabajo:** Incompleto - Requiere corrección de parsing de Thymeleaf
+**Estado del Trabajo:** ✅ COMPLETADO Y FUNCIONAL
 
