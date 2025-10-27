@@ -202,6 +202,8 @@
                     <span th:each="image, iterStat : ${product.images}" 
                           th:class="${iterStat.first} ? 'indicator active' : 'indicator'"
                           th:data-image-index="${iterStat.index}"
+                          th:data-image-url="${image.getImageUrl()}"
+                          th:data-is-video="${image.isVideo}"
                           class="indicator" 
                           style="width: 8px; height: 8px; border-radius: 50%; background: rgba(0,0,0,0.44); cursor: pointer; transition: all 0.3s ease;"></span>
                 </div>
@@ -1183,10 +1185,32 @@
             
             currentImageIndex = index;
             const mobileImage = document.getElementById('mobileImage');
+            const mobileVideo = document.getElementById('mobileVideo');
             const indicators = document.querySelectorAll('.mobile-gallery-indicators .indicator');
             
-            if (mobileImage && productImages[index]) {
-                mobileImage.src = productImages[index].getImageUrl();
+            if (productImages[index]) {
+                const isVideo = productImages[index].getIsVideo();
+                const imageUrl = productImages[index].getImageUrl();
+                
+                if (isVideo) {
+                    // Es un video
+                    if (mobileVideo) {
+                        mobileVideo.src = imageUrl;
+                        mobileVideo.classList.remove('d-none');
+                    }
+                    if (mobileImage) {
+                        mobileImage.classList.add('d-none');
+                    }
+                } else {
+                    // Es una imagen
+                    if (mobileImage) {
+                        mobileImage.src = imageUrl;
+                        mobileImage.classList.remove('d-none');
+                    }
+                    if (mobileVideo) {
+                        mobileVideo.classList.add('d-none');
+                    }
+                }
             }
             
             // Actualizar indicadores
@@ -1260,7 +1284,8 @@
             const imageElements = document.querySelectorAll('[data-image-url]');
             productImages = Array.from(imageElements).map(el => ({
                 getImageUrl: () => el.getAttribute('data-image-url'),
-                getThumbnailUrl: () => el.querySelector('img').src
+                getThumbnailUrl: () => el.querySelector('img') ? el.querySelector('img').src : '',
+                getIsVideo: () => el.getAttribute('data-is-video') === 'true'
             }));
 
             // Search functionality
