@@ -33,8 +33,8 @@ public class PublicController {
             // Mostrar solo productos de novedades (esNuevo = true y activo = true)
             model.addAttribute("products", productRepository.findByEsNuevoTrueAndActivoTrue());
             
-            // Agregar categorías para el dropdown
-            model.addAttribute("categories", categoryService.getActiveCategories());
+            // Agregar categorías para el dropdown (solo las que tienen productos)
+            model.addAttribute("categories", categoryService.getCategoriesWithProducts());
             
             // Obtener categorías listas para el carrusel (solo si hay categorías válidas)
             List<Category> carouselCategories = categoryService.findReadyForCarousel();
