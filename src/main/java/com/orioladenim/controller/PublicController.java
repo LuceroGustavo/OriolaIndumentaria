@@ -5,6 +5,7 @@ import com.orioladenim.entity.Category;
 import com.orioladenim.repo.ProductRepository;
 import com.orioladenim.service.CategoryService;
 import com.orioladenim.service.HistoriaService;
+import com.orioladenim.service.AnalyticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +28,9 @@ public class PublicController {
     
     @Autowired
     private HistoriaService historiaService;
+    
+    @Autowired
+    private AnalyticsService analyticsService;
     
     @GetMapping("/")
     public String home(Model model) {
@@ -123,7 +128,7 @@ public class PublicController {
     }
     
     @GetMapping("/product/{id}")
-    public String productDetail(@PathVariable Integer id, Model model) {
+    public String productDetail(@PathVariable Integer id, Model model, HttpServletRequest request) {
         // Cargar producto con colores usando consulta optimizada
         java.util.Optional<Product> productOpt = productRepository.findByIdWithColors(id);
         
@@ -132,6 +137,9 @@ public class PublicController {
         }
         
         Product product = productOpt.get();
+        
+        // 📊 TRACKING AUTOMÁTICO DE VISITAS
+        analyticsService.trackProductView(id, request);
         
         // Debug: Verificar colores
         System.out.println("🔍 [PRODUCT-DETAIL] Producto: " + product.getName());
