@@ -140,12 +140,6 @@
                 <div th:each="product : ${products}" class="product-card">
                     <a th:href="@{/product/{id}(id=${product.pId})}" class="text-decoration-none text-dark">
                         <div class="product-image-container">
-                            <!-- Etiqueta promocional -->
-                            <div th:if="${product.etiquetaPromocional != null and !product.etiquetaPromocional.isEmpty()}" 
-                                 class="product-promo-label"
-                                 th:text="${product.etiquetaPromocional}">
-                            </div>
-                            
                             <!-- Calcular si es video usando th:with -->
                             <div th:with="imagenPrincipal=${product.getImagenPrincipal()}, 
                                            isVideo=${imagenPrincipal != null ? (imagenPrincipal.isVideo != null ? imagenPrincipal.isVideo : false) : false}">
@@ -169,12 +163,19 @@
                         </div>
                         <div class="product-info">
                             <h3 class="product-name" th:text="${product.name}">Nombre del Producto</h3>
-                            <div class="product-price">
-                                <span th:if="${product.precioOriginal != null and product.precioOriginal > product.price}" 
-                                      class="product-price-original" th:text="'$' + ${#numbers.formatDecimal(product.precioOriginal, 0, 0)}">$0</span>
-                                <span th:text="'$' + ${#numbers.formatDecimal(product.price, 0, 0)}">$0</span>
-                                <span th:if="${product.descuentoPorcentaje != null and product.descuentoPorcentaje > 0}" 
-                                      class="product-discount" th:text="'-' + ${#numbers.formatDecimal(product.descuentoPorcentaje, 0, 0)} + '%'">-0%</span>
+                            <div class="product-price-container">
+                                <div class="product-price">
+                                    <span th:if="${product.precioOriginal != null and product.precioOriginal > product.price}" 
+                                          class="product-price-original" th:text="'$' + ${#numbers.formatDecimal(product.precioOriginal, 0, 0)}">$0</span>
+                                    <span th:text="'$' + ${#numbers.formatDecimal(product.price, 0, 0)}">$0</span>
+                                    <span th:if="${product.descuentoPorcentaje != null and product.descuentoPorcentaje > 0}" 
+                                          class="product-discount" th:text="'-' + ${#numbers.formatDecimal(product.descuentoPorcentaje, 0, 0)} + '%'">-0%</span>
+                                </div>
+                                <!-- Etiqueta promocional -->
+                                <div th:if="${product.etiquetaPromocional != null and !product.etiquetaPromocional.isEmpty()}" 
+                                     class="product-promo-label"
+                                     th:text="${product.etiquetaPromocional}">
+                                </div>
                             </div>
                             <div class="product-colors" th:if="${product.coloresDisponibles != null and !#strings.isEmpty(product.coloresDisponibles)}">
                                 <div th:each="color : ${#strings.arraySplit(product.coloresDisponibles, ',')}" 
@@ -727,22 +728,17 @@
         
         /* Etiqueta promocional */
         .product-promo-label {
-            position: absolute;
-            top: 10px;
-            right: 10px;
             background: linear-gradient(135deg, #ff6b6b, #ee5a24);
             color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            z-index: 10;
-            max-width: 80px;
-            text-align: center;
-            line-height: 1.2;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         
         .product-promo-label.sale {
@@ -882,11 +878,17 @@
             min-height: 42px;
         }
 
+        .product-price-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
         .product-price {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 8px;
         }
 
         .current-price {

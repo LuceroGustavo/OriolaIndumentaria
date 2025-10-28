@@ -220,10 +220,17 @@
                             Nombre del Producto
                         </h1>
                         
-                        <!-- Precio -->
-                        <div class="product-price mb-4">
-                            <span class="current-price" th:text="'$ ' + ${#numbers.formatDecimal(product.price, 0, 0)}" 
-                                  style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 400; color: #000;">$ 0</span>
+                        <!-- Precio con etiqueta promocional -->
+                        <div class="product-price-container mb-4 d-flex align-items-center" style="gap: 12px;">
+                            <div class="product-price">
+                                <span class="current-price" th:text="'$ ' + ${#numbers.formatDecimal(product.price, 0, 0)}" 
+                                      style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 400; color: #000;">$ 0</span>
+                            </div>
+                            <!-- Etiqueta promocional -->
+                            <div th:if="${product.etiquetaPromocional != null and !product.etiquetaPromocional.isEmpty()}" 
+                                 class="product-promo-label"
+                                 th:text="${product.etiquetaPromocional}">
+                            </div>
                         </div>
                         
                         <!-- Información de colores disponibles (desktop) -->
@@ -251,9 +258,16 @@
                     </h2>
                     
                 </div>
-                                <div class="mobile-product-price mb-4">
-                                    <span class="mobile-current-price" th:text="'$ ' + ${#numbers.formatDecimal(product.price, 0, 0)}" 
-                                          style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 400; color: #000;">$ 0</span>
+                                <div class="product-price-container mb-4 d-flex align-items-center" style="gap: 12px;">
+                                    <div class="mobile-product-price">
+                                        <span class="mobile-current-price" th:text="'$ ' + ${#numbers.formatDecimal(product.price, 0, 0)}" 
+                                              style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 400; color: #000;">$ 0</span>
+                                    </div>
+                                    <!-- Etiqueta promocional -->
+                                    <div th:if="${product.etiquetaPromocional != null and !product.etiquetaPromocional.isEmpty()}" 
+                                         class="product-promo-label"
+                                         th:text="${product.etiquetaPromocional}">
+                                    </div>
                                 </div>
                                 
                                 <!-- Información de colores y talles -->
@@ -792,6 +806,29 @@
         .price-currency {
             font-size: 2rem;
             vertical-align: top;
+        }
+
+        /* Etiqueta promocional */
+        .product-promo-label {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        /* Ajustar el tamaño de la etiqueta en móvil */
+        @media (max-width: 768px) {
+            .product-promo-label {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
         }
 
         .image-overlay {
