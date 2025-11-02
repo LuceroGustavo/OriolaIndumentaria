@@ -36,6 +36,10 @@ public class ContactController {
         if (producto != null && !producto.trim().isEmpty()) {
             contact.setProductoInteres(producto.trim());
         }
+        // Establecer valor predeterminado para asunto
+        if (contact.getAsunto() == null || contact.getAsunto().trim().isEmpty()) {
+            contact.setAsunto("Solicito Info.");
+        }
         model.addAttribute("contact", contact);
         return "contact";
     }
