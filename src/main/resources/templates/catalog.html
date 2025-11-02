@@ -94,13 +94,11 @@
 
     <!-- Título del Catálogo -->
     <section class="catalog-title-section">
-        <div class="container">
-            <h1 class="catalog-title">Catálogo</h1>
-        </div>
+        <h1 class="catalog-title">Catálogo</h1>
     </section>
 
     <!-- Filtros Modernos -->
-        <div class="container">
+    <section class="filters-section">
         <div class="filters desktop-filters">
             <div class="filter-group">
                 <span style="font-weight: 600; margin-right: 10px;">Filtros:</span>
@@ -131,12 +129,11 @@
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- Products Section -->
     <section class="products-section">
-        <div class="container">
-            <div class="products-grid">
+        <div class="products-grid">
                 <div th:each="product : ${products}" 
                      class="product-card"
                      th:data-product-id="${product.pId}"
@@ -187,20 +184,20 @@
                             </div>
                         </div>
                 </div>
-            </div>
-            
-            <!-- Mensaje si no hay productos -->
-            <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
-                <div class="empty-state">
-                <i class="bi bi-box-seam" style="font-size: 5rem; color: #667eea; margin-bottom: 2rem;"></i>
-                    <h3>No hay productos disponibles</h3>
-                    <p class="text-muted">Pronto agregaremos nuevos productos a nuestro catálogo.</p>
-                    <a href="/" class="btn btn-oriola mt-3">
-                        <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
-                    </a>
-                </div>
+        </div>
+        
+        <!-- Mensaje si no hay productos -->
+        <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
+            <div class="empty-state">
+            <i class="bi bi-box-seam" style="font-size: 5rem; color: #667eea; margin-bottom: 2rem;"></i>
+                <h3>No hay productos disponibles</h3>
+                <p class="text-muted">Pronto agregaremos nuevos productos a nuestro catálogo.</p>
+                <a href="/" class="btn btn-oriola mt-3">
+                    <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
+                </a>
             </div>
         </div>
+    </section>
 
 
     <!-- WhatsApp Button -->
@@ -580,32 +577,53 @@
     </script>
 
     <style>
+        /* Reset y estilos base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fff;
+            color: #000;
+            line-height: 1.6;
+            width: 100%;
+            overflow-x: hidden;
+        }
+        
         /* Estilos del catálogo moderno */
-        .catalog-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 3rem 0;
+        .catalog-title-section {
+            max-width: 1330px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .catalog-title {
             text-align: center;
-            margin-bottom: 2rem;
+            font-size: 28px;
+            font-weight: 400;
+            color: #000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 40px 0 30px 0;
+            font-family: 'Inter', sans-serif;
         }
 
-        .catalog-header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .catalog-header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+        .filters-section {
+            max-width: 1330px;
+            margin: 0 auto;
+            padding: 0 20px;
+            margin-bottom: 30px;
         }
 
         .filters {
             background: white;
             padding: 20px;
             border-radius: 12px;
-            margin-bottom: 2rem;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            /* El contenido interno de los filtros está a 40px de los bordes (20px section + 20px filters) */
         }
 
         .filter-group {
@@ -671,12 +689,39 @@
             font-size: 14px;
         }
 
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+        .products-section {
+            max-width: 1330px !important;
+            margin: 0 auto;
+            padding: 0 20px !important;
+            margin-bottom: 80px;
             width: 100%;
-            margin-bottom: 3rem;
+            box-sizing: border-box;
+            /* Asegurar que el contenedor ocupe todo el ancho disponible */
+            min-width: 0;
+            /* Sobrescribir estilos de lovely-style.css */
+            background-color: transparent !important;
+        }
+
+        .products-grid {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 8px !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            max-width: none !important;
+            box-sizing: border-box;
+            /* Asegurar que el grid use el 100% del ancho disponible */
+            min-width: 0;
+            /* Sobrescribir estilos de lovely-style.css que tienen max-width: 1200px y gap: 15px */
+        }
+        
+        /* Asegurar que las tarjetas ocupen todo el ancho de su celda del grid */
+        .products-grid .product-card {
+            min-width: 0;
+            width: 100%;
+            /* Asegurar que el contenido no desborde */
+            overflow: hidden;
         }
 
         @media (max-width: 1024px) {
@@ -691,10 +736,13 @@
         }
 
         @media (max-width: 768px) {
+            .products-section {
+                padding: 0 20px;
+            }
+            
             .products-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 8px;
-                padding: 0 20px;
             }
             
             .product-image-container {
@@ -769,6 +817,22 @@
             overflow: hidden;
             background: #f8f9fa;
             flex-shrink: 0;
+            display: block;
+            padding: 0;
+            margin: 0;
+        }
+        
+        /* Asegurar que el div wrapper interno llene el contenedor en escritorio */
+        .product-image-container > div {
+            width: 100% !important;
+            height: 100% !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
         
         /* Etiqueta promocional */
@@ -803,11 +867,46 @@
         }
 
         .product-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            min-width: 100% !important;
+            min-height: 100% !important;
+            object-fit: cover !important;
+            object-position: center center !important;
             transition: transform 0.3s ease;
+            display: block !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background-color: #f8f9fa;
+        }
+        
+        /* Asegurar que las imágenes dentro del wrapper también llenen */
+        .product-image-container > div .product-image,
+        .product-image-container > div img,
+        .product-image-container > div video {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            min-width: 100% !important;
+            min-height: 100% !important;
+            object-fit: cover !important;
+            object-position: center center !important;
+            display: block !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
         }
 
         .product-image-placeholder {
@@ -1006,8 +1105,13 @@
         /* Responsive - Eliminado, ya está manejado arriba */
 
         @media (max-width: 768px) {
-            .catalog-header h1 {
-                font-size: 2rem;
+            .catalog-title {
+                font-size: 24px;
+                margin: 30px 0 20px 0;
+            }
+            
+            .filters-section {
+                padding: 0 20px;
             }
 
             .search-input input {
@@ -1021,10 +1125,21 @@
         }
 
         @media (max-width: 480px) {
+            .catalog-title {
+                font-size: 20px;
+            }
+            
+            .filters-section {
+                padding: 0 15px;
+            }
+            
+            .products-section {
+                padding: 0 15px;
+            }
+            
             .products-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 6px;
-                padding: 0 15px;
             }
             
             .product-image-container {
