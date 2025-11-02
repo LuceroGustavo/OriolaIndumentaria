@@ -10,30 +10,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Navbar Admin -->
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
+        <div class="container-fluid">
             <a class="navbar-brand" href="/admin/dashboard">
-                <i class="bi bi-gear me-2"></i>Oriola Admin
+                <i class="bi bi-images me-2"></i>Oriola - Imágenes
             </a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/admin/dashboard">Panel de Admin</a>
-                <a class="nav-link" href="/admin/products">Productos</a>
-                <a class="nav-link" href="/admin/logout">Cerrar Sesión</a>
+                <a class="nav-link" th:href="@{/admin/products/edit/{id}(id=${product.pId})}">
+                    <i class="bi bi-arrow-left me-1"></i>Volver al Producto
+                </a>
+                <a class="nav-link" href="/admin/logout">
+                    <i class="bi bi-box-arrow-right me-1"></i>Cerrar Sesión
+                </a>
             </div>
         </div>
     </nav>
-
-    <!-- Breadcrumb -->
-    <div class="container mt-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/admin/dashboard">Panel de Admin</a></li>
-                <li class="breadcrumb-item"><a href="/admin/products">Productos</a></li>
-                <li class="breadcrumb-item active">Imágenes del Producto</li>
-            </ol>
-        </nav>
-    </div>
 
     <!-- Contenido Principal -->
     <div class="container mt-4">
@@ -61,7 +53,7 @@
                             </div>
                         </div>
 
-                        <!-- Especificaciones de Imágenes y Videos -->
+                        <!-- 1. Especificaciones de Imágenes y Videos -->
                         <div class="specifications-section mb-4">
                             <h6 class="mb-3">
                                 <i class="bi bi-rulers me-2"></i>Especificaciones de Imágenes y Videos
@@ -73,10 +65,13 @@
                                             <i class="bi bi-check-circle me-2"></i>Imágenes
                                         </h6>
                                         <ul class="list-unstyled mb-0 small">
-                                            <li><strong>Proporción:</strong> 2:3 (vertical)</li>
-                                            <li><strong>Ejemplo:</strong> 2400 x 3600 px</li>
-                                            <li><strong>Tamaño:</strong> Hasta 5 MB</li>
-                                            <li><strong>Formato:</strong> JPG, PNG, WebP</li>
+                                            <li><strong>Dimensiones óptimas:</strong> 1000px × 1500px</li>
+                                            <li><strong>Dimensiones mínimas:</strong> 800px × 1200px</li>
+                                            <li><strong>Relación:</strong> 2:3 (vertical/portrait)</li>
+                                            <li><strong>Tamaño archivo:</strong> 500KB - 800KB máximo</li>
+                                            <li><strong>Formato:</strong> WebP (preferido) o JPG</li>
+                                            <li><strong>Fondo:</strong> Blanco/neutro</li>
+                                            <li><strong>Composición:</strong> Producto centrado</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -86,53 +81,19 @@
                                             <i class="bi bi-camera-video me-2"></i>Videos
                                         </h6>
                                         <ul class="list-unstyled mb-0 small">
-                                            <li><strong>Formato:</strong> MP4, WebM, MOV, AVI</li>
-                                            <li><strong>Tamaño:</strong> Hasta 50MB</li>
-                                            <li><strong>Resolución:</strong> 1080x1920 (vertical)</li>
+                                            <li><strong>Formato:</strong> MP4 (preferido), WebM, MOV</li>
+                                            <li><strong>Tamaño:</strong> Máximo 3MB</li>
+                                            <li><strong>Resolución:</strong> 1080x1920 (vertical, 9:16)</li>
                                             <li><strong>Duración:</strong> Hasta 15 segundos</li>
+                                            <li><strong>Relación:</strong> Vertical/portrait</li>
                                         </ul>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Subida de Imágenes y Videos -->
-                        <div class="upload-section mb-4">
-                            <h6 class="mb-3">
-                                <i class="bi bi-cloud-upload me-2"></i>Subir Imágenes o Videos (Máximo 5)
-                            </h6>
-                            
-                            <!-- Dropzone para subida múltiple -->
-                            <div class="upload-dropzone" id="uploadDropzone">
-                                <div class="text-center py-5">
-                                    <i class="bi bi-cloud-upload" style="font-size: 3rem; color: var(--primary-color);"></i>
-                                    <h5 class="mt-3">Arrastra y suelta las imágenes o videos aquí</h5>
-                                    <p class="text-muted">o haz clic para seleccionar archivos (máximo 5 archivos por producto)</p>
-                                    <input type="file" id="fileInput" multiple accept="image/*,video/*" style="display: none;" max="5">
-                                    <button class="btn btn-oriola" onclick="document.getElementById('fileInput').click()">
-                                        <i class="bi bi-plus-circle me-2"></i>SELECCIONAR ARCHIVOS
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Barra de progreso -->
-                            <div class="progress mt-3" id="uploadProgress" style="display: none;">
-                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                            </div>
-
-                            <!-- Mensajes de estado -->
-                            <div id="uploadMessages" class="mt-3"></div>
-
-                            <!-- Botón para asociar imágenes -->
-                            <div class="text-center mt-4" id="associateButton" style="display: none;">
-                                <button class="btn btn-success btn-lg" onclick="associateImages()">
-                                    <i class="bi bi-check-circle me-2"></i>Asociar Imágenes al Producto
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Galería de Imágenes Existentes -->
-                        <div class="images-gallery">
+                        <!-- 2. Galería de Imágenes Existentes -->
+                        <div class="images-gallery mb-4">
                             <h6 class="mb-3">
                                 <i class="bi bi-images me-2"></i>Imágenes del Producto
                                 <span class="badge bg-secondary ms-2" th:text="${#lists.size(product.images)}">0</span>
@@ -179,6 +140,41 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- 3. Subida de Imágenes y Videos -->
+                        <div class="upload-section mb-4">
+                            <h6 class="mb-3">
+                                <i class="bi bi-cloud-upload me-2"></i>Subir Imágenes o Videos (Máximo 5)
+                            </h6>
+                            
+                            <!-- Dropzone para subida múltiple -->
+                            <div class="upload-dropzone" id="uploadDropzone">
+                                <div class="text-center py-5">
+                                    <i class="bi bi-cloud-upload" style="font-size: 3rem; color: var(--primary-color);"></i>
+                                    <h5 class="mt-3">Arrastra y suelta las imágenes o videos aquí</h5>
+                                    <p class="text-muted">o haz clic para seleccionar archivos (máximo 5 archivos por producto)</p>
+                                    <input type="file" id="fileInput" multiple accept="image/*,video/*" style="display: none;" max="5">
+                                    <button class="btn btn-oriola" onclick="document.getElementById('fileInput').click()">
+                                        <i class="bi bi-plus-circle me-2"></i>SELECCIONAR ARCHIVOS
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Barra de progreso -->
+                            <div class="progress mt-3" id="uploadProgress" style="display: none;">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+
+                            <!-- Mensajes de estado -->
+                            <div id="uploadMessages" class="mt-3"></div>
+
+                            <!-- Botón para asociar imágenes -->
+                            <div class="text-center mt-4" id="associateButton" style="display: none;">
+                                <button class="btn btn-success btn-lg" onclick="associateImages()">
+                                    <i class="bi bi-check-circle me-2"></i>Asociar Imágenes al Producto
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -207,8 +203,8 @@
         // Validar archivos
         function validateFiles(files) {
             const maxFiles = 5;
-            const maxSizeImage = 5 * 1024 * 1024; // 5MB para imágenes
-            const maxSizeVideo = 50 * 1024 * 1024; // 50MB para videos
+            const maxSizeImage = 800 * 1024; // 800KB para imágenes
+            const maxSizeVideo = 3 * 1024 * 1024; // 3MB para videos
             const allowedTypes = [
                 'image/jpeg', 'image/jpg', 'image/png', 'image/webp', // Imágenes
                 'video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo' // Videos
@@ -227,7 +223,7 @@
                 const isVideo = file.type.startsWith('video/');
                 const maxSize = isVideo ? maxSizeVideo : maxSizeImage;
                 if (file.size > maxSize) {
-                    showMessage('error', `Archivo muy grande: ${file.name} (máximo ${isVideo ? '50MB' : '5MB'})`);
+                    showMessage('error', `Archivo muy grande: ${file.name} (máximo ${isVideo ? '3MB' : '800KB'})`);
                     return false;
                 }
             }

@@ -182,52 +182,67 @@
         .temporada-option.selected:hover {
             background-color: #e9ecef;
         }
+        
+        .sidebar {
+            min-height: 100vh;
+        }
     </style>
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-oriola fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center" href="/">
-                <i class="bi bi-heart-fill text-white me-2"></i>
-                <span class="text-white fw-bold">Oriola</span>
+            <a class="navbar-brand" href="/admin/dashboard">
+                <i class="bi bi-box-seam me-2"></i>Oriola - <span th:if="${product.pId == null}">Nuevo Producto</span><span th:if="${product.pId != null}">Editar Producto</span>
             </a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link text-white me-3" href="/">Inicio</a>
-                <a class="nav-link text-white me-3" href="/catalog">Catálogo</a>
-                <a class="nav-link text-white me-3" href="/about">Sobre Nosotros</a>
-                <a class="nav-link text-white me-3" href="/contact">Contacto</a>
-                <a class="btn btn-success" href="/admin">
-                            <i class="bi bi-gear me-1"></i>Admin
-                        </a>
+                <a class="nav-link" href="/admin/products">
+                    <i class="bi bi-arrow-left me-1"></i>Volver a Productos
+                </a>
+                <a class="nav-link" href="/admin/logout">
+                    <i class="bi bi-box-arrow-right me-1"></i>Cerrar Sesión
+                </a>
             </div>
         </div>
     </nav>
 
-    <div class="container-fluid" style="margin-top: 80px;">
-            <div class="row">
+    <div class="container-fluid mt-4">
+        <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-2 bg-light sidebar">
+            <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
                 <div class="position-sticky pt-3">
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Administración</span>
+                    </h6>
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin">
-                                <i class="bi bi-house-door me-2"></i>Panel de Admin
+                            <a class="nav-link" href="/admin/dashboard">
+                                <i class="bi bi-speedometer2 me-2"></i>Panel de Admin
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="/admin/products">
-                                <i class="bi bi-box me-2"></i>Productos
+                                <i class="bi bi-box-seam me-2"></i>Productos
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/consultas">
+                            <a class="nav-link" href="/admin/categories">
+                                <i class="bi bi-tags me-2"></i>Categorías
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/colors">
+                                <i class="bi bi-palette me-2"></i>Colores
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/historias">
+                                <i class="bi bi-camera-video me-2"></i>Historias
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/contacts">
                                 <i class="bi bi-envelope me-2"></i>Consultas
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/config">
-                                <i class="bi bi-gear me-2"></i>Configuración
                             </a>
                         </li>
                     </ul>
@@ -235,7 +250,7 @@
             </div>
             
             <!-- Main Content -->
-            <div class="col-md-10">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h1 class="h3 mb-0">
                         <i class="bi bi-plus-circle me-2"></i>
@@ -277,19 +292,53 @@
                         <!-- Información del Producto -->
                         <div class="col-md-8">
                             <div class="card mb-4">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">
-                                    <i class="bi bi-info-circle me-2"></i>Información del Producto
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                    <div class="row mb-4">
-                                        <div class="col-md-6">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="bi bi-info-circle me-2"></i>Información del Producto
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-12 mb-3">
                                             <label for="name" class="form-label">Nombre del Producto *</label>
                                             <input type="text" class="form-control" id="name" th:field="*{name}" required>
                                             <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback" th:errors="*{name}"></div>
                                         </div>
-                                        <div class="col-md-6">
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="price" class="form-label">Precio *</label>
+                                            <input type="number" step="0.01" class="form-control" id="price" th:field="*{price}" required>
+                                            <div th:if="${#fields.hasErrors('price')}" class="invalid-feedback" th:errors="*{price}"></div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="medidas" class="form-label">Medidas *</label>
+                                            <input type="text" class="form-control" id="medidas" th:field="*{medidas}" required>
+                                            <div th:if="${#fields.hasErrors('medidas')}" class="invalid-feedback" th:errors="*{medidas}"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="material" class="form-label">Material</label>
+                                            <input type="text" class="form-control" id="material" th:field="*{material}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="cuidados" class="form-label">Cuidados</label>
+                                            <input type="text" class="form-control" id="cuidados" th:field="*{cuidados}">
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-12 mb-3">
+                                            <label for="descripcion" class="form-label">Descripción</label>
+                                            <textarea class="form-control" id="descripcion" th:field="*{descripcion}" rows="3"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-12 mb-3">
                                             <label for="categories" class="form-label">
                                                 Categorías *
                                                 <i class="bi bi-question-circle text-primary ms-1" 
@@ -306,7 +355,7 @@
                                             </div>
                                             
                                             <!-- Dropdown de categorías disponibles -->
-                                            <div class="dropdown">
+                                            <div class="dropdown mb-2">
                                                 <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="categoryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <i class="bi bi-plus-circle me-1"></i>Agregar categorías
                                                 </button>
@@ -331,61 +380,16 @@
                                                 <a th:href="@{/admin/categories}" target="_blank" class="text-decoration-none">
                                                     <i class="bi bi-plus-circle me-1"></i>Gestionar categorías
                                                 </a>
-                                                <br>
-                                                <small class="text-muted">
+                                                <small class="text-muted ms-2">
                                                     <strong>Ejemplos:</strong> Camperas + Invierno + Casual
                                                 </small>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="row mb-4">
-                                        <div class="col-md-6">
-                                            <label for="price" class="form-label">Precio *</label>
-                                            <input type="number" step="0.01" class="form-control" id="price" th:field="*{price}" required>
-                                            <div th:if="${#fields.hasErrors('price')}" class="invalid-feedback" th:errors="*{price}"></div>
-                                        </div>
-                                        <!-- Campo de stock comentado - no se utiliza por ahora -->
-                                        <!--
-                                        <div class="col-md-6">
-                                            <label for="qty" class="form-label">Stock *</label>
-                                            <input type="number" class="form-control" id="qty" th:field="*{qty}" required>
-                                            <div th:if="${#fields.hasErrors('qty')}" class="invalid-feedback" th:errors="*{qty}"></div>
-                                        </div>
-                                        -->
-                                    </div>
-
-
-                                    <div class="mb-4">
-                                        <label for="descripcion" class="form-label">Descripción</label>
-                                        <textarea class="form-control" id="descripcion" th:field="*{descripcion}" rows="3"></textarea>
-                                    </div>
-
-                                    <div class="row mb-4">
-                                        <div class="col-md-6">
-                                            <label for="material" class="form-label">Material</label>
-                                            <input type="text" class="form-control" id="material" th:field="*{material}">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="cuidados" class="form-label">Cuidados</label>
-                                            <input type="text" class="form-control" id="cuidados" th:field="*{cuidados}">
-                                        </div>
-                                    </div>
-
-                                    <div class="row mb-4">
-                                        <div class="col-md-6">
-                                            <label for="medidas" class="form-label">Medidas *</label>
-                                            <input type="text" class="form-control" id="medidas" th:field="*{medidas}" required>
-                                            <div th:if="${#fields.hasErrors('medidas')}" class="invalid-feedback" th:errors="*{medidas}"></div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <!-- Espacio para futuras funcionalidades -->
-                                        </div>
-                                    </div>
-
-                                    <!-- Selección múltiple de colores -->
-                                    <div class="row mb-4">
-                                        <div class="col-md-6">
+                                    <!-- Selección múltiple de colores y talles -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-6 mb-3">
                                             <label for="colores" class="form-label">
                                                 Colores Disponibles
                                                 <i class="bi bi-question-circle text-primary ms-1" 
@@ -424,7 +428,7 @@
                                         </div>
                                         
                                         <!-- Selección múltiple de talles -->
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 mb-3">
                                             <label for="talles" class="form-label">
                                                 Talles Disponibles
                                                 <i class="bi bi-question-circle text-primary ms-1" 
@@ -464,8 +468,8 @@
                                     </div>
 
                                     <!-- Selección múltiple de géneros y temporadas -->
-                                    <div class="row mb-4">
-                                        <div class="col-md-6">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6 mb-3">
                                             <label for="generos" class="form-label">
                                                 Géneros
                                                 <i class="bi bi-question-circle text-primary ms-1" 
@@ -503,7 +507,7 @@
                                             <input type="hidden" id="generoNames" name="generoNames" value="">
                                         </div>
                                         
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 mb-3">
                                             <label for="temporadas" class="form-label">
                                                 Temporadas
                                                 <i class="bi bi-question-circle text-primary ms-1" 
@@ -542,8 +546,9 @@
                                         </div>
                                     </div>
             
-                                    <div class="row mb-4">
-                                        <div class="col-md-6">
+                                    <!-- Checkboxes y etiqueta promocional -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 mb-3">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="esDestacado" th:field="*{esDestacado}">
                                                 <label class="form-check-label" for="esDestacado">
@@ -551,7 +556,7 @@
                                                 </label>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4 mb-3">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="esNuevo" th:field="*{esNuevo}">
                                                 <label class="form-check-label" for="esNuevo">
@@ -559,11 +564,7 @@
                                                 </label>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <!-- Campo de etiqueta promocional -->
-                                    <div class="row mb-4">
-                                        <div class="col-md-6">
+                                        <div class="col-md-4 mb-3">
                                             <label for="etiquetaPromocional" class="form-label">
                                                 Etiqueta Promocional
                                                 <i class="bi bi-question-circle text-primary ms-1" 
@@ -571,23 +572,21 @@
                                                    data-bs-placement="top" 
                                                    title="Texto que aparecerá en la tarjeta del producto (ej: -10% OFF, HOT SALE, NUEVO)"></i>
                                             </label>
-                                            <input type="text" class="form-control" id="etiquetaPromocional" th:field="*{etiquetaPromocional}" maxlength="50" placeholder="Ej: -10% OFF, HOT SALE, NUEVO">
+                                            <input type="text" class="form-control" id="etiquetaPromocional" th:field="*{etiquetaPromocional}" maxlength="50" placeholder="Ej: -10% OFF">
                                             <div class="form-text">
                                                 <small class="text-muted">
                                                     <i class="bi bi-lightbulb me-1"></i>
-                                                    <strong>Ejemplos:</strong> -10% OFF, HOT SALE, NUEVO, OFERTA, ¡ÚLTIMAS UNIDADES!
+                                                    <strong>Ejemplos:</strong> -10% OFF, HOT SALE, NUEVO
                                                 </small>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <!-- Espacio para futuras funcionalidades -->
-                                        </div>
                                     </div>
-                    </div>
-                </div>
-            </div>
+                                </div>
+                            </div>
+                        </div>
             
-                        <!-- Sidebar -->
+            
+                        <!-- Sidebar - Guía de Imagen Ideal -->
                         <div class="col-md-4">
                             <!-- Guía de Imagen Ideal -->
                             <div class="card mb-3">
@@ -595,28 +594,31 @@
                                     <h5 class="card-title mb-0">
                                         <i class="bi bi-image me-2"></i>Guía de Imagen Ideal
                                     </h5>
-                                        </div>
+                                </div>
                                 <div class="card-body">
                                     <div class="mb-3">
                                         <h6 class="text-primary mb-2">
                                             <i class="bi bi-check-circle me-1"></i>Recomendaciones:
                                         </h6>
-                                        <ul class="list-unstyled small">
-                                            <li><i class="bi bi-arrow-right me-1"></i><strong>Orientación:</strong> Vertical</li>
-                                            <li><i class="bi bi-arrow-right me-1"></i><strong>Tamaño mínimo:</strong> 400x600px</li>
-                                            <li><i class="bi bi-arrow-right me-1"></i><strong>Fondo:</strong> Blanco/neutro</li>
-                                            <li><i class="bi bi-arrow-right me-1"></i><strong>Calidad:</strong> Alta resolución</li>
+                                        <ul class="list-unstyled small mb-3">
+                                            <li class="mb-2"><i class="bi bi-arrow-right me-1 text-primary"></i><strong>Dimensiones:</strong> 1000px × 1500px (óptimo)</li>
+                                            <li class="mb-2"><i class="bi bi-arrow-right me-1 text-primary"></i><strong>Mínimo:</strong> 800px × 1200px</li>
+                                            <li class="mb-2"><i class="bi bi-arrow-right me-1 text-primary"></i><strong>Relación:</strong> 2:3 (vertical/portrait)</li>
+                                            <li class="mb-2"><i class="bi bi-arrow-right me-1 text-primary"></i><strong>Tamaño archivo:</strong> 500KB - 800KB máximo</li>
+                                            <li class="mb-2"><i class="bi bi-arrow-right me-1 text-primary"></i><strong>Formato:</strong> WebP (preferido) o JPG</li>
+                                            <li class="mb-2"><i class="bi bi-arrow-right me-1 text-primary"></i><strong>Fondo:</strong> Blanco/neutro</li>
+                                            <li class="mb-2"><i class="bi bi-arrow-right me-1 text-primary"></i><strong>Composición:</strong> Producto centrado</li>
                                         </ul>
-            </div>
-            
-                                    <div class="alert alert-info py-2">
+                                    </div>
+                                    
+                                    <div class="alert alert-info py-2 mb-0">
                                         <small class="mb-0">
                                             <i class="bi bi-lightbulb me-1"></i>
-                                            <strong>Tip:</strong> Una buena imagen mejora las ventas
+                                            <strong>Tip:</strong> Las imágenes verticales (2:3) se adaptan mejor a todos los dispositivos y mejoran las ventas
                                         </small>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
 
                             <!-- Ejemplos de Categorías Múltiples -->
                         <div class="card">
@@ -677,23 +679,23 @@
                             </div>
                         </div>
 
-                    <!-- Botones de acción -->
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="d-flex justify-content-end gap-2">
-                                <a href="/admin/products" class="btn btn-secondary">
-                                    <i class="bi bi-x-circle me-1"></i>Cancelar
-                                </a>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-check-circle me-1"></i>
-                                    <span th:if="${product.pId == null}">Guardar Producto</span>
-                                    <span th:if="${product.pId != null}">Actualizar Producto</span>
-                                </button>
-                            </div>
+                <!-- Botones de acción -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="/admin/products" class="btn btn-secondary">
+                                <i class="bi bi-x-circle me-1"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-1"></i>
+                                <span th:if="${product.pId == null}">Guardar Producto</span>
+                                <span th:if="${product.pId != null}">Actualizar Producto</span>
+                            </button>
                         </div>
                     </div>
-                </form>
                 </div>
+                </form>
+            </main>
         </div>
     </div>
 
