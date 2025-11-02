@@ -137,9 +137,11 @@
     <section class="products-section">
         <div class="container">
             <div class="products-grid">
-                <div th:each="product : ${products}" class="product-card">
-                    <a th:href="@{/product/{id}(id=${product.pId})}" class="text-decoration-none text-dark">
-                        <div class="product-image-container">
+                <div th:each="product : ${products}" 
+                     class="product-card"
+                     th:data-product-id="${product.pId}"
+                     onclick="goToProduct(this)">
+                    <div class="product-image-container">
                             <!-- Calcular si es video usando th:with -->
                             <div th:with="imagenPrincipal=${product.getImagenPrincipal()}, 
                                            isVideo=${imagenPrincipal != null ? (imagenPrincipal.isVideo != null ? imagenPrincipal.isVideo : false) : false}">
@@ -184,7 +186,6 @@
                                      th:title="${color.trim()}"></div>
                             </div>
                         </div>
-                    </a>
                 </div>
             </div>
             
@@ -489,7 +490,7 @@
         }
 
         function sortProducts(sortBy) {
-            const container = document.querySelector('.product-grid');
+            const container = document.querySelector('.products-grid');
             const products = Array.from(container.querySelectorAll('.product-card'));
             
             products.sort((a, b) => {
@@ -670,28 +671,30 @@
             font-size: 14px;
         }
 
-        .product-grid {
+        .products-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            gap: 8px;
+            width: 100%;
             margin-bottom: 3rem;
         }
 
         @media (max-width: 1024px) {
-            .product-grid {
+            .products-grid {
                 grid-template-columns: repeat(3, 1fr);
-                gap: 15px;
+                gap: 8px;
             }
             
             .product-image-container {
-                height: 350px;
+                height: 420px;
             }
         }
 
         @media (max-width: 768px) {
-            .product-grid {
+            .products-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
+                gap: 8px;
+                padding: 0 20px;
             }
             
             .product-image-container {
@@ -743,27 +746,26 @@
         }
 
         .product-card {
-            background: white;
-            border-radius: 12px;
+            background-color: #fff;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
         }
 
         .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: inherit;
         }
 
         .product-image-container {
             position: relative;
             width: 100%;
-            height: 400px;
+            height: 480px;
             overflow: hidden;
             background: #f8f9fa;
             flex-shrink: 0;
@@ -887,73 +889,46 @@
         }
 
         .product-info {
-            padding: 16px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            padding: 20px;
         }
 
-        .product-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .product-brand {
-            font-size: 12px;
-            color: #666;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .product-title {
-            font-size: 15px;
+        .product-name {
+            font-size: 16px;
             font-weight: 600;
-            color: #333;
-            line-height: 1.4;
+            color: #000;
             margin-bottom: 8px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            min-height: 42px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .product-price-container {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
         .product-price {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .current-price {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 700;
-            color: #333;
+            color: #000;
         }
 
-        .original-price {
+        .product-price-original {
             font-size: 14px;
             color: #999;
             text-decoration: line-through;
+            margin-right: 8px;
         }
 
-        .discount-percent {
+        .product-discount {
             background: #ff4757;
-            color: white;
+            color: #fff;
             padding: 2px 6px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
+            margin-left: 8px;
         }
 
         .product-colors {
@@ -1028,67 +1003,9 @@
             padding: 3rem 0;
         }
 
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .product-grid {
-                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-                gap: 20px;
-            }
-        }
+        /* Responsive - Eliminado, ya está manejado arriba */
 
         @media (max-width: 768px) {
-            .product-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-                gap: 18px;
-            }
-            
-            .product-image-container {
-                height: 370px;
-                overflow: hidden;
-                position: relative;
-                display: block;
-                padding: 0;
-                margin: 0;
-            }
-            
-            /* Asegurar que el div wrapper no interfiera */
-            .product-image-container > div {
-                width: 100% !important;
-                height: 100% !important;
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                bottom: 0 !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            
-            /* Forzar que las imágenes llenen completamente el contenedor en móvil */
-            .product-image-container .product-image,
-            .product-image-container img.product-image,
-            .product-image-container video.product-image,
-            .product-image-container > div .product-image,
-            .product-image-container > div img,
-            .product-image-container > div video {
-                width: 100% !important;
-                height: 100% !important;
-                max-width: 100% !important;
-                max-height: 100% !important;
-                min-width: 100% !important;
-                min-height: 100% !important;
-                object-fit: cover !important;
-                object-position: center center !important;
-                display: block !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                bottom: 0 !important;
-            }
-            
             .catalog-header h1 {
                 font-size: 2rem;
             }
@@ -1104,9 +1021,10 @@
         }
 
         @media (max-width: 480px) {
-            .product-grid {
-                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-                gap: 15px;
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+                padding: 0 15px;
             }
             
             .product-image-container {
@@ -1229,6 +1147,29 @@
                 // Focus on search input when opened
                 searchBar.querySelector('.search-input').focus();
             }
+        }
+
+        // Función para ir al detalle del producto
+        function goToProduct(element) {
+            const productId = element.getAttribute('data-product-id');
+            console.log('🔄 [PRODUCTO] Clic en producto:', productId);
+            
+            // Efecto visual de clic
+            element.style.transform = 'scale(0.95)';
+            element.style.opacity = '0.8';
+            
+            setTimeout(() => {
+                element.style.transform = 'scale(1)';
+                element.style.opacity = '1';
+            }, 150);
+            
+            const url = '/product/' + productId;
+            console.log('🔄 [PRODUCTO] Redirigiendo a:', url);
+            
+            // Pequeño delay para mostrar el efecto visual
+            setTimeout(() => {
+                window.location.href = url;
+            }, 200);
         }
 
         // Initialize event listeners
