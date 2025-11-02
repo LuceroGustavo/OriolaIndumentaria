@@ -95,9 +95,9 @@
                 </div>
                 
                 <nav class="nav flex-column">
-                    <!-- Dashboard -->
+                    <!-- Panel de Admin -->
                     <a class="nav-link" th:classappend="${#httpServletRequest.requestURI == '/admin/dashboard'} ? 'active'" href="/admin/dashboard">
-                        <i class="bi bi-speedometer2"></i>Dashboard
+                        <i class="bi bi-speedometer2"></i>Panel de Admin
                     </a>
                     
                     <!-- Gestión de Contenido -->
@@ -119,15 +119,6 @@
                     <div class="nav-section">Comunicación</div>
                     <a class="nav-link" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/admin/contacts')} ? 'active'" href="/admin/contacts">
                         <i class="bi bi-envelope"></i>Consultas
-                    </a>
-                    
-                    <!-- Administración -->
-                    <div class="nav-section">Administración</div>
-                    <a class="nav-link" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/admin/users')} ? 'active'" href="/admin/users" th:if="${user != null and user.role == T(com.orioladenim.entity.User$Role).SUPER_ADMIN}">
-                        <i class="bi bi-people"></i>Usuarios
-                    </a>
-                    <a class="nav-link" th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/admin/settings')} ? 'active'" href="/admin/settings">
-                        <i class="bi bi-gear"></i>Configuración
                     </a>
                     
                     <!-- Ayuda -->
