@@ -29,6 +29,9 @@ public class CategoryService {
     @Autowired
     private ProductRepository productRepository;
     
+    @Autowired
+    private CategoryImageService categoryImageService;
+    
     /**
      * Obtener todas las categorías activas ordenadas
      */
@@ -185,6 +188,22 @@ public class CategoryService {
             productRepository.save(product);
         }
         
+        // Eliminar imágenes físicas del sistema de archivos
+        if (category.getImagePath() != null && !category.getImagePath().isEmpty()) {
+            System.out.println("🖼️ Eliminando imagen de categoría: " + category.getImagePath());
+            try {
+                boolean deleted = categoryImageService.deleteCategoryImage(category.getImagePath());
+                if (deleted) {
+                    System.out.println("✅ Imagen de categoría eliminada del sistema de archivos");
+                } else {
+                    System.err.println("⚠️ No se pudo eliminar la imagen de categoría");
+                }
+            } catch (Exception e) {
+                System.err.println("⚠️ Error al eliminar imagen de categoría: " + e.getMessage());
+                // Continuar con la eliminación aunque falle la eliminación de la imagen
+            }
+        }
+        
         // Ahora eliminar la categoría físicamente de la base de datos
         categoryRepository.delete(category);
         
@@ -201,6 +220,22 @@ public class CategoryService {
         // Verificar si tiene productos
         if (category.hasProducts()) {
             throw new IllegalStateException("No se puede eliminar la categoría porque tiene productos asociados");
+        }
+        
+        // Eliminar imágenes físicas del sistema de archivos
+        if (category.getImagePath() != null && !category.getImagePath().isEmpty()) {
+            System.out.println("🖼️ Eliminando imagen de categoría: " + category.getImagePath());
+            try {
+                boolean deleted = categoryImageService.deleteCategoryImage(category.getImagePath());
+                if (deleted) {
+                    System.out.println("✅ Imagen de categoría eliminada del sistema de archivos");
+                } else {
+                    System.err.println("⚠️ No se pudo eliminar la imagen de categoría");
+                }
+            } catch (Exception e) {
+                System.err.println("⚠️ Error al eliminar imagen de categoría: " + e.getMessage());
+                // Continuar con la eliminación aunque falle la eliminación de la imagen
+            }
         }
         
         categoryRepository.delete(category);
