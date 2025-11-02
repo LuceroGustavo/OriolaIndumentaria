@@ -105,6 +105,7 @@
                                     <div class="mb-3">
                                         <label for="displayOrder" class="form-label">Orden de Visualización</label>
                                         <input type="number" class="form-control" id="displayOrder" th:field="*{displayOrder}" 
+                                               th:value="${category.id != null ? category.displayOrder : 1}"
                                                placeholder="1" min="1" onchange="checkOrderAvailability(this.value)">
                                         <div class="form-text">
                                             <i class="bi bi-info-circle me-1"></i>
@@ -142,9 +143,6 @@
                                         <div class="form-text">
                                             Formatos: JPG, PNG, WebP. Máximo 3MB. Se optimizará automáticamente.
                                         </div>
-                                        <button type="button" class="btn btn-warning btn-sm mt-2" onclick="debugImage()">
-                                            🐛 Debug Imagen
-                                        </button>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="category-image-preview" 
@@ -216,7 +214,8 @@
                                             <label for="carouselOrder" class="form-label">Orden en el carrusel</label>
                                             <div class="input-group">
                                                 <input type="number" class="form-control" id="carouselOrder" th:field="*{carouselOrder}" 
-                                                       min="1" step="1" placeholder="1" value="1">
+                                                       th:value="${category.id != null ? category.carouselOrder : 1}"
+                                                       min="1" step="1" placeholder="1">
                                                 <button type="button" class="btn btn-outline-secondary" onclick="setNextCarouselOrder()">
                                                     <i class="bi bi-arrow-down-circle"></i> Siguiente
                                                 </button>
@@ -945,6 +944,21 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, JavaScript is working');
             toggleCarouselSection();
+            
+            // Establecer valores por defecto de 1 para nuevas categorías
+            const categoryId = document.querySelector('input[name="category.id"]')?.value;
+            if (!categoryId || categoryId === '') {
+                // Es una nueva categoría, establecer valores por defecto
+                const displayOrderInput = document.getElementById('displayOrder');
+                if (displayOrderInput && (!displayOrderInput.value || displayOrderInput.value === '0')) {
+                    displayOrderInput.value = '1';
+                }
+                
+                const carouselOrderInput = document.getElementById('carouselOrder');
+                if (carouselOrderInput && (!carouselOrderInput.value || carouselOrderInput.value === '0')) {
+                    carouselOrderInput.value = '1';
+                }
+            }
             
             // Agregar listener adicional al input de archivo
             const fileInput = document.getElementById('imageFile');

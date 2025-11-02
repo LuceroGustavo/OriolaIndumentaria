@@ -155,20 +155,22 @@
                                             <span class="badge bg-secondary" th:text="${category.displayOrder}">1</span>
                                         </td>
                                         <td>
-                                            <div class="category-image-container" style="width: 50px; height: 50px; overflow: hidden; border-radius: 8px;">
+                                            <div class="category-image-container" style="width: 50px; height: 50px; overflow: hidden; border-radius: 8px; position: relative;">
                                                 <img th:if="${category.imagePath != null and !category.imagePath.isEmpty()}"
-                                                     th:src="${category.imagePath}" 
+                                                     th:src="@{/uploads/{imagePath}(imagePath=${category.imagePath})}" 
                                                      th:alt="${category.name}"
-                                                     style="width: 100%; height: 100%; object-fit: cover;"
+                                                     style="width: 100%; height: 100%; object-fit: cover; display: block;"
                                                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                                <div th:unless="${category.imagePath != null and !category.imagePath.isEmpty()}"
-                                                     class="d-flex align-items-center justify-content-center bg-light text-muted"
-                                                     style="width: 100%; height: 100%;">
-                                                    <i class="bi bi-image"></i>
+                                                <div th:if="${category.imagePath == null or category.imagePath.isEmpty()}"
+                                                     class="d-flex flex-column align-items-center justify-content-center bg-light text-muted"
+                                                     style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; font-size: 0.65rem; text-align: center; padding: 2px;">
+                                                    <i class="bi bi-image mb-1"></i>
+                                                    <span style="line-height: 1;">Sin imagen</span>
                                                 </div>
-                                                <div class="d-flex align-items-center justify-content-center bg-light text-muted"
-                                                     style="width: 100%; height: 100%; display: none;">
-                                                    <i class="bi bi-image"></i>
+                                                <div class="d-flex flex-column align-items-center justify-content-center bg-light text-muted"
+                                                     style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: none; font-size: 0.65rem; text-align: center; padding: 2px;">
+                                                    <i class="bi bi-image mb-1"></i>
+                                                    <span style="line-height: 1;">Error al cargar</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -238,6 +240,45 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Actualizar contadores automáticamente al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Solo actualizar si no se actualizó recientemente (evitar bucles)
+            const lastUpdate = sessionStorage.getItem('countersLastUpdate');
+            const now = Date.now();
+            const fiveSeconds = 5000; // 5 segundos
+            
+            if (!lastUpdate || (now - parseInt(lastUpdate)) > fiveSeconds) {
+                updateProductCountsAsync();
+            }
+        });
+        
+        // Función para actualizar los contadores de productos de forma asíncrona
+        async function updateProductCountsAsync() {
+            try {
+                // Marcar el tiempo de actualización
+                sessionStorage.setItem('countersLastUpdate', Date.now().toString());
+                
+                // Usar fetch para hacer la actualización en segundo plano
+                const formData = new FormData();
+                
+                const response = await fetch('/admin/categories/update-product-counts', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                });
+                
+                // Si la respuesta fue exitosa, recargar la página para mostrar los datos actualizados
+                if (response.ok || response.redirected) {
+                    // Esperar un momento para que el servidor termine de procesar
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
+                }
+            } catch (error) {
+                console.error('Error al actualizar contadores:', error);
+            }
+        }
+        
         function toggleCarrusel(categoryId, checkbox) {
             const isChecked = checkbox.checked;
             const action = isChecked ? 'activar' : 'desactivar';
