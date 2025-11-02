@@ -245,19 +245,132 @@ function goToProduct(element) {
 
 ---
 
-## 🚀 **TAREAS PENDIENTES**
+## ✅ **NORMALIZACIÓN DE ESTILOS INDEX/CATÁLOGO (Enero 2025)**
 
-### **Implementación en Catálogo**
-- **Objetivo:** Aplicar el mismo diseño de tarjetas del index en la página de catálogo
-- **Archivo objetivo:** `src/main/resources/templates/catalog.html`
-- **Elementos a replicar:**
-  - Grid de 4 columnas con espaciado de 8px
-  - Imágenes de productos con altura de 480px
-  - `object-fit: cover` para mejor visualización
-  - Efectos hover consistentes
-  - Responsive design para móviles
-- **Prioridad:** Alta
-- **Fecha estimada:** Próxima iteración
+### **Cambios Implementados**
+
+#### **1. Unificación de Anchos y Estructura**
+**Fecha:** Enero 2025  
+**Archivos modificados:** `index.html`, `catalog.html`
+
+- **Problema:** El catálogo tenía un ancho menor (`max-width: 1200px` desde `lovely-style.css`) mientras que el index tenía `max-width: 1330px`, causando que las tarjetas se vieran más pequeñas.
+- **Solución:** 
+  - Estilos con `!important` para sobrescribir `lovely-style.css`
+  - Ambos archivos ahora usan `max-width: 1330px` con `padding: 0 20px`
+  - Grid con `width: 100%` sin restricciones adicionales
+  - Mismo gap de `8px` en ambos archivos
+
+**Código implementado:**
+```css
+.products-section {
+    max-width: 1330px !important;
+    margin: 0 auto;
+    padding: 0 20px !important;
+    margin-bottom: 80px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.products-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: none !important;
+}
+```
+
+#### **2. Corrección de Imágenes en Vista Móvil**
+**Problema:** Imágenes y videos no llenaban completamente sus contenedores en móvil, dejando espacios en blanco.
+
+**Solución implementada:**
+- `object-fit: cover !important` con `object-position: center !important`
+- Uso de `position: absolute` para el wrapper interno
+- Estilos específicos para móvil (768px y 480px):
+  - Altura de contenedor: 300px (768px) y 320px (480px)
+  - Imágenes/videos ocupan el 100% del contenedor
+
+**Código móvil:**
+```css
+@media (max-width: 768px) {
+    .product-image-container {
+        height: 300px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .product-image-container > div {
+        position: absolute !important;
+        width: 100% !important;
+        height: 100% !important;
+    }
+    
+    .product-image-container .product-image,
+    .product-image-container > div img,
+    .product-image-container > div video {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        object-position: center center !important;
+        position: absolute !important;
+    }
+}
+```
+
+#### **3. Vista Móvil - 2 Columnas**
+**Problema:** Los estilos con `!important` estaban sobrescribiendo los media queries en móvil.
+
+**Solución:**
+- Agregado `!important` a los media queries también
+- `grid-template-columns: repeat(2, 1fr) !important` para móvil (768px y 480px)
+- Gap ajustado: `8px` (768px) y `6px` (480px)
+
+#### **4. Unificación del Título**
+**Cambio:** Título "CATÁLOGO" ahora tiene las mismas dimensiones que "CATEGORÍAS" del index.
+
+```css
+.catalog-title {
+    text-align: center;
+    font-size: 28px;        /* Igual que .lovely-title */
+    font-weight: 400;       /* Igual que index */
+    margin: 40px 0 30px 0; /* Igual que index */
+    text-transform: uppercase;
+}
+```
+
+#### **5. Unificación de Filtros y Grid**
+- Los filtros y el grid de productos ahora tienen el mismo ancho
+- Ambos usan `max-width: 1330px` con `padding: 0 20px`
+- Mismo sistema de contenedores que el index
+
+#### **6. Cambio de Marca: "Orioladenim" → "Oriola"**
+**Cambio global:** Se actualizó el nombre de la marca de "Orioladenim" a "Oriola" en todos los HTML (públicos y admin), excepto:
+- Emails: `info@orioladenim.com` (se mantienen)
+- Paquetes Java: `com.orioladenim` (se mantienen)
+
+**Archivos modificados:**
+- `index.html`, `catalog.html`, `product-detail.html`, `contact.html`, `about.html`
+- `admin/login.html`, `admin/dashboard.html`, `admin/product-form.html`, etc.
+- `fragments/footer-black.html`
+- Eliminado `text-transform: uppercase` del footer para mostrar "Oriola" correctamente
+
+#### **7. Reset CSS Base**
+Agregado reset CSS al catálogo para igualar el comportamiento:
+```css
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+```
+
+### **Resultados**
+✅ Index y catálogo tienen exactamente la misma estructura y estilos  
+✅ Imágenes/videos llenan completamente los contenedores en móvil y escritorio  
+✅ Sin espacios en blanco en las tarjetas de productos  
+✅ Mismo ancho y distribución en ambas páginas  
+✅ Vista móvil con 2 columnas funcionando correctamente  
+✅ Marca "Oriola" consistente en toda la aplicación  
 
 ---
 
@@ -363,9 +476,23 @@ nohup java -jar target/oriola-denim-0.0.1-SNAPSHOT.jar --spring.profiles.active=
 
 ---
 
+---
+
+## 📝 **HISTORIAL DE CAMBIOS**
+
+### **Enero 2025 - Normalización Index/Catálogo**
+- ✅ Unificación de anchos (1330px) entre index y catálogo
+- ✅ Corrección de espacios en blanco en imágenes móvil
+- ✅ Normalización de estilos de tarjetas de productos
+- ✅ Ajuste de vista móvil (2 columnas)
+- ✅ Cambio de marca "Orioladenim" → "Oriola" en todos los HTML
+- ✅ Unificación del título "CATÁLOGO" con "CATEGORÍAS"
+
+---
+
 **Documento creado el:** 15 de enero de 2025  
-**Última actualización:** 15 de enero de 2025  
-**Versión del documento:** 1.0  
+**Última actualización:** Enero 2025  
+**Versión del documento:** 2.2  
 **Estado:** ✅ Completo y actualizado  
 
 ---
