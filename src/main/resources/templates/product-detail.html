@@ -999,6 +999,49 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        
+        /* Estilos para el carrusel en pantalla completa */
+        .fullscreen-carousel-container {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        
+        .fullscreen-carousel-track {
+            will-change: transform;
+        }
+        
+        .fullscreen-carousel-slide {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .fullscreen-carousel-slide img,
+        .fullscreen-carousel-slide video {
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .fullscreen-carousel-indicator {
+            transition: all 0.3s ease;
+        }
+        
+        .fullscreen-carousel-indicator.active {
+            transform: scale(1.3);
+        }
+        
+        .fullscreen-carousel-indicator:hover {
+            background: rgba(255,255,255,0.8) !important;
+        }
+        
+        /* Prevenir scroll del body cuando el modal está abierto */
+        body.carousel-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
 
         /* Mejoras en el layout móvil */
         @media (max-width: 768px) {
@@ -1276,42 +1319,298 @@
             changeMobileImage(prevIndex);
         }
 
-        // Función para zoom de imagen móvil
+        // Variables para el carrusel en pantalla completa
+        let fullscreenCarouselIndex = 0;
+        let fullscreenCarouselModal = null;
+        let fullscreenTouchStartX = 0;
+        let fullscreenTouchEndX = 0;
+
+        // Función para zoom de imagen móvil con carrusel
         function zoomMobileImage() {
-            const mobileImage = document.getElementById('mobileImage');
-            if (mobileImage) {
-                // Crear modal de zoom
-                const zoomModal = document.createElement('div');
-                zoomModal.className = 'mobile-zoom-modal';
-                zoomModal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
+            if (productImages.length === 0) return;
+            
+            // Usar el índice actual de la imagen
+            fullscreenCarouselIndex = currentImageIndex;
+            
+            // Crear modal de zoom con carrusel
+            fullscreenCarouselModal = document.createElement('div');
+            fullscreenCarouselModal.className = 'mobile-zoom-modal';
+            fullscreenCarouselModal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.95);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                touch-action: pan-y;
+            `;
+            
+            // Contenedor del carrusel
+            const carouselContainer = document.createElement('div');
+            carouselContainer.className = 'fullscreen-carousel-container';
+            carouselContainer.style.cssText = `
+                position: relative;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+            `;
+            
+            // Contenedor de imágenes/videos con transform para el carrusel
+            const carouselTrack = document.createElement('div');
+            carouselTrack.className = 'fullscreen-carousel-track';
+            carouselTrack.style.cssText = `
+                display: flex;
+                width: 100%;
+                height: 100%;
+                position: relative;
+                transition: transform 0.3s ease;
+            `;
+            
+            // Crear slides para cada imagen/video
+            productImages.forEach((image, index) => {
+                const slide = document.createElement('div');
+                slide.className = 'fullscreen-carousel-slide';
+                slide.style.cssText = `
+                    min-width: 100%;
                     width: 100%;
                     height: 100%;
-                    background: rgba(0,0,0,0.9);
-                    z-index: 9999;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    cursor: pointer;
+                    position: relative;
                 `;
                 
-                const zoomImage = document.createElement('img');
-                zoomImage.src = mobileImage.src;
-                zoomImage.style.cssText = `
-                    max-width: 90%;
-                    max-height: 90%;
-                    object-fit: contain;
+                const isVideo = image.getIsVideo();
+                const imageUrl = image.getImageUrl();
+                
+                if (isVideo) {
+                    const video = document.createElement('video');
+                    video.src = imageUrl;
+                    video.autoplay = true;
+                    video.muted = true;
+                    video.loop = true;
+                    video.style.cssText = `
+                        max-width: 90%;
+                        max-height: 90%;
+                        width: auto;
+                        height: auto;
+                        object-fit: contain;
+                    `;
+                    slide.appendChild(video);
+                } else {
+                    const img = document.createElement('img');
+                    img.src = imageUrl;
+                    img.style.cssText = `
+                        max-width: 90%;
+                        max-height: 90%;
+                        width: auto;
+                        height: auto;
+                        object-fit: contain;
+                    `;
+                    slide.appendChild(img);
+                }
+                
+                carouselTrack.appendChild(slide);
+            });
+            
+            carouselContainer.appendChild(carouselTrack);
+            
+            // Indicadores de posición (puntos)
+            if (productImages.length > 1) {
+                const indicatorsContainer = document.createElement('div');
+                indicatorsContainer.className = 'fullscreen-carousel-indicators';
+                indicatorsContainer.style.cssText = `
+                    position: absolute;
+                    bottom: 30px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    display: flex;
+                    gap: 10px;
+                    z-index: 10000;
                 `;
                 
-                zoomModal.appendChild(zoomImage);
-                document.body.appendChild(zoomModal);
-                
-                // Cerrar al hacer clic
-                zoomModal.addEventListener('click', () => {
-                    document.body.removeChild(zoomModal);
+                productImages.forEach((image, index) => {
+                    const indicator = document.createElement('span');
+                    indicator.className = 'fullscreen-carousel-indicator';
+                    if (index === fullscreenCarouselIndex) {
+                        indicator.classList.add('active');
+                    }
+                    indicator.style.cssText = `
+                        width: 10px;
+                        height: 10px;
+                        border-radius: 50%;
+                        background: ${index === fullscreenCarouselIndex ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.5)'};
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    `;
+                    indicator.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        goToFullscreenImage(index);
+                    });
+                    indicatorsContainer.appendChild(indicator);
                 });
+                
+                carouselContainer.appendChild(indicatorsContainer);
+            }
+            
+            // Botón de cerrar
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
+            closeBtn.style.cssText = `
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+                background: rgba(0,0,0,0.5);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                z-index: 10000;
+                font-size: 20px;
+                transition: all 0.3s ease;
+            `;
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeFullscreenCarousel();
+            });
+            closeBtn.addEventListener('mouseenter', () => {
+                closeBtn.style.background = 'rgba(0,0,0,0.8)';
+                closeBtn.style.transform = 'scale(1.1)';
+            });
+            closeBtn.addEventListener('mouseleave', () => {
+                closeBtn.style.background = 'rgba(0,0,0,0.5)';
+                closeBtn.style.transform = 'scale(1)';
+            });
+            
+            carouselContainer.appendChild(closeBtn);
+            
+            fullscreenCarouselModal.appendChild(carouselContainer);
+            document.body.appendChild(fullscreenCarouselModal);
+            
+            // Prevenir scroll del body
+            document.body.classList.add('carousel-open');
+            
+            // Actualizar posición inicial
+            updateFullscreenCarouselPosition();
+            
+            // Eventos de touch para swipe
+            carouselTrack.addEventListener('touchstart', (e) => {
+                fullscreenTouchStartX = e.touches[0].clientX;
+                // Pausar transición durante el drag
+                carouselTrack.style.transition = 'none';
+            }, { passive: true });
+            
+            carouselTrack.addEventListener('touchmove', (e) => {
+                if (fullscreenTouchStartX === 0) return;
+                const currentX = e.touches[0].clientX;
+                const diff = currentX - fullscreenTouchStartX;
+                // Mover el carrusel mientras se arrastra
+                const translateX = -(fullscreenCarouselIndex * 100) + (diff / window.innerWidth * 100);
+                carouselTrack.style.transform = `translateX(${translateX}%)`;
+            }, { passive: true });
+            
+            carouselTrack.addEventListener('touchend', (e) => {
+                if (fullscreenTouchStartX === 0) return;
+                
+                fullscreenTouchEndX = e.changedTouches[0].clientX;
+                const diff = fullscreenTouchStartX - fullscreenTouchEndX;
+                const swipeThreshold = 50;
+                
+                // Restaurar transición
+                carouselTrack.style.transition = 'transform 0.3s ease';
+                
+                if (Math.abs(diff) > swipeThreshold) {
+                    if (diff > 0) {
+                        // Swipe izquierda - siguiente imagen
+                        nextFullscreenImage();
+                    } else {
+                        // Swipe derecha - imagen anterior
+                        prevFullscreenImage();
+                    }
+                } else {
+                    // Volver a la posición actual si no se superó el threshold
+                    updateFullscreenCarouselPosition();
+                }
+                
+                fullscreenTouchStartX = 0;
+            }, { passive: true });
+            
+            // Prevenir el cierre al hacer clic en el contenido
+            carouselContainer.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            // Cerrar al hacer clic en el fondo
+            fullscreenCarouselModal.addEventListener('click', (e) => {
+                if (e.target === fullscreenCarouselModal) {
+                    closeFullscreenCarousel();
+                }
+            });
+        }
+        
+        // Función para actualizar posición del carrusel en pantalla completa
+        function updateFullscreenCarouselPosition() {
+            if (!fullscreenCarouselModal) return;
+            const carouselTrack = fullscreenCarouselModal.querySelector('.fullscreen-carousel-track');
+            if (carouselTrack) {
+                carouselTrack.style.transform = `translateX(-${fullscreenCarouselIndex * 100}%)`;
+            }
+            
+            // Actualizar indicadores
+            const indicators = fullscreenCarouselModal.querySelectorAll('.fullscreen-carousel-indicator');
+            indicators.forEach((indicator, index) => {
+                if (index === fullscreenCarouselIndex) {
+                    indicator.classList.add('active');
+                    indicator.style.background = 'rgba(255,255,255,1)';
+                } else {
+                    indicator.classList.remove('active');
+                    indicator.style.background = 'rgba(255,255,255,0.5)';
+                }
+            });
+        }
+        
+        // Función para siguiente imagen en pantalla completa
+        function nextFullscreenImage() {
+            if (productImages.length === 0) return;
+            fullscreenCarouselIndex = (fullscreenCarouselIndex + 1) % productImages.length;
+            updateFullscreenCarouselPosition();
+        }
+        
+        // Función para imagen anterior en pantalla completa
+        function prevFullscreenImage() {
+            if (productImages.length === 0) return;
+            fullscreenCarouselIndex = fullscreenCarouselIndex === 0 ? productImages.length - 1 : fullscreenCarouselIndex - 1;
+            updateFullscreenCarouselPosition();
+        }
+        
+        // Función para ir a una imagen específica en pantalla completa
+        function goToFullscreenImage(index) {
+            if (index >= 0 && index < productImages.length) {
+                fullscreenCarouselIndex = index;
+                updateFullscreenCarouselPosition();
+            }
+        }
+        
+        // Función para cerrar el carrusel en pantalla completa
+        function closeFullscreenCarousel() {
+            if (fullscreenCarouselModal && document.body.contains(fullscreenCarouselModal)) {
+                document.body.removeChild(fullscreenCarouselModal);
+                fullscreenCarouselModal = null;
+                // Restaurar scroll del body
+                document.body.classList.remove('carousel-open');
             }
         }
 
@@ -1360,17 +1659,78 @@
 
             // Galería móvil - Touch gestures
             const mobileMainImage = document.getElementById('mobileMainImage');
+            const mobileImage = document.getElementById('mobileImage');
+            const mobileVideo = document.getElementById('mobileVideo');
+            
             if (mobileMainImage) {
+                let touchStartedOnImage = false;
+                let touchMoved = false;
+                let touchStartTime = 0;
+                
                 mobileMainImage.addEventListener('touchstart', (e) => {
                     touchStartX = e.touches[0].clientX;
-                });
+                    touchStartTime = Date.now();
+                    touchStartedOnImage = true;
+                    touchMoved = false;
+                }, { passive: true });
+
+                mobileMainImage.addEventListener('touchmove', (e) => {
+                    if (touchStartedOnImage) {
+                        const currentX = e.touches[0].clientX;
+                        const diff = Math.abs(touchStartX - currentX);
+                        // Si hay movimiento horizontal significativo, es un swipe
+                        if (diff > 10) {
+                            touchMoved = true;
+                        }
+                    }
+                }, { passive: true });
 
                 mobileMainImage.addEventListener('touchend', (e) => {
-                    touchEndX = e.changedTouches[0].clientX;
-                    handleSwipe();
-                });
+                    if (touchStartedOnImage) {
+                        touchEndX = e.changedTouches[0].clientX;
+                        const diff = Math.abs(touchStartX - touchEndX);
+                        const touchDuration = Date.now() - touchStartTime;
+                        window.lastTouchEnd = Date.now();
+                        
+                        // Si hubo movimiento horizontal significativo (swipe)
+                        if (touchMoved && diff > 50) {
+                            handleSwipe();
+                        } else if (!touchMoved && touchDuration < 300) {
+                            // Si fue un tap rápido sin movimiento, abrir zoom
+                            setTimeout(() => {
+                                if (!fullscreenCarouselModal) {
+                                    zoomMobileImage();
+                                }
+                            }, 50);
+                        }
+                    }
+                    touchStartedOnImage = false;
+                    touchMoved = false;
+                }, { passive: true });
 
-                mobileMainImage.addEventListener('click', zoomMobileImage);
+                // Click en la imagen principal (para casos donde no haya touch)
+                mobileMainImage.addEventListener('click', (e) => {
+                    // Solo si no hubo un touch reciente
+                    const timeSinceTouchEnd = Date.now() - (window.lastTouchEnd || 0);
+                    if (timeSinceTouchEnd > 300) {
+                        zoomMobileImage();
+                    }
+                });
+                
+                // También permitir click directo en imagen/video
+                if (mobileImage) {
+                    mobileImage.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        zoomMobileImage();
+                    });
+                }
+                
+                if (mobileVideo) {
+                    mobileVideo.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        zoomMobileImage();
+                    });
+                }
             }
 
             // Los colores ahora son solo informativos (sin funcionalidad de selección)
@@ -1404,12 +1764,15 @@
             const diff = touchStartX - touchEndX;
             
             if (Math.abs(diff) > swipeThreshold) {
-                if (diff > 0) {
-                    // Swipe izquierda - siguiente imagen
-                    nextMobileImage();
-                } else {
-                    // Swipe derecha - imagen anterior
-                    prevMobileImage();
+                // Solo procesar si no estamos en pantalla completa
+                if (!fullscreenCarouselModal) {
+                    if (diff > 0) {
+                        // Swipe izquierda - siguiente imagen
+                        nextMobileImage();
+                    } else {
+                        // Swipe derecha - imagen anterior
+                        prevMobileImage();
+                    }
                 }
             }
         }
