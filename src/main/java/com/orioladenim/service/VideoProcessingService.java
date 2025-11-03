@@ -83,19 +83,25 @@ public class VideoProcessingService {
             // Obtener ruta completa del video
             Path videoFilePath = Paths.get(uploadPath, videoPath);
             
+            System.out.println("🎬 [THUMBNAIL] Iniciando generación de thumbnail...");
+            System.out.println("🎬 [THUMBNAIL] Video: " + videoFilePath.toAbsolutePath());
+            System.out.println("🎬 [THUMBNAIL] Video existe: " + Files.exists(videoFilePath));
+            
             // Intentar extraer frame con FFmpeg primero
             if (extraerFrameConFFmpeg(videoFilePath, thumbnailFilePath)) {
-                System.out.println("✅ Thumbnail generado con FFmpeg: " + thumbnailFileName);
+                System.out.println("✅ [THUMBNAIL] Thumbnail generado con FFmpeg: " + thumbnailFileName);
+                System.out.println("✅ [THUMBNAIL] Tamaño: " + Files.size(thumbnailFilePath) + " bytes");
                 return "thumbnails/historias/" + thumbnailFileName;
             }
             
             // Si FFmpeg no está disponible, crear un placeholder de imagen
+            System.out.println("⚠️ [THUMBNAIL] FFmpeg no disponible o falló, creando placeholder...");
             crearPlaceholderImagen(thumbnailFilePath);
-            System.out.println("⚠️ Thumbnail placeholder creado: " + thumbnailFileName);
+            System.out.println("⚠️ [THUMBNAIL] Thumbnail placeholder creado: " + thumbnailFileName);
             
             return "thumbnails/historias/" + thumbnailFileName;
         } catch (IOException e) {
-            System.err.println("❌ Error generando thumbnail: " + e.getMessage());
+            System.err.println("❌ [THUMBNAIL] Error generando thumbnail: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -108,32 +114,119 @@ public class VideoProcessingService {
         try {
             // Verificar que el video existe
             if (!Files.exists(videoFile)) {
+                System.err.println("❌ [FFMPEG] Video no encontrado: " + videoFile.toAbsolutePath());
                 return false;
             }
             
-            // Comando FFmpeg para extraer frame en el segundo 1
+            // Verificar si FFmpeg está disponible
+            if (!verificarFFmpegDisponible()) {
+                System.out.println("⚠️ [FFMPEG] FFmpeg no está instalado o no está en el PATH");
+                return false;
+            }
+            
+            System.out.println("🔧 [FFMPEG] Intentando extraer frame del video...");
+            
+            // Intentar primero con frame del inicio (más rápido y confiable)
+            // Usar formato image2 con update para asegurar que funcione en todos los sistemas
             ProcessBuilder processBuilder = new ProcessBuilder(
                 "ffmpeg",
                 "-i", videoFile.toAbsolutePath().toString(),
-                "-ss", "00:00:01",  // Extraer frame en el segundo 1
-                "-vframes", "1",    // Solo un frame
-                "-q:v", "2",        // Alta calidad
-                "-y",               // Sobrescribir si existe
+                "-ss", "00:00:00.5",  // Frame en el medio segundo (más confiable que segundo 1)
+                "-vframes", "1",       // Solo un frame
+                "-q:v", "2",          // Alta calidad (1-31, menor es mejor calidad)
+                "-vf", "scale=640:-1", // Escalar a ancho de 640 manteniendo aspecto
+                "-f", "image2",        // Formato de salida: imagen
+                "-update", "1",        // Actualizar si existe (necesario para image2)
+                "-y",                 // Sobrescribir si existe
                 thumbnailFile.toAbsolutePath().toString()
             );
             
+            // Redirigir errores para capturarlos
+            processBuilder.redirectErrorStream(true);
+            
             Process process = processBuilder.start();
+            
+            // Capturar output para debugging
+            java.io.BufferedReader reader = new java.io.BufferedReader(
+                new java.io.InputStreamReader(process.getInputStream())
+            );
+            StringBuilder output = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append("\n");
+            }
+            
             int exitCode = process.waitFor();
             
-            // Verificar que el archivo se creó correctamente
-            if (exitCode == 0 && Files.exists(thumbnailFile) && Files.size(thumbnailFile) > 0) {
-                return true;
+            // Log del output de FFmpeg para debugging
+            if (exitCode != 0) {
+                System.err.println("❌ [FFMPEG] FFmpeg falló con código: " + exitCode);
+                System.err.println("❌ [FFMPEG] Output: " + output.toString());
+            } else {
+                System.out.println("✅ [FFMPEG] FFmpeg ejecutado exitosamente");
+            }
+            
+            // Verificar que el archivo se creó correctamente y es una imagen válida
+            if (exitCode == 0 && Files.exists(thumbnailFile)) {
+                long fileSize = Files.size(thumbnailFile);
+                if (fileSize > 0) {
+                    // Verificar que sea una imagen válida leyendo el header
+                    try {
+                        BufferedImage img = ImageIO.read(thumbnailFile.toFile());
+                        if (img != null) {
+                            System.out.println("✅ [FFMPEG] Thumbnail válido generado: " + fileSize + " bytes, " + 
+                                             img.getWidth() + "x" + img.getHeight());
+                            return true;
+                        } else {
+                            System.err.println("❌ [FFMPEG] El archivo generado no es una imagen válida");
+                        }
+                    } catch (IOException e) {
+                        System.err.println("❌ [FFMPEG] Error leyendo imagen generada: " + e.getMessage());
+                    }
+                } else {
+                    System.err.println("❌ [FFMPEG] El archivo generado está vacío");
+                }
+            } else {
+                System.err.println("❌ [FFMPEG] No se generó el archivo thumbnail");
             }
             
             return false;
         } catch (Exception e) {
             // FFmpeg no está disponible o falló, continuar con placeholder
-            System.out.println("⚠️ FFmpeg no disponible o error: " + e.getMessage());
+            System.err.println("❌ [FFMPEG] Error al ejecutar FFmpeg: " + e.getClass().getSimpleName());
+            System.err.println("❌ [FFMPEG] Mensaje: " + e.getMessage());
+            if (e.getCause() != null) {
+                System.err.println("❌ [FFMPEG] Causa: " + e.getCause().getMessage());
+            }
+            return false;
+        }
+    }
+    
+    /**
+     * Verifica si FFmpeg está disponible en el sistema
+     */
+    private boolean verificarFFmpegDisponible() {
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("ffmpeg", "-version");
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            
+            // Leer output
+            java.io.BufferedReader reader = new java.io.BufferedReader(
+                new java.io.InputStreamReader(process.getInputStream())
+            );
+            String firstLine = reader.readLine();
+            int exitCode = process.waitFor();
+            
+            if (exitCode == 0 && firstLine != null && firstLine.contains("ffmpeg")) {
+                System.out.println("✅ [FFMPEG] FFmpeg disponible: " + firstLine);
+                return true;
+            } else {
+                System.out.println("⚠️ [FFMPEG] FFmpeg no disponible (código: " + exitCode + ")");
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ [FFMPEG] Error verificando FFmpeg: " + e.getMessage());
             return false;
         }
     }

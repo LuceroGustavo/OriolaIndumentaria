@@ -153,4 +153,38 @@ public class HistoriaController {
         model.addAttribute("estadisticas", historiaService.obtenerEstadisticas());
         return "admin/historias/listar";
     }
+    
+    /**
+     * Regenera el thumbnail de una historia específica
+     * Útil después de instalar FFmpeg para regenerar thumbnails que eran placeholders
+     */
+    @PostMapping("/{id}/regenerar-thumbnail")
+    public String regenerarThumbnail(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            boolean exito = historiaService.regenerarThumbnail(id);
+            if (exito) {
+                redirectAttributes.addFlashAttribute("success", "Thumbnail regenerado exitosamente");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "No se pudo regenerar el thumbnail. Verifique que FFmpeg esté instalado y que el video exista.");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al regenerar thumbnail: " + e.getMessage());
+        }
+        return "redirect:/admin/historias";
+    }
+    
+    /**
+     * Regenera thumbnails de todas las historias
+     */
+    @PostMapping("/regenerar-todos-thumbnails")
+    public String regenerarTodosThumbnails(RedirectAttributes redirectAttributes) {
+        try {
+            int exitosas = historiaService.regenerarTodosLosThumbnails();
+            redirectAttributes.addFlashAttribute("success", 
+                "Se regeneraron " + exitosas + " thumbnails exitosamente");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al regenerar thumbnails: " + e.getMessage());
+        }
+        return "redirect:/admin/historias";
+    }
 }

@@ -186,6 +186,72 @@ public class HistoriaService {
     }
     
     /**
+     * Regenera el thumbnail de una historia específica
+     * Útil para regenerar thumbnails después de instalar FFmpeg
+     */
+    public boolean regenerarThumbnail(Integer id) {
+        Optional<Historia> historiaOpt = historiaRepository.findById(id);
+        if (historiaOpt.isEmpty()) {
+            return false;
+        }
+        
+        Historia historia = historiaOpt.get();
+        if (historia.getVideoPath() == null || historia.getVideoPath().isEmpty()) {
+            System.err.println("❌ [REGENERAR] Historia no tiene video path");
+            return false;
+        }
+        
+        try {
+            System.out.println("🔄 [REGENERAR] Regenerando thumbnail para historia ID: " + id);
+            
+            // Eliminar thumbnail anterior si existe
+            if (historia.getVideoThumbnail() != null && !historia.getVideoThumbnail().isEmpty()) {
+                videoProcessingService.eliminarThumbnail(historia.getVideoThumbnail());
+            }
+            
+            // Generar nuevo thumbnail
+            String nuevoThumbnailPath = videoProcessingService.generarThumbnail(historia.getVideoPath());
+            
+            if (nuevoThumbnailPath != null) {
+                historia.setVideoThumbnail(nuevoThumbnailPath);
+                historiaRepository.save(historia);
+                System.out.println("✅ [REGENERAR] Thumbnail regenerado exitosamente");
+                return true;
+            } else {
+                System.err.println("❌ [REGENERAR] No se pudo generar el thumbnail");
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("❌ [REGENERAR] Error regenerando thumbnail: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Regenera thumbnails de todas las historias
+     * Útil para regenerar todos los thumbnails después de instalar FFmpeg
+     */
+    public int regenerarTodosLosThumbnails() {
+        List<Historia> historias = historiaRepository.findAll();
+        int exitosas = 0;
+        int fallidas = 0;
+        
+        System.out.println("🔄 [REGENERAR] Regenerando thumbnails de " + historias.size() + " historias...");
+        
+        for (Historia historia : historias) {
+            if (regenerarThumbnail(historia.getId())) {
+                exitosas++;
+            } else {
+                fallidas++;
+            }
+        }
+        
+        System.out.println("✅ [REGENERAR] Completado: " + exitosas + " exitosas, " + fallidas + " fallidas");
+        return exitosas;
+    }
+    
+    /**
      * Obtiene estadísticas de historias
      */
     public HistoriaStats obtenerEstadisticas() {
