@@ -55,6 +55,8 @@ public class HistoriaService {
     
     /**
      * Crea una nueva historia con video
+     * Si es la única historia, se crea activa por defecto.
+     * Si ya existen historias activas, se crea inactiva.
      */
     public Historia crearHistoria(String titulo, String descripcion, MultipartFile video) throws IOException {
         // Procesar video
@@ -66,6 +68,9 @@ public class HistoriaService {
         // Obtener información del video
         VideoProcessingService.VideoInfo videoInfo = videoProcessingService.obtenerInformacionVideo(video);
         
+        // Verificar si hay historias activas
+        Long historiasActivas = countActivas();
+        
         // Crear entidad
         Historia historia = new Historia();
         historia.setTitulo(titulo);
@@ -74,7 +79,8 @@ public class HistoriaService {
         historia.setVideoThumbnail(thumbnailPath);
         historia.setPesoArchivo(video.getSize());
         historia.setDuracionSegundos(videoInfo.getDuracion());
-        historia.setActiva(true);
+        // Si es la única historia (contando esta nueva), se crea activa. Si hay otras activas, se crea inactiva.
+        historia.setActiva(historiasActivas == 0);
         
         return historiaRepository.save(historia);
     }
@@ -113,6 +119,7 @@ public class HistoriaService {
     
     /**
      * Cambia el estado activo/inactivo de una historia
+     * Si se activa una historia, desactiva automáticamente todas las demás
      */
     public Historia toggleActiva(Integer id) {
         Optional<Historia> historiaOpt = historiaRepository.findById(id);
@@ -121,7 +128,20 @@ public class HistoriaService {
         }
         
         Historia historia = historiaOpt.get();
-        historia.setActiva(!historia.getActiva());
+        boolean nuevoEstado = !historia.getActiva();
+        
+        // Si se está activando la historia, desactivar todas las demás
+        if (nuevoEstado) {
+            List<Historia> historiasActivas = historiaRepository.findByActivaTrueOrderByFechaCreacionDesc();
+            for (Historia h : historiasActivas) {
+                if (!h.getId().equals(id)) {
+                    h.setActiva(false);
+                    historiaRepository.save(h);
+                }
+            }
+        }
+        
+        historia.setActiva(nuevoEstado);
         return historiaRepository.save(historia);
     }
     

@@ -97,9 +97,21 @@ public class HistoriaController {
     @PostMapping("/{id}/toggle")
     public String toggleActiva(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         try {
+            // Verificar si la historia está actualmente inactiva (se va a activar)
+            Historia historiaActual = historiaService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Historia no encontrada"));
+            boolean seVaAActivar = !historiaActual.getActiva();
+            
             Historia historia = historiaService.toggleActiva(id);
             String estado = historia.getActiva() ? "activada" : "desactivada";
-            redirectAttributes.addFlashAttribute("success", "Historia " + estado + " exitosamente");
+            
+            if (seVaAActivar) {
+                // Si se activó, informar que se desactivaron las demás
+                redirectAttributes.addFlashAttribute("success", 
+                    "Historia activada exitosamente. Las demás historias han sido desactivadas automáticamente.");
+            } else {
+                redirectAttributes.addFlashAttribute("success", "Historia " + estado + " exitosamente");
+            }
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
