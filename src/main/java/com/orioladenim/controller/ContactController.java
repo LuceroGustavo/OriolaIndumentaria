@@ -153,7 +153,7 @@ public class ContactController {
             }
 
             model.addAttribute("contact", contact.get());
-            return "admin/contact-detail-simple";
+            return "admin/contact-detail";
         } else {
             return "redirect:/admin/contacts?error=Consulta no encontrada";
         }

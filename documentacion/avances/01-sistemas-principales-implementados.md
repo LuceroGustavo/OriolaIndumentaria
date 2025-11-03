@@ -100,6 +100,14 @@ Este documento consolida todos los sistemas principales implementados en el proy
 - ✅ **Confirmación** de recepción de consultas
 - ✅ **Panel de administración** para gestionar consultas
 
+### **Mejoras del Sistema de Consultas (Nov 2025):**
+- ✅ **Vista de detalle mejorada** con sección dedicada para respuestas
+- ✅ **Eliminación en cascada** de consultas y respuestas
+- ✅ **Feedback visual** en envío de respuestas (loading, éxito, error)
+- ✅ **Interfaz consistente** con navbar y sidebar unificados
+- ✅ **Corrección de errores** de parsing en templates
+- 📄 Ver detalles completos en: `documentacion/avances/07-mejoras-sistema-consultas.md`
+
 ### **Integración WhatsApp:**
 - ✅ **Detección automática** de dispositivo (móvil/desktop)
 - ✅ **Botones de WhatsApp** en tarjetas de productos

@@ -40,12 +40,22 @@ public class ContactService {
         return contactRepository.findByActivoTrueOrderByFechaCreacionDesc(pageable);
     }
     
+    /**
+     * Elimina físicamente una consulta y su respuesta de la base de datos
+     */
     public void eliminar(Long id) {
         Optional<Contact> contact = contactRepository.findById(id);
         if (contact.isPresent()) {
             Contact c = contact.get();
-            c.setActivo(false);
-            contactRepository.save(c);
+            System.out.println("🗑️ Eliminando consulta ID: " + id);
+            System.out.println("   - Nombre: " + c.getNombre());
+            System.out.println("   - Respondida: " + c.isRespondido());
+            if (c.getRespuesta() != null && !c.getRespuesta().isEmpty()) {
+                System.out.println("   - Respuesta será eliminada junto con la consulta");
+            }
+            // Eliminar físicamente de la base de datos (eliminación en cascada)
+            contactRepository.deleteById(id);
+            System.out.println("✅ Consulta eliminada correctamente");
         }
     }
     
