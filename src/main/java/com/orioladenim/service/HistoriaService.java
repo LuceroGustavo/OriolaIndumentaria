@@ -146,16 +146,28 @@ public class HistoriaService {
     }
     
     /**
-     * Elimina una historia
+     * Elimina una historia y sus archivos asociados (video y thumbnail)
      */
     public void deleteById(Integer id) {
         Optional<Historia> historiaOpt = historiaRepository.findById(id);
         if (historiaOpt.isPresent()) {
             Historia historia = historiaOpt.get();
-            // Eliminar archivos del sistema
-            videoProcessingService.eliminarVideo(historia.getVideoPath());
+            
+            // Eliminar video del sistema de archivos
+            if (historia.getVideoPath() != null && !historia.getVideoPath().isEmpty()) {
+                System.out.println("🖼️ Eliminando video de historia: " + historia.getVideoPath());
+                videoProcessingService.eliminarVideo(historia.getVideoPath());
+            }
+            
+            // Eliminar thumbnail del sistema de archivos
+            if (historia.getVideoThumbnail() != null && !historia.getVideoThumbnail().isEmpty()) {
+                System.out.println("🖼️ Eliminando thumbnail de historia: " + historia.getVideoThumbnail());
+                videoProcessingService.eliminarThumbnail(historia.getVideoThumbnail());
+            }
+            
             // Eliminar de la base de datos
             historiaRepository.deleteById(id);
+            System.out.println("✅ Historia eliminada correctamente (ID: " + id + ")");
         }
     }
     

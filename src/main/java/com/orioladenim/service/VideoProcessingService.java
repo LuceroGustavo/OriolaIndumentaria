@@ -10,6 +10,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 @Service
 public class VideoProcessingService {
@@ -63,6 +67,7 @@ public class VideoProcessingService {
     
     /**
      * Genera un thumbnail para el video
+     * Intenta extraer un frame usando FFmpeg, si no está disponible crea un placeholder de imagen
      */
     public String generarThumbnail(String videoPath) {
         try {
@@ -73,19 +78,99 @@ public class VideoProcessingService {
             // Generar nombre del thumbnail
             String videoFileName = Paths.get(videoPath).getFileName().toString();
             String thumbnailFileName = "thumb_" + videoFileName.replaceFirst("[.][^.]+$", ".jpg");
+            Path thumbnailFilePath = thumbnailsDir.resolve(thumbnailFileName);
             
-            // Por ahora, creamos un placeholder
-            // En una implementación real, usarías FFmpeg para extraer un frame
-            Path thumbnailPath = thumbnailsDir.resolve(thumbnailFileName);
+            // Obtener ruta completa del video
+            Path videoFilePath = Paths.get(uploadPath, videoPath);
             
-            // Crear un archivo placeholder (en producción usar FFmpeg)
-            Files.write(thumbnailPath, "thumbnail placeholder".getBytes());
+            // Intentar extraer frame con FFmpeg primero
+            if (extraerFrameConFFmpeg(videoFilePath, thumbnailFilePath)) {
+                System.out.println("✅ Thumbnail generado con FFmpeg: " + thumbnailFileName);
+                return "thumbnails/historias/" + thumbnailFileName;
+            }
             
-            return "historias/" + thumbnailFileName;
+            // Si FFmpeg no está disponible, crear un placeholder de imagen
+            crearPlaceholderImagen(thumbnailFilePath);
+            System.out.println("⚠️ Thumbnail placeholder creado: " + thumbnailFileName);
+            
+            return "thumbnails/historias/" + thumbnailFileName;
         } catch (IOException e) {
-            // Si falla la generación del thumbnail, retornar null
+            System.err.println("❌ Error generando thumbnail: " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
+    }
+    
+    /**
+     * Intenta extraer un frame del video usando FFmpeg
+     */
+    private boolean extraerFrameConFFmpeg(Path videoFile, Path thumbnailFile) {
+        try {
+            // Verificar que el video existe
+            if (!Files.exists(videoFile)) {
+                return false;
+            }
+            
+            // Comando FFmpeg para extraer frame en el segundo 1
+            ProcessBuilder processBuilder = new ProcessBuilder(
+                "ffmpeg",
+                "-i", videoFile.toAbsolutePath().toString(),
+                "-ss", "00:00:01",  // Extraer frame en el segundo 1
+                "-vframes", "1",    // Solo un frame
+                "-q:v", "2",        // Alta calidad
+                "-y",               // Sobrescribir si existe
+                thumbnailFile.toAbsolutePath().toString()
+            );
+            
+            Process process = processBuilder.start();
+            int exitCode = process.waitFor();
+            
+            // Verificar que el archivo se creó correctamente
+            if (exitCode == 0 && Files.exists(thumbnailFile) && Files.size(thumbnailFile) > 0) {
+                return true;
+            }
+            
+            return false;
+        } catch (Exception e) {
+            // FFmpeg no está disponible o falló, continuar con placeholder
+            System.out.println("⚠️ FFmpeg no disponible o error: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Crea un placeholder de imagen para el video
+     */
+    private void crearPlaceholderImagen(Path thumbnailPath) throws IOException {
+        // Crear una imagen de placeholder
+        int width = 400;
+        int height = 300;
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = image.createGraphics();
+        
+        // Fondo gris claro
+        g.setColor(new Color(240, 240, 240));
+        g.fillRect(0, 0, width, height);
+        
+        // Dibujar un icono de video simple
+        g.setColor(new Color(180, 180, 180));
+        int iconSize = 80;
+        int iconX = (width - iconSize) / 2;
+        int iconY = (height - iconSize) / 2;
+        
+        // Dibujar rectángulo redondeado
+        g.fillRoundRect(iconX, iconY, iconSize, iconSize, 10, 10);
+        
+        // Dibujar triángulo de play
+        g.setColor(new Color(220, 220, 220));
+        int[] xPoints = {iconX + 25, iconX + 25, iconX + 55};
+        int[] yPoints = {iconY + 20, iconY + 60, iconY + 40};
+        g.fillPolygon(xPoints, yPoints, 3);
+        
+        g.dispose();
+        
+        // Guardar como JPEG
+        ImageIO.write(image, "jpg", thumbnailPath.toFile());
     }
     
     /**
@@ -114,25 +199,45 @@ public class VideoProcessingService {
     }
     
     /**
-     * Elimina un video y su thumbnail
+     * Elimina un video del sistema de archivos
      */
     public void eliminarVideo(String videoPath) {
         try {
-            // Eliminar video
             Path videoFile = Paths.get(uploadPath, videoPath);
             if (Files.exists(videoFile)) {
                 Files.delete(videoFile);
-            }
-            
-            // Eliminar thumbnail si existe
-            String thumbnailPath = videoPath.replaceFirst("[.][^.]+$", ".jpg");
-            Path thumbnailFile = Paths.get(this.thumbnailPath, thumbnailPath);
-            if (Files.exists(thumbnailFile)) {
-                Files.delete(thumbnailFile);
+                System.out.println("✅ Video eliminado: " + videoPath);
+            } else {
+                System.out.println("⚠️ Video no encontrado: " + videoPath);
             }
         } catch (IOException e) {
-            // Log del error pero no lanzar excepción
-            System.err.println("Error al eliminar video: " + e.getMessage());
+            System.err.println("❌ Error al eliminar video: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Elimina un thumbnail del sistema de archivos
+     */
+    public void eliminarThumbnail(String thumbnailPath) {
+        try {
+            Path thumbnailFile;
+            
+            // Si la ruta ya incluye thumbnails/, construirla directamente
+            if (thumbnailPath.startsWith("thumbnails/")) {
+                thumbnailFile = Paths.get(uploadPath, thumbnailPath);
+            } else {
+                // Si es solo "historias/...", agregar thumbnails/
+                thumbnailFile = Paths.get(uploadPath, "thumbnails", thumbnailPath);
+            }
+            
+            if (Files.exists(thumbnailFile)) {
+                Files.delete(thumbnailFile);
+                System.out.println("✅ Thumbnail eliminado: " + thumbnailPath);
+            } else {
+                System.out.println("⚠️ Thumbnail no encontrado: " + thumbnailFile.toAbsolutePath());
+            }
+        } catch (IOException e) {
+            System.err.println("❌ Error al eliminar thumbnail: " + e.getMessage());
         }
     }
     

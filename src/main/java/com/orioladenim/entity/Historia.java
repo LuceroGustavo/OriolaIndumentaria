@@ -56,7 +56,12 @@ public class Historia {
     
     public String getThumbnailUrl() {
         if (videoThumbnail != null && !videoThumbnail.isEmpty()) {
-            return "/uploads/" + videoThumbnail;
+            // Si la ruta ya incluye thumbnails/, usar directamente
+            if (videoThumbnail.startsWith("thumbnails/")) {
+                return "/uploads/" + videoThumbnail;
+            }
+            // Si es solo "historias/...", agregar thumbnails/
+            return "/uploads/thumbnails/" + videoThumbnail;
         }
         return "/images/no-video-thumbnail.jpg";
     }

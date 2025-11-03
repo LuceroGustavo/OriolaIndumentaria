@@ -108,7 +108,51 @@ Este documento consolida todos los sistemas principales implementados en el proy
 
 ---
 
-## 💾 **5. SISTEMA DE BACKUP Y RESTORE**
+## 🎬 **5. SISTEMA DE HISTORIAS TIPO INSTAGRAM**
+
+### **Funcionalidades Implementadas:**
+- ✅ **CRUD completo** de historias promocionales
+- ✅ **Procesamiento de videos** con validaciones
+- ✅ **Generación automática de thumbnails** (FFmpeg o placeholder)
+- ✅ **Sistema de activación inteligente** (solo una activa a la vez)
+- ✅ **Panel de administración** completo y mejorado
+- ✅ **Eliminación en cascada** de videos y thumbnails
+- ✅ **Reproducción en modal** para previsualización
+
+### **Características Técnicas:**
+- **Formatos soportados**: MP4, WebM, MOV, AVI
+- **Tamaño máximo**: 15MB por video
+- **Duración máxima**: 15 segundos
+- **Resolución recomendada**: 1080x1920 (vertical, 9:16)
+- **Thumbnails automáticos**: Extracción con FFmpeg o placeholder de imagen
+- **Activación única**: Solo una historia activa simultáneamente
+
+### **Mejoras Implementadas (v2.0):**
+- ✅ **Interfaz mejorada**: Navbar y sidebar consistentes
+- ✅ **Drag and Drop**: Funcionalidad completa para subir videos
+- ✅ **Eliminación de video**: Botón X para quitar video antes de guardar
+- ✅ **Corrección de bugs**: Solucionado doble click al seleccionar video
+- ✅ **Modal de reproducción**: Video player en miniatura en modal
+- ✅ **Borde verde**: Identificación visual de historias activas
+- ✅ **Badges reposicionados**: Duración y estado en la misma fila
+- ✅ **Eliminación en cascada**: Video y thumbnail se eliminan correctamente
+
+### **Estructura de Archivos:**
+- **Videos**: `uploads/historias/historia_YYYYMMDD_HHMMSS.mp4`
+- **Thumbnails**: `uploads/thumbnails/historias/thumb_historia_YYYYMMDD_HHMMSS.jpg`
+- **Rutas**: Manejo automático de rutas antiguas y nuevas
+
+### **Lógica de Activación:**
+- **Primera historia**: Se crea automáticamente activa
+- **Historias adicionales**: Se crean inactivas si ya hay una activa
+- **Al activar**: Se desactivan automáticamente todas las demás
+- **Confirmaciones**: Mensajes informativos en frontend y backend
+
+**Documentación detallada**: Ver `documentacion/avances/06-mejoras-sistema-historias.md`
+
+---
+
+## 💾 **6. SISTEMA DE BACKUP Y RESTORE**
 
 ### **Funcionalidades Implementadas:**
 - ✅ **Exportación completa** de todos los datos
@@ -132,7 +176,7 @@ Este documento consolida todos los sistemas principales implementados en el proy
 
 ---
 
-## 🚀 **6. OPTIMIZACIONES DE RENDIMIENTO**
+## 🚀 **7. OPTIMIZACIONES DE RENDIMIENTO**
 
 ### **Procesamiento de Imágenes:**
 - ✅ **Interpolación optimizada** (BILINEAR vs BICUBIC)
@@ -171,6 +215,7 @@ Este documento consolida todos los sistemas principales implementados en el proy
 ### **Sistemas Completamente Funcionales:**
 - ✅ **Gestión de productos** con múltiples categorías y colores
 - ✅ **Sistema de usuarios** con roles y seguridad
+- ✅ **Sistema de historias** tipo Instagram con administración completa
 - ✅ **Formularios de contacto** con notificaciones por email
 - ✅ **Integración WhatsApp** automática
 - ✅ **Sistema de backup/restore** completo
@@ -193,4 +238,5 @@ Este documento consolida todos los sistemas principales implementados en el proy
 
 **Desarrollado por:** Equipo de Desarrollo ORIOLA  
 **Fecha de consolidación:** 15 de enero de 2025  
+**Última actualización:** Noviembre 2025 (Mejoras sistema de historias v2.0)  
 **Estado:** ✅ Todos los sistemas principales implementados y funcionando

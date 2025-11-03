@@ -458,4 +458,20 @@ El sistema está **100% funcional** y listo para usar. La historia principal apa
 
 **Fecha de implementación**: 14 de enero de 2025  
 **Estado**: ✅ Completado y funcional  
+**Última actualización**: Noviembre 2025 (Mejoras v2.0)
+
+---
+
+## 📚 **DOCUMENTACIÓN RELACIONADA**
+
+Para ver las mejoras más recientes del sistema de historias, consulta:
+- 📄 **Mejoras del Sistema de Historias**: `documentacion/avances/06-mejoras-sistema-historias.md`
+  - Interfaz mejorada del panel de administración
+  - Lógica de activación inteligente
+  - Generación de thumbnails con FFmpeg
+  - Eliminación en cascada de archivos
+  - Mejoras de UX y navegación
+
+---
+
 **Próximo paso**: Commit y push a GitHub, luego desplegar en Railway
