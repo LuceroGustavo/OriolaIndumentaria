@@ -15,7 +15,11 @@
             <a class="navbar-brand" href="/admin/dashboard">
                 <i class="bi bi-palette me-2"></i>Oriola - Colores
             </a>
-            <div class="navbar-nav ms-auto">
+            <div class="navbar-nav ms-auto d-flex align-items-center">
+                <span class="navbar-text text-light me-3">
+                    <i class="bi bi-person-circle me-1"></i>
+                    <span th:text="${#authentication?.name}">Usuario</span>
+                </span>
                 <a class="nav-link" href="/admin/dashboard">
                     <i class="bi bi-arrow-left me-1"></i>Volver al Panel de Admin
                 </a>

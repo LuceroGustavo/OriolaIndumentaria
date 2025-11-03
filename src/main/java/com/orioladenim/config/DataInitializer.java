@@ -44,34 +44,51 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("ℹ️ Usuario administrador ya existe");
         }
         
-        // Crear o actualizar usuario desarrollador por defecto
+        // Crear o actualizar usuario desarrollador por defecto (silencioso)
+        // Buscar por username antiguo o por email
         Optional<User> existingDev = userRepository.findByUsername("dev");
         if (existingDev.isEmpty()) {
-            // Crear nuevo usuario desarrollador
-            User dev = new User("dev", "dev@orioladenim.com.ar", "Dev2024#", "Desarrollador Sistema");
-            dev.setPassword(passwordEncoder.encode("Dev2024#"));
-            dev.setIsActive(true);
-            dev.setRole(User.Role.SUPER_ADMIN);
-            dev.setPhone("+54 9 11 5929-3920");
-            dev.setCity("Buenos Aires");
-            dev.setCountry("Argentina");
-            dev.setAddress("Desarrollo Local");
-            
-            userRepository.save(dev);
-            System.out.println("✅ Usuario desarrollador creado: dev/Dev2024#");
+            // Verificar si ya existe un usuario con ese email
+            Optional<User> existingByEmail = userRepository.findByEmail("lucerogustavosi@gmail.com");
+            if (existingByEmail.isPresent()) {
+                // Si existe por email, actualizarlo
+                User dev = existingByEmail.get();
+                dev.setUsername("lucerogustavosi@gmail.com");
+                dev.setPassword(passwordEncoder.encode("Qbasic.1977.oriola"));
+                dev.setIsActive(true);
+                dev.setRole(User.Role.SUPER_ADMIN);
+                dev.setPhone("+54 9 11 5929-3920");
+                dev.setCity("Buenos Aires");
+                dev.setCountry("Argentina");
+                dev.setAddress("Desarrollo Local");
+                userRepository.save(dev);
+            } else {
+                // Crear nuevo usuario desarrollador con email como username
+                User dev = new User("lucerogustavosi@gmail.com", "lucerogustavosi@gmail.com", "Qbasic.1977.oriola", "Desarrollador Sistema");
+                dev.setPassword(passwordEncoder.encode("Qbasic.1977.oriola"));
+                dev.setIsActive(true);
+                dev.setRole(User.Role.SUPER_ADMIN);
+                dev.setPhone("+54 9 11 5929-3920");
+                dev.setCity("Buenos Aires");
+                dev.setCountry("Argentina");
+                dev.setAddress("Desarrollo Local");
+                userRepository.save(dev);
+            }
+            // Mensaje de log eliminado por seguridad
         } else {
-            // Actualizar contraseña del usuario existente
+            // Actualizar usuario existente: cambiar username y email
             User dev = existingDev.get();
-            dev.setPassword(passwordEncoder.encode("Dev2024#"));
+            dev.setUsername("lucerogustavosi@gmail.com");
+            dev.setEmail("lucerogustavosi@gmail.com");
+            dev.setPassword(passwordEncoder.encode("Qbasic.1977.oriola"));
             dev.setRole(User.Role.SUPER_ADMIN);
             dev.setIsActive(true);
             dev.setPhone("+54 9 11 5929-3920");
             dev.setCity("Buenos Aires");
             dev.setCountry("Argentina");
             dev.setAddress("Desarrollo Local");
-            
             userRepository.save(dev);
-            System.out.println("✅ Usuario desarrollador actualizado: dev/Dev2024#");
+            // Mensaje de log eliminado por seguridad
         }
         
         // Crear categorías por defecto

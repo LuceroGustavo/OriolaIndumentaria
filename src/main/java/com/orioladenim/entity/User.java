@@ -18,8 +18,8 @@ public class User {
     private Long id;
     
     @NotBlank(message = "El nombre de usuario es requerido")
-    @Size(min = 3, max = 20, message = "El nombre de usuario debe tener entre 3 y 20 caracteres")
-    @Column(unique = true, nullable = false, length = 20)
+    @Size(min = 3, max = 100, message = "El nombre de usuario debe tener entre 3 y 100 caracteres")
+    @Column(unique = true, nullable = false, length = 100)
     private String username;
     
     @NotBlank(message = "El email es requerido")

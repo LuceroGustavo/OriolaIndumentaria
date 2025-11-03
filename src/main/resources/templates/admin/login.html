@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oriola - Login Administrador</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -67,6 +68,32 @@
             font-size: 1rem;
             transition: all 0.2s ease;
             background: #ffffff;
+        }
+        
+        .password-wrapper {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #718096;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: color 0.2s ease;
+            z-index: 10;
+        }
+        
+        .password-toggle:hover {
+            color: #667eea;
+        }
+        
+        .password-wrapper .form-control {
+            padding-right: 4.5rem;
         }
         
         .form-control:focus {
@@ -194,8 +221,13 @@
             
             <div class="mb-4">
                 <label for="password" class="form-label">Contraseña</label>
-                <input type="password" class="form-control" id="password" name="password" required 
-                       placeholder="Ingresa tu contraseña" autocomplete="current-password">
+                <div class="password-wrapper">
+                    <input type="password" class="form-control" id="password" name="password" required 
+                           placeholder="Ingresa tu contraseña" autocomplete="current-password">
+                    <button type="button" class="password-toggle" id="togglePassword" aria-label="Mostrar/Ocultar contraseña">
+                        <i class="bi bi-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
             </div>
             
             <button type="submit" class="btn-login" id="loginBtn">
@@ -267,6 +299,25 @@
                         this.classList.add('is-invalid');
                     }
                 });
+            });
+            
+            // Toggle mostrar/ocultar contraseña
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Cambiar icono
+                if (type === 'password') {
+                    eyeIcon.classList.remove('bi-eye-slash');
+                    eyeIcon.classList.add('bi-eye');
+                } else {
+                    eyeIcon.classList.remove('bi-eye');
+                    eyeIcon.classList.add('bi-eye-slash');
+                }
             });
         });
     </script>
