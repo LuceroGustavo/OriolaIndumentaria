@@ -336,10 +336,17 @@
                             <textarea class="form-control" id="respuesta" rows="5" 
                                       placeholder="Escribe tu respuesta aquí..." required></textarea>
                         </div>
+                        <!-- Mensaje de estado -->
+                        <div id="respuestaStatus" class="alert d-none" role="alert">
+                            <div class="d-flex align-items-center">
+                                <span id="respuestaStatusIcon" class="me-2"></span>
+                                <span id="respuestaStatusText"></span>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-oriola">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelBtn">Cancelar</button>
+                        <button type="submit" class="btn btn-oriola" id="submitBtn">
                             <i class="bi bi-send me-1"></i>Enviar respuesta
                         </button>
                     </div>
@@ -395,6 +402,29 @@
                 return;
             }
             
+            // Obtener elementos del UI
+            const statusDiv = document.getElementById('respuestaStatus');
+            const statusIcon = document.getElementById('respuestaStatusIcon');
+            const statusText = document.getElementById('respuestaStatusText');
+            const submitBtn = document.getElementById('submitBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const closeBtn = document.querySelector('#responderModal .btn-close');
+            const textarea = document.getElementById('respuesta');
+            
+            // Mostrar estado de envío
+            statusDiv.classList.remove('d-none', 'alert-success', 'alert-danger');
+            statusDiv.classList.add('alert-info');
+            statusIcon.innerHTML = '<i class="bi bi-clock-history"></i>';
+            statusIcon.className = 'me-2';
+            statusText.textContent = 'Enviando respuesta...';
+            
+            // Deshabilitar controles
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Enviando...';
+            cancelBtn.disabled = true;
+            if (closeBtn) closeBtn.disabled = true;
+            textarea.disabled = true;
+            
             fetch(`/api/contacts/${contactIdActual}/responder`, {
                 method: 'POST',
                 headers: {
@@ -405,14 +435,45 @@
             .then(response => response.text())
             .then(data => {
                 if (data === 'OK') {
-                    location.reload();
+                    // Mostrar éxito
+                    statusDiv.classList.remove('alert-info');
+                    statusDiv.classList.add('alert-success');
+                    statusIcon.innerHTML = '<i class="bi bi-check-circle"></i>';
+                    statusText.textContent = '¡Respuesta enviada exitosamente!';
+                    
+                    // Recargar después de 1.5 segundos
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
                 } else {
-                    alert('Error al enviar respuesta: ' + data);
+                    // Mostrar error
+                    statusDiv.classList.remove('alert-info');
+                    statusDiv.classList.add('alert-danger');
+                    statusIcon.innerHTML = '<i class="bi bi-exclamation-triangle"></i>';
+                    statusText.textContent = 'Error al enviar respuesta: ' + data;
+                    
+                    // Rehabilitar controles
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-send me-1"></i>Enviar respuesta';
+                    cancelBtn.disabled = false;
+                    if (closeBtn) closeBtn.disabled = false;
+                    textarea.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error al enviar respuesta');
+                // Mostrar error
+                statusDiv.classList.remove('alert-info');
+                statusDiv.classList.add('alert-danger');
+                statusIcon.innerHTML = '<i class="bi bi-exclamation-triangle"></i>';
+                statusText.textContent = 'Error al enviar respuesta. Por favor, intenta nuevamente.';
+                
+                // Rehabilitar controles
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-send me-1"></i>Enviar respuesta';
+                cancelBtn.disabled = false;
+                if (closeBtn) closeBtn.disabled = false;
+                textarea.disabled = false;
             });
         });
         

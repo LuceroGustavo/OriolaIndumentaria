@@ -106,6 +106,11 @@ Este documento consolida todos los sistemas principales implementados en el proy
 - ✅ **Feedback visual** en envío de respuestas (loading, éxito, error)
 - ✅ **Interfaz consistente** con navbar y sidebar unificados
 - ✅ **Corrección de errores** de parsing en templates
+- ✅ **Sistema de historial de respuestas** - Nueva entidad `ContactResponse` para mantener historial completo
+- ✅ **Botón WhatsApp** en vista de detalle con validación y limpieza de número
+- ✅ **Corrección crítica del formulario público** - Los campos ahora llegan correctamente al servidor
+- ✅ **Visibilidad móvil mejorada** - Mensajes de estado visibles en dispositivos móviles
+- ✅ **Logging mejorado** - Logs detallados para depuración
 - 📄 Ver detalles completos en: `documentacion/avances/07-mejoras-sistema-consultas.md`
 
 ### **Integración WhatsApp:**

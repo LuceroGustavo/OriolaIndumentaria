@@ -184,6 +184,119 @@ Este documento describe las mejoras y correcciones implementadas en el sistema d
 
 ---
 
+---
+
+## 🆕 **ACTUALIZACIÓN - 4 de noviembre de 2025**
+
+### **Mejoras Adicionales Implementadas**
+
+#### **1. Sistema de Historial de Respuestas**
+
+**Problema anterior:**
+- Solo se guardaba la última respuesta, sobrescribiendo las anteriores
+- No se podía ver el historial completo de comunicaciones con un cliente
+
+**Solución implementada:**
+- ✅ **Nueva entidad `ContactResponse`**: Tabla separada para almacenar cada respuesta individual
+- ✅ **Historial completo**: Se muestra todas las respuestas enviadas a una consulta, ordenadas por fecha (más reciente primero)
+- ✅ **Eliminación en cascada**: Al eliminar una consulta, se eliminan automáticamente todas sus respuestas asociadas
+- ✅ **Compatibilidad**: Se mantiene el campo `respuesta` en `Contact` para compatibilidad con código legacy
+
+**Archivos creados/modificados:**
+- `src/main/java/com/orioladenim/entity/ContactResponse.java` (nuevo)
+- `src/main/java/com/orioladenim/repo/ContactResponseRepository.java` (nuevo)
+- `src/main/java/com/orioladenim/service/ContactService.java` (actualizado)
+- `src/main/resources/templates/admin/contact-detail.html` (actualizado)
+
+#### **2. Mejoras en Vista de Detalle de Consulta**
+
+**Nuevas funcionalidades:**
+- ✅ **Teléfono del cliente**: Se muestra el teléfono del cliente en la sección de datos del cliente, con indicador "No proporcionado" si no está disponible
+- ✅ **Botón "Enviar email"**: Conectado al modal de respuesta para facilitar el envío
+- ✅ **Botón "WhatsApp"**: 
+  - Abre WhatsApp Web/App con el número del cliente pre-cargado
+  - Validación: muestra alerta si no hay teléfono asociado
+  - Limpieza automática del número (remueve espacios, guiones, paréntesis)
+  - Validación de formato (mínimo 10 dígitos)
+- ✅ **Historial de respuestas visual**: Cada respuesta se muestra en una tarjeta con:
+  - Número de respuesta (#1, #2, etc.)
+  - Fecha y hora formateada
+  - Contenido con formato preservado
+
+**Archivos modificados:**
+- `src/main/resources/templates/admin/contact-detail.html`
+- `src/main/java/com/orioladenim/controller/ContactController.java`
+
+#### **3. Corrección Crítica del Formulario de Contacto Público**
+
+**Problema detectado:**
+- Los campos del formulario llegaban como `null` al servidor
+- El formulario mostraba mensaje de éxito pero no guardaba la consulta
+- Causa: al usar JavaScript para interceptar el submit, los nombres de los campos no se enviaban correctamente
+
+**Solución implementada:**
+- ✅ **Atributos `name` explícitos**: Todos los campos del formulario ahora tienen atributos `name` explícitos además de `th:field`
+- ✅ **Enctype explícito**: Agregado `enctype="application/x-www-form-urlencoded"` al formulario
+- ✅ **Envío tradicional**: Restaurado el envío tradicional del formulario (sin interceptar con `fetch`) para garantizar que los datos lleguen correctamente
+- ✅ **Efecto visual mantenido**: Se mantiene el mensaje de "Enviando..." pero sin bloquear el envío real del formulario
+- ✅ **Campos no deshabilitados**: Los campos de entrada ya no se deshabilitan antes del envío (solo los botones), ya que algunos navegadores no envían valores de campos deshabilitados
+
+**Archivos modificados:**
+- `src/main/resources/templates/contact.html`
+
+#### **4. Mejoras en Visibilidad Móvil**
+
+**Problema:**
+- El mensaje de estado "Enviando..." no era visible en dispositivos móviles
+
+**Solución:**
+- ✅ **Estilos CSS específicos**: Agregados estilos con `!important` para forzar visibilidad en móvil
+- ✅ **JavaScript mejorado**: Forzado de `display: block`, `visibility: visible` y `opacity: 1` cuando se muestra el mensaje
+- ✅ **Scroll automático**: En dispositivos móviles, el scroll se mueve automáticamente al mensaje para asegurar visibilidad
+- ✅ **Estilos responsivos**: Tamaños de fuente y padding ajustados para móvil
+
+**Archivos modificados:**
+- `src/main/resources/templates/contact.html`
+
+#### **5. Logging Mejorado para Depuración**
+
+**Mejoras implementadas:**
+- ✅ **Logs detallados en controlador**: 
+  - Content-Type de la petición
+  - Todos los parámetros recibidos
+  - Valores del objeto Contact después del binding
+- ✅ **Logs en servicio**: 
+  - Información detallada al crear consulta
+  - Confirmación de guardado con ID
+  - Logs de errores con stack trace
+- ✅ **Logs de eliminación**: Información detallada sobre el proceso de eliminación en cascada
+
+**Archivos modificados:**
+- `src/main/java/com/orioladenim/controller/ContactController.java`
+- `src/main/java/com/orioladenim/service/ContactService.java`
+
+---
+
+## 📊 **RESUMEN DE CAMBIOS TÉCNICOS**
+
+### **Base de Datos:**
+- Nueva tabla `contact_responses` con relación Many-to-One con `contacts`
+- Eliminación en cascada configurada con `@OnDelete(action = OnDeleteAction.CASCADE)`
+
+### **Backend:**
+- Nuevo método `obtenerRespuestas(Long contactId)` en `ContactService`
+- Método `responder()` actualizado para crear registros en `ContactResponse`
+- Método `eliminar()` mejorado para eliminar respuestas antes de eliminar la consulta
+
+### **Frontend:**
+- Formulario público con atributos `name` explícitos
+- Envío tradicional restaurado (sin `fetch`)
+- Mensaje de estado visible en móvil con scroll automático
+- Botón WhatsApp con validación y limpieza de número
+- Historial de respuestas con diseño visual mejorado
+
+---
+
 **Documento creado**: 2 de noviembre de 2025  
-**Última actualización**: 2 de noviembre de 2025
+**Última actualización**: 4 de noviembre de 2025
 

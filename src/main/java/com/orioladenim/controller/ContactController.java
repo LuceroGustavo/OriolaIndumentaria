@@ -50,11 +50,29 @@ public class ContactController {
             HttpServletRequest request,
             RedirectAttributes redirectAttributes) {
 
+        System.out.println("📨 Recibiendo formulario de contacto:");
+        System.out.println("   - Content-Type: " + request.getContentType());
+        System.out.println("   - Method: " + request.getMethod());
+        System.out.println("   - Parámetros recibidos:");
+        request.getParameterMap().forEach((key, values) -> {
+            System.out.println("      * " + key + " = " + (values.length > 0 ? values[0] : "vacío"));
+        });
+        System.out.println("   - Objeto Contact:");
+        System.out.println("      * Nombre: " + (contact.getNombre() != null ? contact.getNombre() : "null"));
+        System.out.println("      * Email: " + (contact.getEmail() != null ? contact.getEmail() : "null"));
+        System.out.println("      * Teléfono: " + (contact.getTelefono() != null ? contact.getTelefono() : "null"));
+        System.out.println("      * Asunto: " + (contact.getAsunto() != null ? contact.getAsunto() : "null"));
+        System.out.println("      * Mensaje: " + (contact.getMensaje() != null ? (contact.getMensaje().length() > 50 ? contact.getMensaje().substring(0, 50) + "..." : contact.getMensaje()) : "null"));
+        System.out.println("      * Producto interés: " + (contact.getProductoInteres() != null ? contact.getProductoInteres() : "null"));
+
         // Validar datos
         if (!contactService.esConsultaValida(contact)) {
+            System.out.println("⚠️ Validación fallida - consulta rechazada");
             redirectAttributes.addFlashAttribute("error", "Por favor, complete todos los campos requeridos correctamente.");
             return "redirect:/contact";
         }
+        
+        System.out.println("✅ Validación exitosa - procesando consulta");
 
         try {
             // Obtener información del cliente
@@ -78,7 +96,10 @@ public class ContactController {
 
             // Agregar ubicación a la consulta y guardar
             nuevaConsulta.setUbicacion(ubicacion);
-            contactService.guardar(nuevaConsulta);
+            Contact consultaGuardada = contactService.guardar(nuevaConsulta);
+            System.out.println("✅ Consulta guardada exitosamente - ID: " + consultaGuardada.getId() + 
+                             " - Nombre: " + consultaGuardada.getNombre() + 
+                             " - Email: " + consultaGuardada.getEmail());
 
             // Enviar notificación por email al administrador
             emailService.sendNewContactNotification(nuevaConsulta);
@@ -92,6 +113,8 @@ public class ContactController {
             return "redirect:/contact";
 
         } catch (Exception e) {
+            System.err.println("❌ Error al procesar consulta: " + e.getMessage());
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error",
                     "Hubo un error al enviar tu consulta. Por favor, inténtalo de nuevo.");
             return "redirect:/contact";
@@ -153,6 +176,8 @@ public class ContactController {
             }
 
             model.addAttribute("contact", contact.get());
+            // Obtener todas las respuestas de la consulta
+            model.addAttribute("responses", contactService.obtenerRespuestas(id));
             return "admin/contact-detail";
         } else {
             return "redirect:/admin/contacts?error=Consulta no encontrada";

@@ -99,13 +99,13 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
 
-                            <form th:action="@{/contact}" th:object="${contact}" method="post" novalidate>
+                            <form th:action="@{/contact}" th:object="${contact}" method="post" enctype="application/x-www-form-urlencoded" novalidate>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label for="nombre" class="form-label">
                                             <i class="bi bi-person me-1"></i>Nombre completo *
                                         </label>
-                                        <input type="text" class="form-control" id="nombre" th:field="*{nombre}" 
+                                        <input type="text" class="form-control" id="nombre" name="nombre" th:field="*{nombre}" 
                                                placeholder="Tu Nombre" required>
                                         <div class="invalid-feedback">
                                             Por favor, ingresa tu nombre completo.
@@ -115,7 +115,7 @@
                                         <label for="email" class="form-label">
                                             <i class="bi bi-envelope me-1"></i>Email *
                                         </label>
-                                        <input type="email" class="form-control" id="email" th:field="*{email}" 
+                                        <input type="email" class="form-control" id="email" name="email" th:field="*{email}" 
                                                placeholder="tu@email.com" required>
                                         <div class="invalid-feedback">
                                             Por favor, ingresa un email válido.
@@ -125,39 +125,46 @@
                                         <label for="telefono" class="form-label">
                                             <i class="bi bi-telephone me-1"></i>Teléfono <span class="text-muted">(Opcional)</span>
                                         </label>
-                                        <input type="tel" class="form-control" id="telefono" th:field="*{telefono}" 
+                                        <input type="tel" class="form-control" id="telefono" name="telefono" th:field="*{telefono}" 
                                                placeholder="+54 9 11 1234-5678">
                                     </div>
                                     <div class="col-md-6">
                                         <label for="asunto" class="form-label">
                                             <i class="bi bi-tag me-1"></i>Asunto
                                         </label>
-                                        <input type="text" class="form-control" id="asunto" th:field="*{asunto}" 
+                                        <input type="text" class="form-control" id="asunto" name="asunto" th:field="*{asunto}" 
                                                placeholder="Solicito Info.">
                                     </div>
                                     <div class="col-12">
                                         <label for="productoInteres" class="form-label">
                                             <i class="bi bi-bag me-1"></i>Producto de interés
                                         </label>
-                                        <input type="text" class="form-control" id="productoInteres" th:field="*{productoInteres}" 
+                                        <input type="text" class="form-control" id="productoInteres" name="productoInteres" th:field="*{productoInteres}" 
                                                placeholder="¿Hay algún producto específico que te interese?">
                                     </div>
                                     <div class="col-12">
                                         <label for="mensaje" class="form-label">
                                             <i class="bi bi-chat-text me-1"></i>Mensaje *
                                         </label>
-                                        <textarea class="form-control" id="mensaje" th:field="*{mensaje}" 
+                                        <textarea class="form-control" id="mensaje" name="mensaje" th:field="*{mensaje}" 
                                                   rows="4" placeholder="Cuéntanos qué necesitas saber..." required></textarea>
                                         <div class="invalid-feedback">
                                             Por favor, escribe tu mensaje.
                                         </div>
                                     </div>
                                     <div class="col-12">
+                                        <!-- Mensaje de estado -->
+                                        <div id="formStatus" class="alert mb-3" role="alert" style="display: none;">
+                                            <div class="d-flex align-items-center">
+                                                <span id="formStatusIcon" class="me-2"></span>
+                                                <span id="formStatusText"></span>
+                                            </div>
+                                        </div>
                                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                            <button type="reset" class="btn btn-clear me-md-2">
+                                            <button type="reset" class="btn btn-clear me-md-2" id="resetBtn">
                                                 <i class="bi bi-arrow-clockwise me-1"></i>Limpiar
                                             </button>
-                                            <button type="submit" class="btn btn-submit" style="background-color: #28a745; color: white; border: none; font-weight: 500;">
+                                            <button type="submit" class="btn btn-submit" id="submitBtn" style="background-color: #28a745; color: white; border: none; font-weight: 500;">
                                                 <i class="bi bi-send me-1"></i>Enviar consulta
                                             </button>
                                         </div>
@@ -421,6 +428,32 @@
                 padding-bottom: 0.75rem;
             }
         }
+        
+        /* Estilos para mensaje de estado - visible en móvil */
+        #formStatus {
+            position: relative !important;
+            z-index: 1000 !important;
+            min-height: 50px !important;
+            padding: 12px 16px !important;
+            margin-bottom: 1rem !important;
+            border-radius: 8px !important;
+            font-size: 14px !important;
+            line-height: 1.5 !important;
+        }
+        
+        #formStatus[style*="display: block"] {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        @media (max-width: 768px) {
+            #formStatus {
+                font-size: 13px !important;
+                padding: 10px 14px !important;
+                margin-bottom: 1rem !important;
+            }
+        }
     </style>
 
     <!-- Scripts -->
@@ -435,14 +468,52 @@
             // Obtener formulario
             const form = document.querySelector('form');
             
-            // Validar en tiempo real
+            // Validar en tiempo real y mostrar loading
             form.addEventListener('submit', function(event) {
+                // Validar formulario
                 if (!form.checkValidity()) {
                     event.preventDefault();
                     event.stopPropagation();
+                    form.classList.add('was-validated');
+                    return;
                 }
                 
+                // Si el formulario es válido, mostrar loading pero NO prevenir envío
                 form.classList.add('was-validated');
+                
+                // Obtener elementos del UI
+                const statusDiv = document.getElementById('formStatus');
+                const statusIcon = document.getElementById('formStatusIcon');
+                const statusText = document.getElementById('formStatusText');
+                const submitBtn = document.getElementById('submitBtn');
+                const resetBtn = document.getElementById('resetBtn');
+                const formInputs = form.querySelectorAll('input, textarea, select');
+                
+                // Mostrar estado de envío
+                statusDiv.classList.remove('d-none', 'alert-success', 'alert-danger');
+                statusDiv.classList.add('alert-info');
+                statusDiv.style.display = 'block'; // Forzar visibilidad en móvil
+                statusDiv.style.visibility = 'visible';
+                statusDiv.style.opacity = '1';
+                statusIcon.innerHTML = '<i class="bi bi-clock-history"></i>';
+                statusIcon.className = 'me-2';
+                statusText.textContent = 'Enviando formulario, aguarde...';
+                
+                // Scroll automático al mensaje en móvil
+                if (window.innerWidth <= 768) {
+                    setTimeout(() => {
+                        statusDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 100);
+                }
+                
+                // Deshabilitar solo el botón para evitar doble envío
+                // NO deshabilitar los campos porque algunos navegadores no envían valores deshabilitados
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Enviando...';
+                resetBtn.disabled = true;
+                
+                // NO prevenir el envío - permitir que el formulario se envíe normalmente
+                // El servidor manejará el envío y mostrará el mensaje de éxito mediante flash attributes
             });
             
             // Validación personalizada para email

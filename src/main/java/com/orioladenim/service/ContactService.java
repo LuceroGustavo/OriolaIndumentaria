@@ -1,8 +1,9 @@
 package com.orioladenim.service;
 
-import com.orioladenim.dto.ContactStats;
 import com.orioladenim.entity.Contact;
+import com.orioladenim.entity.ContactResponse;
 import com.orioladenim.repo.ContactRepository;
+import com.orioladenim.repo.ContactResponseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,9 @@ public class ContactService {
     
     @Autowired
     private ContactRepository contactRepository;
+    
+    @Autowired
+    private ContactResponseRepository contactResponseRepository;
     
     @Autowired
     private EmailService emailService;
@@ -41,7 +45,14 @@ public class ContactService {
     }
     
     /**
-     * Elimina físicamente una consulta y su respuesta de la base de datos
+     * Elimina físicamente una consulta y todas sus respuestas de la base de datos.
+     * 
+     * La eliminación se realiza en dos niveles:
+     * 1. Eliminación manual explícita de respuestas (para logs y control)
+     * 2. Eliminación en cascada a nivel de base de datos (configurada con @OnDelete)
+     * 
+     * Esto garantiza que todas las respuestas asociadas se eliminen correctamente,
+     * incluso si hay algún problema con la eliminación manual.
      */
     public void eliminar(Long id) {
         Optional<Contact> contact = contactRepository.findById(id);
@@ -50,12 +61,29 @@ public class ContactService {
             System.out.println("🗑️ Eliminando consulta ID: " + id);
             System.out.println("   - Nombre: " + c.getNombre());
             System.out.println("   - Respondida: " + c.isRespondido());
-            if (c.getRespuesta() != null && !c.getRespuesta().isEmpty()) {
-                System.out.println("   - Respuesta será eliminada junto con la consulta");
+            
+            // Contar respuestas antes de eliminar (para logs)
+            List<ContactResponse> responses = contactResponseRepository.findByContactIdOrderByFechaRespuestaDesc(id);
+            int totalRespuestas = responses.size();
+            
+            if (totalRespuestas > 0) {
+                System.out.println("   - Encontradas " + totalRespuestas + " respuesta(s) asociada(s)");
+                // Eliminar manualmente todas las respuestas (la cascada de BD también funcionará como respaldo)
+                contactResponseRepository.deleteAll(responses);
+                System.out.println("   - ✅ " + totalRespuestas + " respuesta(s) eliminada(s) manualmente");
+            } else {
+                System.out.println("   - No hay respuestas asociadas");
             }
-            // Eliminar físicamente de la base de datos (eliminación en cascada)
+            
+            if (c.getRespuesta() != null && !c.getRespuesta().isEmpty()) {
+                System.out.println("   - Respuesta legacy será eliminada junto con la consulta");
+            }
+            
+            // Eliminar la consulta (la eliminación en cascada de la BD eliminará cualquier respuesta restante)
             contactRepository.deleteById(id);
-            System.out.println("✅ Consulta eliminada correctamente");
+            System.out.println("✅ Consulta eliminada correctamente (con eliminación en cascada de respuestas)");
+        } else {
+            System.out.println("⚠️ Consulta no encontrada con ID: " + id);
         }
     }
     
@@ -125,16 +153,33 @@ public class ContactService {
     public void responder(Long id, String respuesta) {
         Optional<Contact> contact = contactRepository.findById(id);
         if (contact.isPresent()) {
-            contact.get().responder(respuesta);
-            contactRepository.save(contact.get());
+            Contact c = contact.get();
+            
+            // Crear nueva respuesta en la tabla de respuestas
+            ContactResponse response = new ContactResponse(c, respuesta.trim());
+            contactResponseRepository.save(response);
+            
+            // Mantener compatibilidad: actualizar el campo respuesta en Contact (última respuesta)
+            c.setRespuesta(respuesta.trim());
+            c.setRespondido(true);
+            c.setFechaRespuesta(LocalDateTime.now());
+            c.setFechaActualizacion(LocalDateTime.now());
+            contactRepository.save(c);
             
             // Enviar respuesta por email al cliente
             try {
-                emailService.sendResponseToClient(contact.get());
+                emailService.sendResponseToClient(c);
             } catch (Exception e) {
                 System.err.println("Error enviando respuesta al cliente: " + e.getMessage());
             }
         }
+    }
+    
+    /**
+     * Obtiene todas las respuestas de una consulta ordenadas por fecha (más reciente primero)
+     */
+    public List<ContactResponse> obtenerRespuestas(Long contactId) {
+        return contactResponseRepository.findByContactIdOrderByFechaRespuestaDesc(contactId);
     }
     
     public void marcarComoLeida(Contact contact) {
@@ -211,10 +256,22 @@ public class ContactService {
     public Contact crearConsulta(String nombre, String email, String telefono, 
                                 String asunto, String mensaje, String productoInteres,
                                 String ipAddress, String userAgent) {
+        System.out.println("📝 Creando nueva consulta:");
+        System.out.println("   - Nombre: " + nombre);
+        System.out.println("   - Email: " + email);
+        System.out.println("   - Teléfono: " + (telefono != null ? telefono : "No proporcionado"));
+        System.out.println("   - Asunto: " + (asunto != null ? asunto : "No proporcionado"));
+        System.out.println("   - Mensaje: " + (mensaje != null && mensaje.length() > 50 ? mensaje.substring(0, 50) + "..." : mensaje));
+        System.out.println("   - Producto interés: " + (productoInteres != null ? productoInteres : "No especificado"));
+        System.out.println("   - IP: " + ipAddress);
+        
         Contact contact = new Contact(nombre, email, telefono, asunto, mensaje, productoInteres);
         contact.setIpAddress(ipAddress);
         contact.setUserAgent(userAgent);
-        return guardar(contact);
+        
+        Contact guardado = guardar(contact);
+        System.out.println("   ✅ Consulta creada con ID: " + guardado.getId());
+        return guardado;
     }
     
     // Método para crear consulta simple

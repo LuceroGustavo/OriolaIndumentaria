@@ -132,8 +132,18 @@
                                     <div class="col-md-6">
                                         <h6 class="text-muted">Cliente</h6>
                                         <p class="mb-0 fw-bold" th:text="${contact.nombre}">Nombre</p>
-                                        <p class="text-muted mb-0" th:text="${contact.email}">email@ejemplo.com</p>
-                                        <p th:if="${contact.telefono}" class="text-muted mb-0" th:text="${contact.telefono}">Teléfono</p>
+                                        <p class="text-muted mb-0">
+                                            <i class="bi bi-envelope me-1"></i>
+                                            <span th:text="${contact.email}">email@ejemplo.com</span>
+                                        </p>
+                                        <p th:if="${contact.telefono}" class="text-muted mb-0">
+                                            <i class="bi bi-telephone me-1"></i>
+                                            <span th:text="${contact.telefono}">Teléfono</span>
+                                        </p>
+                                        <p th:if="${contact.telefono == null || contact.telefono.isEmpty()}" class="text-muted mb-0 small">
+                                            <i class="bi bi-telephone me-1"></i>
+                                            <span class="text-muted">No proporcionado</span>
+                                        </p>
                                     </div>
                                     <div class="col-md-6">
                                         <h6 class="text-muted">Fecha</h6>
@@ -170,30 +180,54 @@
                             </div>
                         </div>
 
-                        <!-- Respuesta -->
-                        <div th:if="${contact.respondido && contact.respuesta != null && !contact.respuesta.isEmpty()}" class="card mb-4 border-success">
-                            <div class="card-header bg-success text-white">
-                                <h5 class="card-title mb-0">
-                                    <i class="bi bi-reply-fill me-2"></i>Respuesta Enviada
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3 pb-3 border-bottom">
-                                    <div class="d-flex align-items-center">
-                                        <i class="bi bi-calendar-check me-2 text-success"></i>
-                                        <div>
-                                            <h6 class="text-muted mb-1">Fecha de respuesta</h6>
-                                            <p class="mb-0 fw-bold" th:if="${contact.fechaRespuesta != null}">
-                                                <span th:text="${#temporals.format(contact.fechaRespuesta, 'dd/MM/yyyy HH:mm')}">Fecha</span>
-                                            </p>
-                                            <p class="mb-0 text-muted" th:if="${contact.fechaRespuesta == null}">
-                                                Fecha no disponible
-                                            </p>
-                                        </div>
+                        <!-- Historial de Respuestas -->
+                        <div th:if="${contact.respondido && responses != null && !responses.isEmpty()}" class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="bi bi-chat-left-text me-2"></i>Historial de Respuestas
+                                <span class="badge bg-success ms-2" th:text="${#lists.size(responses)}">0</span>
+                            </h5>
+                            
+                            <!-- Iterar sobre todas las respuestas -->
+                            <div th:each="response, iterStat : ${responses}" class="card mb-3 border-success">
+                                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                                    <h6 class="card-title mb-0">
+                                        <i class="bi bi-reply-fill me-2"></i>Respuesta #<span th:text="${iterStat.count}">1</span>
+                                    </h6>
+                                    <small th:if="${response.fechaRespuesta != null}" 
+                                           th:text="${#temporals.format(response.fechaRespuesta, 'dd/MM/yyyy HH:mm')}">
+                                        Fecha
+                                    </small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="bg-light p-4 rounded border-start border-success border-4">
+                                        <p class="mb-0" style="white-space: pre-wrap;" th:text="${response.respuesta}">Respuesta</p>
                                     </div>
                                 </div>
-                                <div>
-                                    <h6 class="text-muted mb-2">Contenido de la respuesta</h6>
+                            </div>
+                            
+                            <!-- Mostrar última respuesta del campo legacy (si existe y no está en la lista) -->
+                            <div th:if="${contact.respuesta != null && !contact.respuesta.isEmpty() && (responses == null || responses.isEmpty())}" 
+                                 class="card mb-3 border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="card-title mb-0">
+                                        <i class="bi bi-reply-fill me-2"></i>Respuesta Enviada
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3 pb-3 border-bottom">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-check me-2 text-success"></i>
+                                            <div>
+                                                <h6 class="text-muted mb-1">Fecha de respuesta</h6>
+                                                <p class="mb-0 fw-bold" th:if="${contact.fechaRespuesta != null}">
+                                                    <span th:text="${#temporals.format(contact.fechaRespuesta, 'dd/MM/yyyy HH:mm')}">Fecha</span>
+                                                </p>
+                                                <p class="mb-0 text-muted" th:if="${contact.fechaRespuesta == null}">
+                                                    Fecha no disponible
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="bg-light p-4 rounded border-start border-success border-4">
                                         <p class="mb-0" style="white-space: pre-wrap;" th:text="${contact.respuesta}">Respuesta</p>
                                     </div>
@@ -223,14 +257,15 @@
                                             class="btn btn-warning">
                                         <i class="bi bi-reply me-1"></i>Responder
                                     </button>
-                                    <a th:href="'mailto:' + ${contact.email}" class="btn btn-outline-primary">
+                                    <button th:onclick="'responder(' + ${contact.id} + ')'"
+                                            class="btn btn-outline-primary">
                                         <i class="bi bi-envelope me-1"></i>Enviar email
-                                    </a>
-                                    <a th:href="'https://wa.me/' + ${contact.telefono}" 
-                                       th:if="${contact.telefono}" 
-                                       class="btn btn-outline-success" target="_blank">
+                                    </button>
+                                    <button onclick="enviarWhatsApp(this)"
+                                            th:attr="data-telefono=${contact.telefono != null ? contact.telefono : ''}"
+                                            class="btn btn-outline-success">
                                         <i class="bi bi-whatsapp me-1"></i>WhatsApp
-                                    </a>
+                                    </button>
                                     <button th:onclick="'eliminar(' + ${contact.id} + ')'" 
                                             class="btn btn-outline-danger">
                                         <i class="bi bi-trash me-1"></i>Eliminar
@@ -432,6 +467,31 @@
                 textarea.disabled = false;
             });
         });
+        
+        // Enviar WhatsApp
+        function enviarWhatsApp(boton) {
+            // Obtener el teléfono del botón que fue clickeado
+            const telefono = boton ? boton.getAttribute('data-telefono') : null;
+            
+            // Verificar si hay teléfono
+            if (!telefono || telefono.trim() === '' || telefono === 'null') {
+                alert('No hay un teléfono asociado al cliente. Por favor, contacta al cliente por email.');
+                return;
+            }
+            
+            // Limpiar el teléfono (remover espacios, guiones, paréntesis, etc.)
+            const telefonoLimpio = telefono.replace(/[\s\-\(\)\+]/g, '');
+            
+            // Validar que el teléfono tenga al menos 10 dígitos
+            if (telefonoLimpio.length < 10) {
+                alert('El número de teléfono no es válido. Por favor, verifica el número.');
+                return;
+            }
+            
+            // Abrir WhatsApp
+            const url = `https://wa.me/${telefonoLimpio}`;
+            window.open(url, '_blank');
+        }
         
         // Eliminar consulta
         function eliminar(id) {
