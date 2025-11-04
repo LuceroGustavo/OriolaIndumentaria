@@ -30,6 +30,19 @@
             font-size: 2.5rem;
             opacity: 0.7;
         }
+        @media (max-width: 768px) {
+            .row[style*="flex-wrap: nowrap"] {
+                flex-wrap: wrap !important;
+            }
+            .row[style*="flex-wrap: nowrap"] .col {
+                flex: 1 1 50% !important;
+                max-width: 50%;
+            }
+            .row[style*="flex-wrap: nowrap"] .col .btn {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.75rem;
+            }
+        }
         .analytics-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -109,6 +122,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/admin/contacts">
                                 <i class="bi bi-envelope me-2"></i>Consultas
+                                <span th:if="${consultasNoLeidas > 0}" class="badge bg-danger rounded-pill ms-2" th:text="${consultasNoLeidas}">0</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -145,10 +159,10 @@
                 </div>
                 
                 <!-- Stats Cards -->
-                <div class="row mb-4">
-                    <div class="col-md-3 mb-3">
+                <div class="row mb-4 g-3" style="display: flex; flex-wrap: nowrap;">
+                    <div class="col" style="flex: 1 1 0;">
                         <a href="/admin/products" class="text-decoration-none">
-                            <div class="card card-stat text-center hover-card">
+                            <div class="card card-stat text-center hover-card h-100">
                                 <div class="card-body">
                                     <i class="bi bi-box-seam stat-icon text-primary"></i>
                                     <h3 class="mt-2" th:text="${totalProductos}">0</h3>
@@ -157,8 +171,8 @@
                             </div>
                         </a>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <div class="card card-stat text-center">
+                    <div class="col" style="flex: 1 1 0;">
+                        <div class="card card-stat text-center h-100">
                             <div class="card-body">
                                 <i class="bi bi-star stat-icon text-warning"></i>
                                 <h3 class="mt-2" th:text="${productosDestacados}">0</h3>
@@ -166,8 +180,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <div class="card card-stat text-center">
+                    <div class="col" style="flex: 1 1 0;">
+                        <div class="card card-stat text-center h-100">
                             <div class="card-body">
                                 <i class="bi bi-check-circle stat-icon text-success"></i>
                                 <h3 class="mt-2" th:text="${productosActivos}">0</h3>
@@ -175,8 +189,19 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <div class="card analytics-card text-center">
+                    <div class="col" style="flex: 1 1 0;">
+                        <a href="/admin/contacts" class="text-decoration-none">
+                            <div class="card card-stat text-center hover-card h-100">
+                                <div class="card-body">
+                                    <i class="bi bi-envelope stat-icon text-info"></i>
+                                    <h3 class="mt-2" th:text="${totalConsultas}">0</h3>
+                                    <p class="text-muted mb-0">Consultas Recibidas</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col" style="flex: 1 1 0;">
+                        <div class="card analytics-card text-center h-100">
                             <div class="card-body">
                                 <i class="bi bi-eye-fill" style="font-size: 2.5rem; opacity: 0.8;"></i>
                                 <h3 class="analytics-number mt-2" id="totalViews">0</h3>
@@ -194,23 +219,28 @@
                                 <h5 class="mb-0">Acciones Rápidas</h5>
                             </div>
                             <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-3 mb-3">
+                                <div class="row g-3" style="display: flex; flex-wrap: nowrap;">
+                                    <div class="col" style="flex: 1 1 0;">
                                         <a href="/admin/products/new" class="btn btn-primary w-100">
                                             <i class="bi bi-plus-circle me-2"></i>Nuevo Producto
                                         </a>
                                     </div>
-                                    <div class="col-md-3 mb-3">
+                                    <div class="col" style="flex: 1 1 0;">
                                         <a href="/admin/categories" class="btn btn-warning w-100">
-                                            <i class="bi bi-tags me-2"></i>Gestionar Categorías
+                                            <i class="bi bi-tags me-2"></i>Categorías
                                         </a>
                                     </div>
-                                    <div class="col-md-3 mb-3">
+                                    <div class="col" style="flex: 1 1 0;">
                                         <a href="/admin/colors" class="btn btn-secondary w-100">
                                             <i class="bi bi-palette me-2"></i>Gestionar Colores
                                         </a>
                                     </div>
-                                    <div class="col-md-3 mb-3">
+                                    <div class="col" style="flex: 1 1 0;">
+                                        <a href="/admin/historias" class="btn btn-info w-100">
+                                            <i class="bi bi-camera-video me-2"></i>Gestión de Historias
+                                        </a>
+                                    </div>
+                                    <div class="col" style="flex: 1 1 0;">
                                         <a href="/admin/contacts" class="btn btn-success w-100">
                                             <i class="bi bi-envelope me-2"></i>Ver Consultas
                                         </a>

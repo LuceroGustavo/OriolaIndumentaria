@@ -1,8 +1,8 @@
 package com.orioladenim.controller;
 
-import com.orioladenim.entity.Product;
 import com.orioladenim.entity.User;
 import com.orioladenim.repo.ProductRepository;
+import com.orioladenim.service.ContactService;
 import com.orioladenim.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -21,6 +21,9 @@ public class AdminController {
     @Autowired
     private UserService userService;
     
+    @Autowired
+    private ContactService contactService;
+    
     @GetMapping("/login")
     public String login() {
         return "admin/login";
@@ -32,6 +35,8 @@ public class AdminController {
         long totalProducts = productRepository.count();
         long productosDestacados = productRepository.findByEsDestacadoTrueAndActivoTrue().size();
         long productosActivos = productRepository.findByActivoTrue().size();
+        long consultasNoLeidas = contactService.contarNoLeidas();
+        long totalConsultas = contactService.contarTotal();
         
         // Obtener el usuario real de la base de datos
         String username = authentication.getName();
@@ -41,6 +46,8 @@ public class AdminController {
         model.addAttribute("totalProductos", totalProducts);
         model.addAttribute("productosDestacados", productosDestacados);
         model.addAttribute("productosActivos", productosActivos);
+        model.addAttribute("totalConsultas", totalConsultas);
+        model.addAttribute("consultasNoLeidas", consultasNoLeidas);
         model.addAttribute("username", username);
         model.addAttribute("user", user);
         
