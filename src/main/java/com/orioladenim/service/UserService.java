@@ -133,7 +133,9 @@ public class UserService implements UserDetailsService {
         
         // Cambiar contraseña
         user.changePassword(passwordEncoder.encode(newPassword));
-        user.setMustChangePassword(true); // Forzar cambio en próximo login
+        // NO establecer mustChangePassword = true porque esto bloquea el login
+        // Si el desarrollador está restaurando acceso, el admin debe poder ingresar inmediatamente
+        user.setMustChangePassword(false);
         userRepository.save(user);
     }
     

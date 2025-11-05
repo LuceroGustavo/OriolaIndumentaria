@@ -19,6 +19,9 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - **Navegación por hover en el menú de categorías**
 - **Diseño de 4 columnas para organización de categorías**
 - **Configuración .gitignore para archivos específicos de entorno**
+- **Interfaz mejorada de cambio de contraseña** - Navbar y sidebar consistentes con el resto del panel de admin
+- **Validación avanzada de contraseñas** - Validación en tiempo real en cliente y servidor con indicadores de fortaleza
+- **Funcionalidad de recuperación de contraseña del admin** - El desarrollador puede restablecer la contraseña del admin si se olvidó
 
 ### Changed
 - Refactorización del sistema de usuarios
@@ -34,6 +37,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - Errores de TemplateInputException en páginas de administración
 - **Problemas de centrado del menú desplegable**
 - **Activación del menú por click vs hover**
+- **Bug de bloqueo de login** - Corregido problema donde `mustChangePassword = true` impedía el login después de cambiar contraseña del admin por desarrollador
 
 ## [1.0.0] - 2025-09-23
 

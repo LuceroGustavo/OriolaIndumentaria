@@ -40,23 +40,52 @@ Este documento consolida todos los sistemas principales implementados en el proy
 
 ### **Funcionalidades Implementadas:**
 - ✅ **Autenticación robusta** con Spring Security
-- ✅ **Roles diferenciados** (ADMIN, SUPER_ADMIN)
+- ✅ **Roles diferenciados** (ADMIN, SUPER_ADMIN, USER)
 - ✅ **Gestión completa de usuarios** con perfil personal
-- ✅ **Cambio de contraseñas seguro** con validación
+- ✅ **Cambio de contraseñas seguro** con validación avanzada
 - ✅ **Sistema de activación/desactivación** de usuarios
 - ✅ **Auditoría de usuarios** con timestamps
+- ✅ **Recuperación de contraseña para desarrollador** - Funcionalidad especial para restablecer contraseña del admin
 
 ### **Entidades y Servicios:**
 - **User**: Entidad principal con campos de perfil completo
 - **UserService**: Lógica de negocio para gestión de usuarios
 - **SecurityConfig**: Configuración de seguridad y roles
-- **UserController**: Controlador REST para administración
+- **UserManagementController**: Controlador para gestión de usuarios y contraseñas
+
+### **Sistema de Cambio de Contraseñas (Enero 2025):**
+
+#### **Interfaz Mejorada:**
+- ✅ **Navbar consistente**: Formulario de cambio de contraseña con navbar superior igual que otras páginas de admin (`bg-dark`)
+- ✅ **Sidebar completo**: Panel izquierdo con navegación a todas las secciones del admin (Dashboard, Productos, Categorías, Colores, Historias, Consultas, Cambiar Contraseña)
+- ✅ **Diseño unificado**: Interfaz consistente con el resto del panel de administración
+
+#### **Validación de Contraseñas:**
+- ✅ **Validación cliente (JavaScript)**: 
+  - Validación en tiempo real de fortaleza de contraseña
+  - Indicador visual de fortaleza (Muy débil, Débil, Regular, Buena, Fuerte)
+  - Validación de coincidencia de contraseñas con feedback inmediato
+  - Verificación de criterios: mínimo 6 caracteres, combinación de letras, números y símbolos
+  
+- ✅ **Validación servidor (Java)**:
+  - Validación de longitud mínima (6 caracteres)
+  - Validación de fortaleza: debe cumplir al menos 2 de 3 criterios (letras, números, símbolos)
+  - Verificación de coincidencia de contraseñas
+  - Encriptación segura con BCrypt
+
+#### **Funcionalidad para Desarrollador:**
+- ✅ **Formulario adicional**: El desarrollador (usuario `lucerogustavosi@gmail.com` con rol `SUPER_ADMIN`) tiene acceso a un formulario adicional para cambiar la contraseña del administrador
+- ✅ **Recuperación de acceso**: Permite restablecer la contraseña del admin si se olvidó, sin necesidad de conocer la contraseña actual
+- ✅ **Restricción de acceso**: Solo visible y accesible para el desarrollador, no para otros usuarios
+- ✅ **Corrección de bug**: Solucionado problema donde `mustChangePassword = true` bloqueaba el login después de cambiar la contraseña del admin
 
 ### **Características de Seguridad:**
 - **Encriptación de contraseñas** con BCrypt
 - **Validación de roles** en endpoints protegidos
 - **Sesiones seguras** con configuración personalizada
 - **Protección CSRF** habilitada
+- **Validación de fortaleza** de contraseñas en cliente y servidor
+- **Restricción de acceso** a funcionalidades sensibles por rol y email
 
 ---
 
@@ -251,5 +280,5 @@ Este documento consolida todos los sistemas principales implementados en el proy
 
 **Desarrollado por:** Equipo de Desarrollo ORIOLA  
 **Fecha de consolidación:** 15 de enero de 2025  
-**Última actualización:** Noviembre 2025 (Mejoras sistema de historias v2.0)  
+**Última actualización:** Enero 2025 (Mejoras sistema de cambio de contraseñas)  
 **Estado:** ✅ Todos los sistemas principales implementados y funcionando
