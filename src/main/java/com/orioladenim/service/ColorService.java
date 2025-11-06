@@ -74,6 +74,22 @@ public class ColorService {
      * Crear nuevo color
      */
     public Color createColor(Color color) {
+        // Limpiar y normalizar el código hexadecimal
+        if (color.getHexCode() != null && !color.getHexCode().trim().isEmpty()) {
+            String hexCode = color.getHexCode().trim();
+            // Remover caracteres no válidos excepto #
+            hexCode = hexCode.replaceAll("[^#0-9A-Fa-f]", "");
+            // Asegurar que empiece con #
+            if (!hexCode.startsWith("#")) {
+                hexCode = "#" + hexCode;
+            }
+            // Limitar a 7 caracteres (#RRGGBB) y convertir a mayúsculas
+            if (hexCode.length() > 7) {
+                hexCode = hexCode.substring(0, 7);
+            }
+            color.setHexCode(hexCode.toUpperCase());
+        }
+        
         // Validar datos
         validateColor(color);
         
@@ -82,16 +98,23 @@ public class ColorService {
             throw new IllegalArgumentException("Ya existe un color con el nombre: " + color.getName());
         }
         
-        // Validar que el código hexadecimal no exista
-        if (color.getHexCode() != null && 
+        // Validar que el código hexadecimal no exista (solo si está presente)
+        if (color.getHexCode() != null && !color.getHexCode().isEmpty() &&
             colorRepository.findByHexCodeIgnoreCase(color.getHexCode()).isPresent()) {
             throw new IllegalArgumentException("Ya existe un color con el código hexadecimal: " + color.getHexCode());
         }
         
-        // Asignar orden de visualización si no se especifica
-        if (color.getDisplayOrder() == null) {
-            color.setDisplayOrder(colorRepository.getNextDisplayOrder());
+        // Establecer valores por defecto
+        color.setIsActive(true); // Siempre activo al crear
+        color.setIsDefault(false); // Nunca es predeterminado si se crea manualmente
+        
+        // Asignar orden de visualización automáticamente
+        // Asegurar que nunca sea 0 (el orden mínimo es 1)
+        Integer nextOrder = colorRepository.getNextDisplayOrder();
+        if (nextOrder == null || nextOrder <= 0) {
+            nextOrder = 1;
         }
+        color.setDisplayOrder(nextOrder);
         
         // Inicializar contador de productos
         if (color.getProductCount() == null) {
@@ -103,10 +126,33 @@ public class ColorService {
     
     /**
      * Actualizar color existente
+     * IMPORTANTE: El ID del color NO cambia al actualizar, ya que estamos actualizando
+     * la entidad existente, no creando una nueva.
      */
     public Color updateColor(Long id, Color colorData) {
         Color existingColor = colorRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Color no encontrado con ID: " + id));
+        
+        // No permitir editar colores predeterminados
+        if (Boolean.TRUE.equals(existingColor.getIsDefault())) {
+            throw new IllegalStateException("No se puede editar un color predeterminado del sistema");
+        }
+        
+        // Limpiar y normalizar el código hexadecimal
+        if (colorData.getHexCode() != null && !colorData.getHexCode().trim().isEmpty()) {
+            String hexCode = colorData.getHexCode().trim();
+            // Remover caracteres no válidos excepto #
+            hexCode = hexCode.replaceAll("[^#0-9A-Fa-f]", "");
+            // Asegurar que empiece con #
+            if (!hexCode.startsWith("#")) {
+                hexCode = "#" + hexCode;
+            }
+            // Limitar a 7 caracteres (#RRGGBB) y convertir a mayúsculas
+            if (hexCode.length() > 7) {
+                hexCode = hexCode.substring(0, 7);
+            }
+            colorData.setHexCode(hexCode.toUpperCase());
+        }
         
         // Validar datos
         validateColor(colorData);
@@ -117,38 +163,48 @@ public class ColorService {
             throw new IllegalArgumentException("Ya existe otro color con el nombre: " + colorData.getName());
         }
         
-        // Validar que el nuevo código hexadecimal no exista en otro color
-        if (colorData.getHexCode() != null && 
+        // Validar que el nuevo código hexadecimal no exista en otro color (solo si está presente)
+        if (colorData.getHexCode() != null && !colorData.getHexCode().isEmpty() &&
             !colorData.getHexCode().equalsIgnoreCase(existingColor.getHexCode()) &&
             colorRepository.existsByHexCodeIgnoreCaseAndIdNot(colorData.getHexCode(), id)) {
             throw new IllegalArgumentException("Ya existe otro color con el código hexadecimal: " + colorData.getHexCode());
         }
         
-        // Actualizar campos
+        // Actualizar campos (no permitir cambiar isDefault ni displayOrder)
         existingColor.setName(colorData.getName());
         existingColor.setDescription(colorData.getDescription());
         existingColor.setHexCode(colorData.getHexCode());
         existingColor.setIsActive(colorData.getIsActive());
-        existingColor.setDisplayOrder(colorData.getDisplayOrder());
+        // NO actualizar displayOrder - mantener el orden original del color
+        // El displayOrder solo se asigna al crear, no al editar
         
         return colorRepository.save(existingColor);
     }
     
     /**
-     * Eliminar color (soft delete)
+     * Eliminar color permanentemente
+     * NOTA: Se eliminó el soft delete porque no se usa en esta aplicación
      */
+    @Transactional
     public void deleteColor(Long id) {
         Color color = colorRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Color no encontrado con ID: " + id));
         
-        // Verificar si tiene productos
-        if (color.hasProducts()) {
-            throw new IllegalStateException("No se puede eliminar el color porque tiene productos asociados");
+        // No permitir eliminar colores predeterminados
+        if (Boolean.TRUE.equals(color.getIsDefault())) {
+            throw new IllegalStateException("No se puede eliminar un color predeterminado del sistema");
         }
         
-        // Soft delete
-        color.setIsActive(false);
-        colorRepository.save(color);
+        // Verificar si tiene productos asociados (como colorEntity o en la lista colores)
+        Long productCount = colorRepository.countProductsByColorId(id);
+        if (productCount != null && productCount > 0) {
+            throw new IllegalStateException("No se puede eliminar el color porque tiene " + productCount + " producto(s) asociado(s)");
+        }
+        
+        // Si no tiene productos, eliminar permanentemente
+        // JPA automáticamente eliminará las relaciones en product_colors (Many-to-Many)
+        // cuando se elimine el color, ya que no hay productos que lo referencien
+        colorRepository.delete(color);
     }
     
     /**
@@ -158,6 +214,11 @@ public class ColorService {
         Color color = colorRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Color no encontrado con ID: " + id));
         
+        // No permitir eliminar colores predeterminados
+        if (Boolean.TRUE.equals(color.getIsDefault())) {
+            throw new IllegalStateException("No se puede eliminar un color predeterminado del sistema");
+        }
+        
         // Verificar si tiene productos
         if (color.hasProducts()) {
             throw new IllegalStateException("No se puede eliminar el color porque tiene productos asociados");
@@ -166,16 +227,6 @@ public class ColorService {
         colorRepository.delete(color);
     }
     
-    /**
-     * Activar/Desactivar color
-     */
-    public Color toggleColorStatus(Long id) {
-        Color color = colorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Color no encontrado con ID: " + id));
-        
-        color.setIsActive(!color.getIsActive());
-        return colorRepository.save(color);
-    }
     
     /**
      * Buscar colores por texto
@@ -234,31 +285,53 @@ public class ColorService {
     }
     
     /**
-     * Crear colores por defecto
+     * Crear o actualizar colores por defecto
+     * Este método se asegura de que los colores predeterminados existan y estén marcados como isDefault = true
      */
     public void createDefaultColors() {
-        // Verificar si ya existen colores
-        if (colorRepository.count() > 0) {
-            return;
-        }
-        
-        // Crear colores por defecto
-        Color[] defaultColors = {
-            new Color("Blanco", "Color blanco clásico", "#FFFFFF"),
-            new Color("Negro", "Color negro elegante", "#000000"),
-            new Color("Azul", "Color azul marino", "#000080"),
-            new Color("Rojo", "Color rojo vibrante", "#FF0000"),
-            new Color("Verde", "Color verde natural", "#008000"),
-            new Color("Gris", "Color gris neutro", "#808080"),
-            new Color("Rosa", "Color rosa suave", "#FFC0CB"),
-            new Color("Amarillo", "Color amarillo brillante", "#FFFF00"),
-            new Color("Marrón", "Color marrón tierra", "#A52A2A"),
-            new Color("Violeta", "Color violeta elegante", "#800080")
+        // Definir colores predeterminados del sistema
+        String[][] defaultColorsData = {
+            {"Blanco", "Color blanco clásico", "#FFFFFF"},
+            {"Negro", "Color negro elegante", "#000000"},
+            {"Azul", "Color azul marino", "#000080"},
+            {"Rojo", "Color rojo vibrante", "#FF0000"},
+            {"Verde", "Color verde natural", "#008000"},
+            {"Gris", "Color gris neutro", "#808080"},
+            {"Rosa", "Color rosa suave", "#FFC0CB"},
+            {"Amarillo", "Color amarillo brillante", "#FFFF00"},
+            {"Marrón", "Color marrón tierra", "#A52A2A"},
+            {"Violeta", "Color violeta elegante", "#800080"}
         };
         
-        for (int i = 0; i < defaultColors.length; i++) {
-            defaultColors[i].setDisplayOrder(i + 1);
-            colorRepository.save(defaultColors[i]);
+        // Procesar cada color predeterminado
+        for (int i = 0; i < defaultColorsData.length; i++) {
+            String name = defaultColorsData[i][0];
+            String description = defaultColorsData[i][1];
+            String hexCode = defaultColorsData[i][2];
+            
+            // Buscar si el color ya existe
+            Optional<Color> existingColor = colorRepository.findByNameIgnoreCase(name);
+            
+            if (existingColor.isPresent()) {
+                // Si existe, actualizarlo para marcarlo como predeterminado
+                Color color = existingColor.get();
+                color.setIsDefault(true);
+                color.setDisplayOrder(i + 1);
+                // Actualizar descripción y código hex si no están definidos
+                if (color.getDescription() == null || color.getDescription().isEmpty()) {
+                    color.setDescription(description);
+                }
+                if (color.getHexCode() == null || color.getHexCode().isEmpty()) {
+                    color.setHexCode(hexCode);
+                }
+                colorRepository.save(color);
+            } else {
+                // Si no existe, crearlo como predeterminado
+                Color newColor = new Color(name, description, hexCode);
+                newColor.setDisplayOrder(i + 1);
+                newColor.setIsDefault(true); // Marcar como predeterminado
+                colorRepository.save(newColor);
+            }
         }
     }
     
@@ -278,8 +351,10 @@ public class ColorService {
             throw new IllegalArgumentException("La descripción no puede exceder 200 caracteres");
         }
         
-        if (color.getHexCode() != null && !color.getHexCode().matches("^#[0-9A-Fa-f]{6}$")) {
-            throw new IllegalArgumentException("El código hexadecimal debe tener formato #RRGGBB");
+        // Validar código hexadecimal solo si está presente (es opcional para patrones)
+        if (color.getHexCode() != null && !color.getHexCode().trim().isEmpty() && 
+            !color.getHexCode().matches("^#[0-9A-Fa-f]{6}$")) {
+            throw new IllegalArgumentException("El código hexadecimal debe tener formato #RRGGBB o estar vacío");
         }
     }
     
@@ -289,5 +364,58 @@ public class ColorService {
     @Transactional(readOnly = true)
     public long getColorCount() {
         return colorRepository.count();
+    }
+    
+    /**
+     * Actualizar contador de productos para un color específico
+     */
+    @Transactional
+    public void updateProductCount(Long colorId) {
+        Color color = colorRepository.findById(colorId)
+                .orElseThrow(() -> new IllegalArgumentException("Color no encontrado con ID: " + colorId));
+        
+        Long count = colorRepository.countProductsByColorId(colorId);
+        color.setProductCount(count != null ? count.intValue() : 0);
+        colorRepository.save(color);
+    }
+    
+    /**
+     * Actualizar contadores de productos para todos los colores
+     */
+    @Transactional
+    public void updateAllProductCounts() {
+        List<Color> allColors = colorRepository.findAll();
+        for (Color color : allColors) {
+            Long count = colorRepository.countProductsByColorId(color.getId());
+            color.setProductCount(count != null ? count.intValue() : 0);
+        }
+        colorRepository.saveAll(allColors);
+    }
+    
+    /**
+     * Corregir colores con displayOrder = 0 o null
+     * Asigna un orden válido (mínimo 1) a los colores que tienen orden 0 o null
+     */
+    @Transactional
+    public void fixColorsWithZeroOrder() {
+        List<Color> colorsWithZeroOrder = colorRepository.findAll().stream()
+                .filter(c -> c.getDisplayOrder() == null || c.getDisplayOrder() <= 0)
+                .collect(java.util.stream.Collectors.toList());
+        
+        if (!colorsWithZeroOrder.isEmpty()) {
+            // Obtener el máximo orden actual
+            Integer maxOrder = colorRepository.findAll().stream()
+                    .filter(c -> c.getDisplayOrder() != null && c.getDisplayOrder() > 0)
+                    .mapToInt(Color::getDisplayOrder)
+                    .max()
+                    .orElse(0);
+            
+            // Asignar orden secuencial a los colores con orden 0 o null
+            for (int i = 0; i < colorsWithZeroOrder.size(); i++) {
+                colorsWithZeroOrder.get(i).setDisplayOrder(maxOrder + i + 1);
+            }
+            
+            colorRepository.saveAll(colorsWithZeroOrder);
+        }
     }
 }

@@ -32,12 +32,15 @@ public class Color {
     @Column(name = "description", length = 200)
     private String description;
     
-    @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "El código hexadecimal debe tener formato #RRGGBB")
-    @Column(name = "hex_code", length = 7, unique = true)
-    private String hexCode; // Código hexadecimal del color (#ff6b6b)
+    @Pattern(regexp = "^$|^#[0-9A-Fa-f]{6}$", message = "El código hexadecimal debe tener formato #RRGGBB o estar vacío")
+    @Column(name = "hex_code", length = 7, nullable = true)
+    private String hexCode; // Código hexadecimal del color (#ff6b6b) - Opcional para patrones
     
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
+    
+    @Column(name = "is_default", nullable = false)
+    private Boolean isDefault = false; // Indica si es un color predeterminado del sistema
     
     @Column(name = "display_order")
     private Integer displayOrder = 0; // Orden de visualización en el catálogo
@@ -54,7 +57,8 @@ public class Color {
     private LocalDateTime updatedAt;
     
     // Relación con Product (One-to-Many)
-    @OneToMany(mappedBy = "color", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // NO usar CascadeType.ALL para evitar eliminar productos al eliminar color
+    @OneToMany(mappedBy = "colorEntity", fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
     
     // Constructores
@@ -64,6 +68,7 @@ public class Color {
         this.name = name;
         this.hexCode = hexCode;
         this.isActive = true;
+        this.isDefault = false;
         this.displayOrder = 0;
         this.productCount = 0;
     }
@@ -73,6 +78,7 @@ public class Color {
         this.description = description;
         this.hexCode = hexCode;
         this.isActive = true;
+        this.isDefault = false;
         this.displayOrder = 0;
         this.productCount = 0;
     }
@@ -155,6 +161,14 @@ public class Color {
     
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
+    }
+    
+    public Boolean getIsDefault() {
+        return isDefault;
+    }
+    
+    public void setIsDefault(Boolean isDefault) {
+        this.isDefault = isDefault;
     }
     
     public Integer getDisplayOrder() {

@@ -101,4 +101,13 @@ public interface ColorRepository extends JpaRepository<Color, Long> {
      */
     @Query("SELECT c FROM Color c WHERE c.isActive = true AND c.productCount > 0 ORDER BY c.displayOrder ASC, c.name ASC")
     List<Color> findUsedColors();
+    
+    /**
+     * Contar productos asociados a un color (como colorEntity o en la lista colores)
+     */
+    @Query("SELECT COUNT(DISTINCT p) FROM Product p " +
+           "LEFT JOIN p.colores c " +
+           "WHERE (p.colorEntity.id = :colorId OR c.id = :colorId) " +
+           "AND p.activo = true")
+    Long countProductsByColorId(@Param("colorId") Long colorId);
 }

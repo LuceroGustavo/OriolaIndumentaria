@@ -94,20 +94,12 @@
                               th:object="${color}" method="post">
                             
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="mb-3">
                                         <label for="name" class="form-label">Nombre del Color *</label>
                                         <input type="text" class="form-control" id="name" th:field="*{name}" 
                                                placeholder="Ej: Blanco, Negro, Animal Print, Estampada" required>
                                         <div class="form-text">Nombre descriptivo del color o patrón</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="displayOrder" class="form-label">Orden de Visualización</label>
-                                        <input type="number" class="form-control" id="displayOrder" th:field="*{displayOrder}" 
-                                               placeholder="1" min="1">
-                                        <div class="form-text">Orden en que aparecerá en los filtros</div>
                                     </div>
                                 </div>
                             </div>
@@ -122,14 +114,19 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="hexCode" class="form-label">Código de Color</label>
+                                        <label for="hexCodeText" class="form-label">Código de Color</label>
                                         <div class="input-group">
-                                            <input type="color" class="form-control form-control-color" id="hexCode" 
-                                                   th:field="*{hexCode}" value="#ff6b6b">
-                                            <input type="text" class="form-control" th:field="*{hexCode}" 
-                                                   placeholder="#ff6b6b" pattern="^#[0-9A-Fa-f]{6}$">
+                                            <input type="color" class="form-control form-control-color" id="hexCodePicker" 
+                                                   th:value="${color.hexCode ?: '#ff6b6b'}" style="width: 60px; height: 38px;">
+                                            <input type="text" class="form-control" id="hexCodeText" name="hexCode" 
+                                                   th:value="${color.hexCode}" 
+                                                   placeholder="#ff6b6b" pattern="^#[0-9A-Fa-f]{6}$"
+                                                   maxlength="7">
                                         </div>
                                         <div class="form-text">Código hexadecimal del color (opcional para patrones)</div>
+                                        <div th:if="${#fields.hasErrors('hexCode')}" class="text-danger small mt-1">
+                                            <span th:errors="*{hexCode}">Error</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -137,23 +134,14 @@
                                         <label class="form-label">Vista Previa</label>
                                         <div class="border rounded p-3 text-center">
                                             <div class="color-preview mx-auto" 
-                                                 th:style="'background-color: ' + ${color.hexCode ?: '#ff6b6b'} + '; width: 60px; height: 60px; border-radius: 50%; border: 2px solid #dee2e6;'"
-                                                 th:title="${color.name ?: 'Vista previa'}"></div>
-                                            <small class="text-muted mt-2 d-block" th:text="${color.name ?: 'Nombre del color'}">Nombre del color</small>
+                                                 id="colorPreview"
+                                                 style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #dee2e6; background-color: #ff6b6b;"></div>
+                                            <small class="text-muted mt-2 d-block" id="previewName">Nombre del color</small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="isActive" th:field="*{isActive}">
-                                    <label class="form-check-label" for="isActive">
-                                        Color activo
-                                    </label>
-                                </div>
-                                <div class="form-text">Los colores inactivos no aparecerán en los filtros</div>
-                            </div>
 
                             <div class="d-flex justify-content-between">
                                 <a th:href="@{/admin/colors}" class="btn btn-secondary">
@@ -204,35 +192,86 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Sincronizar el color picker con el input de texto
-        document.getElementById('hexCode').addEventListener('input', function() {
-            const colorInput = document.querySelector('input[type="text"][th\\:field="*{hexCode}"]');
-            if (colorInput) {
-                colorInput.value = this.value;
+        document.addEventListener('DOMContentLoaded', function() {
+            const colorPicker = document.getElementById('hexCodePicker');
+            const hexCodeText = document.getElementById('hexCodeText');
+            const colorPreview = document.getElementById('colorPreview');
+            const previewName = document.getElementById('previewName');
+            const nameInput = document.getElementById('name');
+            
+            // Sincronizar el color picker con el input de texto
+            if (colorPicker) {
+                colorPicker.addEventListener('input', function() {
+                    hexCodeText.value = this.value.toUpperCase();
+                    updatePreview();
+                });
             }
+            
+            // Sincronizar el input de texto con el color picker y validar formato
+            if (hexCodeText) {
+                hexCodeText.addEventListener('input', function() {
+                    let value = this.value.trim();
+                    
+                    // Remover caracteres no válidos excepto #
+                    value = value.replace(/[^#0-9A-Fa-f]/g, '');
+                    
+                    // Asegurar que empiece con #
+                    if (value && !value.startsWith('#')) {
+                        value = '#' + value;
+                    }
+                    
+                    // Limitar a 7 caracteres (#RRGGBB)
+                    if (value.length > 7) {
+                        value = value.substring(0, 7);
+                    }
+                    
+                    this.value = value.toUpperCase();
+                    
+                    // Validar formato y actualizar color picker
+                    if (value.match(/^#[0-9A-Fa-f]{6}$/)) {
+                        colorPicker.value = value;
+                        updatePreview();
+                        // Remover mensaje de error si existe
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    } else if (value.length > 1) {
+                        // Mostrar error si el formato no es válido
+                        this.classList.remove('is-valid');
+                        this.classList.add('is-invalid');
+                    } else {
+                        this.classList.remove('is-invalid', 'is-valid');
+                    }
+                });
+                
+                // Validar al perder el foco
+                hexCodeText.addEventListener('blur', function() {
+                    if (this.value && !this.value.match(/^#[0-9A-Fa-f]{6}$/)) {
+                        this.classList.add('is-invalid');
+                    }
+                });
+            }
+            
+            // Actualizar nombre en la vista previa
+            if (nameInput) {
+                nameInput.addEventListener('input', function() {
+                    previewName.textContent = this.value || 'Nombre del color';
+                });
+            }
+            
+            // Actualizar la vista previa
+            function updatePreview() {
+                const hexValue = hexCodeText.value || '#ff6b6b';
+                if (hexValue.match(/^#[0-9A-Fa-f]{6}$/)) {
+                    colorPreview.style.backgroundColor = hexValue;
+                }
+            }
+            
+            // Inicializar vista previa
             updatePreview();
-        });
-        
-        // Sincronizar el input de texto con el color picker
-        document.querySelector('input[type="text"][th\\:field="*{hexCode}"]').addEventListener('input', function() {
-            const colorPicker = document.getElementById('hexCode');
-            if (this.value.match(/^#[0-9A-Fa-f]{6}$/)) {
-                colorPicker.value = this.value;
-                updatePreview();
+            if (nameInput && nameInput.value) {
+                previewName.textContent = nameInput.value;
             }
         });
-        
-        // Actualizar la vista previa
-        function updatePreview() {
-            const colorInput = document.querySelector('input[type="text"][th\\:field="*{hexCode}"]');
-            const preview = document.querySelector('.color-preview');
-            if (colorInput && preview) {
-                preview.style.backgroundColor = colorInput.value || '#ff6b6b';
-            }
-        }
-        
-        // Actualizar vista previa al cargar la página
-        document.addEventListener('DOMContentLoaded', updatePreview);
     </script>
 </body>
 </html>

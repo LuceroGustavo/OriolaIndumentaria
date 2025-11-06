@@ -33,11 +33,17 @@ public class ColorController {
     @GetMapping
     public String listColors(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "50") int size,
             @RequestParam(defaultValue = "displayOrder") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(required = false) String search,
             Model model) {
+        
+        // Actualizar contadores de productos antes de mostrar la lista
+        colorService.updateAllProductCounts();
+        
+        // Corregir colores con displayOrder = 0 o null
+        colorService.fixColorsWithZeroOrder();
         
         // Configurar paginación y ordenamiento
         Sort sort = sortDir.equalsIgnoreCase("desc") ? 
@@ -178,38 +184,6 @@ public class ColorController {
         return "redirect:/admin/colors";
     }
     
-    /**
-     * Activar/Desactivar color
-     */
-    @PostMapping("/toggle-status/{id}")
-    public String toggleColorStatus(
-            @PathVariable Long id,
-            RedirectAttributes redirectAttributes) {
-        
-        try {
-            Color color = colorService.toggleColorStatus(id);
-            String status = color.getIsActive() ? "activado" : "desactivado";
-            redirectAttributes.addFlashAttribute("success", "Color " + status + " exitosamente");
-        } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-        }
-        
-        return "redirect:/admin/colors";
-    }
-    
-    /**
-     * Ver detalles de color
-     */
-    @GetMapping("/view/{id}")
-    public String viewColor(@PathVariable Long id, Model model) {
-        Optional<Color> color = colorService.getColorById(id);
-        if (color.isPresent()) {
-            model.addAttribute("color", color.get());
-            return "admin/colors/view";
-        } else {
-            return "redirect:/admin/colors?error=color_not_found";
-        }
-    }
     
     /**
      * Reordenar colores
@@ -230,15 +204,16 @@ public class ColorController {
     }
     
     /**
-     * Crear colores por defecto
+     * Crear o actualizar colores por defecto
+     * Este endpoint asegura que los colores predeterminados estén marcados correctamente
      */
     @PostMapping("/create-defaults")
     public String createDefaultColors(RedirectAttributes redirectAttributes) {
         try {
             colorService.createDefaultColors();
-            redirectAttributes.addFlashAttribute("success", "Colores por defecto creados exitosamente");
+            redirectAttributes.addFlashAttribute("success", "Colores predeterminados actualizados exitosamente");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al crear colores por defecto: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar colores predeterminados: " + e.getMessage());
         }
         
         return "redirect:/admin/colors";

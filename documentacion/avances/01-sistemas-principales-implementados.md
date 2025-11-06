@@ -100,10 +100,76 @@ Este documento consolida todos los sistemas principales implementados en el proy
 
 ### **Sistema de Colores:**
 - ✅ **Gestión normalizada** de colores con códigos hexadecimales
-- ✅ **Vista previa visual** en tiempo real
-- ✅ **CRUD completo** con validaciones
-- ✅ **Sistema de activación/desactivación**
-- ✅ **Estadísticas** de uso por color
+- ✅ **Vista previa visual** en tiempo real con sincronización entre color picker y texto
+- ✅ **CRUD completo** con validaciones mejoradas
+- ✅ **Sistema de colores predeterminados** - Colores del sistema protegidos (no editables ni eliminables)
+- ✅ **Creación automática** de colores predeterminados al iniciar la aplicación
+- ✅ **Eliminación permanente** - No se usa soft delete, eliminación directa de la base de datos
+- ✅ **Validación de productos** - No permite eliminar colores con productos asociados
+- ✅ **Estadísticas** de uso por color con contador preciso de productos asociados
+- ✅ **Paginación mejorada** - Vista de lista con 50 colores por página y controles de navegación
+- ✅ **Tooltips informativos** - Mensajes claros en botones deshabilitados para colores predeterminados
+- ✅ **Preservación de orden** - El `displayOrder` se mantiene al editar colores
+- ✅ **Corrección automática** - Sistema que corrige colores con orden 0 o null
+
+#### **Mejoras del Sistema de Colores (Enero 2025):**
+
+**Funcionalidades Eliminadas:**
+- ❌ **Sistema de activación/desactivación** - Removido, los colores existen o se eliminan
+- ❌ **Acción "Ver color"** - Removida, la información se muestra en la edición
+- ❌ **Acción "Pausar/Activar"** - Removida junto con la funcionalidad de activación
+
+**Funcionalidades Mejoradas:**
+- ✅ **Colores Predeterminados (`isDefault`)**:
+  - Campo `isDefault` agregado a la entidad `Color`
+  - Colores del sistema marcados automáticamente como predeterminados
+  - Protección completa: no se pueden editar ni eliminar colores predeterminados
+  - Creación/actualización automática al iniciar la aplicación
+  - Columna "Predeterminado" en la vista de lista (reemplaza "Estado")
+
+- ✅ **Formulario de Creación/Edición**:
+  - Removido campo "Color activo/inactivo"
+  - Removido campo "Orden de Visualización" (se asigna automáticamente)
+  - Mejoras en el input hexadecimal:
+    - Sincronización bidireccional entre color picker y texto
+    - Limpieza automática de caracteres inválidos
+    - Límite de 7 caracteres (#RRGGBB)
+    - Validación visual en tiempo real (bordes verde/rojo)
+    - Vista previa del color seleccionado
+    - Conversión automática a mayúsculas
+
+- ✅ **Vista de Lista de Colores**:
+  - Columna "Predeterminado" muestra si es color del sistema
+  - Columna "Productos" muestra contador preciso con enlace a productos filtrados
+  - Botones "Editar" y "Eliminar" deshabilitados para colores predeterminados
+  - Tooltips informativos en botones deshabilitados
+  - Paginación con 50 colores por página (aumentado de 10)
+  - Controles de navegación de páginas
+
+- ✅ **Eliminación de Colores**:
+  - Cambio de soft delete a eliminación permanente
+  - Validación previa: verifica si tiene productos asociados
+  - Mensaje de error claro si tiene productos asociados
+  - Eliminación directa de la base de datos (no solo marca `isActive = false`)
+
+- ✅ **Edición de Colores**:
+  - Preservación del `displayOrder` original al editar
+  - Corrección de bug: el color no cambia de posición después de editar
+  - Validación mejorada de códigos hexadecimales (opcional para patrones)
+  - Limpieza y normalización automática del código hexadecimal
+
+- ✅ **Corrección Automática**:
+  - Método `fixColorsWithZeroOrder()` corrige colores con orden 0 o null
+  - Ejecución automática al listar colores
+  - Asignación secuencial de orden válido
+
+**Archivos Modificados:**
+- `src/main/java/com/orioladenim/entity/Color.java` - Agregado campo `isDefault`
+- `src/main/java/com/orioladenim/service/ColorService.java` - Lógica de predeterminados, eliminación permanente, preservación de orden
+- `src/main/java/com/orioladenim/controller/ColorController.java` - Ajustes en paginación y corrección automática
+- `src/main/java/com/orioladenim/repo/ColorRepository.java` - Consulta para contar productos asociados
+- `src/main/resources/templates/admin/colors/list.html` - Nueva columna, tooltips, paginación
+- `src/main/resources/templates/admin/colors/form.html` - Mejoras en input hexadecimal, campos removidos
 
 ### **Integración con Productos:**
 - ✅ **Selección múltiple** de categorías y colores
@@ -280,5 +346,5 @@ Este documento consolida todos los sistemas principales implementados en el proy
 
 **Desarrollado por:** Equipo de Desarrollo ORIOLA  
 **Fecha de consolidación:** 15 de enero de 2025  
-**Última actualización:** Enero 2025 (Mejoras sistema de cambio de contraseñas)  
+**Última actualización:** Enero 2025 (Mejoras sistema de cambio de contraseñas y gestión de colores)  
 **Estado:** ✅ Todos los sistemas principales implementados y funcionando
