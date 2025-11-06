@@ -22,6 +22,9 @@ public class ColorService {
     @Autowired
     private ColorRepository colorRepository;
     
+    @Autowired
+    private ColorImageService colorImageService;
+    
     /**
      * Obtener todos los colores activos ordenados
      */
@@ -215,6 +218,11 @@ public class ColorService {
         }
         
         // Si no tiene productos, eliminar permanentemente
+        // Primero eliminar la imagen asociada si existe
+        if (color.getImagePath() != null && !color.getImagePath().isEmpty()) {
+            colorImageService.deleteColorImage(color.getImagePath());
+        }
+        
         // JPA automáticamente eliminará las relaciones en product_colors (Many-to-Many)
         // cuando se elimine el color, ya que no hay productos que lo referencien
         colorRepository.delete(color);

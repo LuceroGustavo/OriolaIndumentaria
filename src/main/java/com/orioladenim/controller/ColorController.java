@@ -2,7 +2,9 @@ package com.orioladenim.controller;
 
 import com.orioladenim.entity.Color;
 import com.orioladenim.service.ColorService;
+import com.orioladenim.service.ColorImageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +28,9 @@ public class ColorController {
     
     @Autowired
     private ColorService colorService;
+    
+    @Autowired
+    private ColorImageService colorImageService;
     
     /**
      * Listar todos los colores
@@ -104,6 +109,7 @@ public class ColorController {
     public String createColor(
             @Valid @ModelAttribute("color") Color color,
             BindingResult bindingResult,
+            @RequestParam(value = "patternImage", required = false) MultipartFile patternImage,
             RedirectAttributes redirectAttributes) {
         
         if (bindingResult.hasErrors()) {
@@ -111,11 +117,27 @@ public class ColorController {
         }
         
         try {
-            colorService.createColor(color);
+            // Si se subió una imagen, procesarla y guardarla
+            if (patternImage != null && !patternImage.isEmpty()) {
+                String imagePath = colorImageService.saveColorImage(patternImage, null);
+                color.setImagePath(imagePath);
+                // Si hay imagen, limpiar hexCode (opcional, pueden coexistir)
+            }
+            
+            Color savedColor = colorService.createColor(color);
+            
+            // Si se guardó correctamente y hay imagen, actualizar con el ID real
+            if (patternImage != null && !patternImage.isEmpty() && savedColor.getId() != null) {
+                // La imagen ya se guardó con el ID null, está bien para nuevos colores
+            }
+            
             redirectAttributes.addFlashAttribute("success", "Color creado exitosamente");
             return "redirect:/admin/colors";
         } catch (IllegalArgumentException e) {
             bindingResult.rejectValue("name", "error.color", e.getMessage());
+            return "admin/colors/form";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al crear color: " + e.getMessage());
             return "admin/colors/form";
         }
     }
@@ -128,18 +150,58 @@ public class ColorController {
             @PathVariable Long id,
             @Valid @ModelAttribute("color") Color color,
             BindingResult bindingResult,
+            @RequestParam(value = "patternImage", required = false) MultipartFile patternImage,
+            @RequestParam(value = "removeExistingImage", defaultValue = "false") String removeExistingImage,
             RedirectAttributes redirectAttributes) {
         
         if (bindingResult.hasErrors()) {
+            // Recargar el color para mostrar la imagen actual
+            Optional<Color> existingColor = colorService.getColorById(id);
+            if (existingColor.isPresent()) {
+                color.setImagePath(existingColor.get().getImagePath());
+            }
             return "admin/colors/form";
         }
         
         try {
+            // Obtener el color existente para preservar la imagen actual si no se cambia
+            Optional<Color> existingColorOpt = colorService.getColorById(id);
+            if (existingColorOpt.isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Color no encontrado");
+                return "redirect:/admin/colors";
+            }
+            
+            Color existingColor = existingColorOpt.get();
+            String currentImagePath = existingColor.getImagePath();
+            
+            // Si se solicita eliminar la imagen existente
+            if ("true".equals(removeExistingImage) && currentImagePath != null && !currentImagePath.isEmpty()) {
+                colorImageService.deleteColorImage(currentImagePath);
+                color.setImagePath(null);
+            }
+            // Si se subió una nueva imagen
+            else if (patternImage != null && !patternImage.isEmpty()) {
+                // Eliminar imagen anterior si existe
+                if (currentImagePath != null && !currentImagePath.isEmpty()) {
+                    colorImageService.deleteColorImage(currentImagePath);
+                }
+                // Guardar nueva imagen
+                String imagePath = colorImageService.saveColorImage(patternImage, id);
+                color.setImagePath(imagePath);
+            }
+            // Si no se cambió nada, preservar la imagen actual
+            else if (currentImagePath != null && !currentImagePath.isEmpty()) {
+                color.setImagePath(currentImagePath);
+            }
+            
             colorService.updateColor(id, color);
             redirectAttributes.addFlashAttribute("success", "Color actualizado exitosamente");
             return "redirect:/admin/colors";
         } catch (IllegalArgumentException e) {
             bindingResult.rejectValue("name", "error.color", e.getMessage());
+            return "admin/colors/form";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar color: " + e.getMessage());
             return "admin/colors/form";
         }
     }

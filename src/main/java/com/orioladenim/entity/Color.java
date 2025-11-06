@@ -36,6 +36,9 @@ public class Color {
     @Column(name = "hex_code", length = 7, nullable = true)
     private String hexCode; // Código hexadecimal del color (#ff6b6b) - Opcional para patrones
     
+    @Column(name = "image_path", length = 500, nullable = true)
+    private String imagePath; // Ruta de la imagen del patrón (ej: "colors/animal_print.webp") - Opcional, alternativa a hexCode
+    
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
     
@@ -153,6 +156,41 @@ public class Color {
     
     public void setHexCode(String hexCode) {
         this.hexCode = hexCode;
+    }
+    
+    public String getImagePath() {
+        return imagePath;
+    }
+    
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+    
+    /**
+     * Verifica si el color tiene una imagen de patrón
+     */
+    public boolean hasPatternImage() {
+        return imagePath != null && !imagePath.trim().isEmpty();
+    }
+    
+    /**
+     * Obtiene la URL completa de la imagen del patrón
+     */
+    public String getImageUrl() {
+        if (imagePath == null || imagePath.trim().isEmpty()) {
+            return null;
+        }
+        return "/uploads/" + imagePath;
+    }
+    
+    /**
+     * Obtiene la URL del thumbnail de la imagen del patrón
+     */
+    public String getThumbnailUrl() {
+        if (imagePath == null || imagePath.trim().isEmpty()) {
+            return null;
+        }
+        return "/uploads/thumbnails/colors/" + imagePath.substring(imagePath.lastIndexOf('/') + 1);
     }
     
     public Boolean getIsActive() {

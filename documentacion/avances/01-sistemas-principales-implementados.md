@@ -145,12 +145,14 @@ Este documento consolida todos los sistemas principales implementados en el proy
   - Tooltips informativos en botones deshabilitados
   - Paginación con 50 colores por página (aumentado de 10)
   - Controles de navegación de páginas
+  - **Visualización de imágenes de patrones**: Los colores con imágenes muestran el patrón en lugar del color sólido
 
 - ✅ **Eliminación de Colores**:
   - Cambio de soft delete a eliminación permanente
   - Validación previa: verifica si tiene productos asociados
   - Mensaje de error claro si tiene productos asociados
   - Eliminación directa de la base de datos (no solo marca `isActive = false`)
+  - **Eliminación automática de imágenes**: Al eliminar un color, también se elimina su imagen del sistema de archivos
 
 - ✅ **Edición de Colores**:
   - Preservación del `displayOrder` original al editar
@@ -163,13 +165,41 @@ Este documento consolida todos los sistemas principales implementados en el proy
   - Ejecución automática al listar colores
   - Asignación secuencial de orden válido
 
+- ✅ **Sistema de Colores con Imágenes de Patrones (Nueva Funcionalidad)**:
+  - **Campo `imagePath`** agregado a la entidad `Color` para almacenar rutas de imágenes de patrones
+  - **ColorImageService**: Nuevo servicio para procesar y guardar imágenes de colores
+    - Conversión automática a WebP
+    - Creación de thumbnails (200x200px)
+    - Validación de tamaño (máximo 3MB) y formatos (JPG, PNG, GIF, WebP, BMP)
+    - Redimensionado automático (máximo 800x800px)
+    - Eliminación de imágenes del sistema de archivos
+  - **Formulario de colores mejorado**:
+    - Campo opcional para subir imagen de patrón
+    - Vista previa que muestra imagen o color sólido según corresponda
+    - Botón para eliminar imagen existente al editar
+    - Validación cliente y servidor de archivos
+  - **Visualización en lista de colores**: Los colores con imágenes muestran el patrón en el círculo
+  - **Visualización en productos**: Los colores asociados a productos muestran:
+    - Imagen del patrón si el color tiene `imagePath`
+    - Color sólido si el color solo tiene `hexCode`
+    - Funciona tanto en vista desktop como móvil
+  - **Integración completa**: Los colores con imágenes funcionan en:
+    - Formulario de creación/edición de colores
+    - Lista de gestión de colores
+    - Vista de detalle de producto (desktop y móvil)
+    - Dropdown de selección de colores en formulario de productos
+
 **Archivos Modificados:**
-- `src/main/java/com/orioladenim/entity/Color.java` - Agregado campo `isDefault`
-- `src/main/java/com/orioladenim/service/ColorService.java` - Lógica de predeterminados, eliminación permanente, preservación de orden
-- `src/main/java/com/orioladenim/controller/ColorController.java` - Ajustes en paginación y corrección automática
+- `src/main/java/com/orioladenim/entity/Color.java` - Agregado campo `isDefault` y `imagePath` con métodos auxiliares
+- `src/main/java/com/orioladenim/service/ColorService.java` - Lógica de predeterminados, eliminación permanente, preservación de orden, eliminación de imágenes
+- `src/main/java/com/orioladenim/service/ColorImageService.java` - **NUEVO**: Servicio para procesar imágenes de colores
+- `src/main/java/com/orioladenim/controller/ColorController.java` - Ajustes en paginación, corrección automática, manejo de `MultipartFile` para imágenes
+- `src/main/java/com/orioladenim/controller/ProductController.java` - Cambio de `getActiveColors()` a `getAllColors()` para mostrar todos los colores en formulario
 - `src/main/java/com/orioladenim/repo/ColorRepository.java` - Consulta para contar productos asociados
-- `src/main/resources/templates/admin/colors/list.html` - Nueva columna, tooltips, paginación
-- `src/main/resources/templates/admin/colors/form.html` - Mejoras en input hexadecimal, campos removidos
+- `src/main/resources/templates/admin/colors/list.html` - Nueva columna, tooltips, paginación, visualización de imágenes
+- `src/main/resources/templates/admin/colors/form.html` - Mejoras en input hexadecimal, campos removidos, **subida de imágenes de patrones**
+- `src/main/resources/templates/product-detail.html` - **Visualización de imágenes de patrones en círculos de color** (desktop y móvil)
+- `documentacion/migrations/add_image_path_to_colors.sql` - **NUEVO**: Script SQL para agregar columna `image_path`
 
 ### **Integración con Productos:**
 - ✅ **Selección múltiple** de categorías y colores
@@ -346,5 +376,5 @@ Este documento consolida todos los sistemas principales implementados en el proy
 
 **Desarrollado por:** Equipo de Desarrollo ORIOLA  
 **Fecha de consolidación:** 15 de enero de 2025  
-**Última actualización:** Enero 2025 (Mejoras sistema de cambio de contraseñas y gestión de colores)  
+**Última actualización:** Enero 2025 (Sistema de colores con imágenes de patrones, mejoras en gestión de colores y cambio de contraseñas)  
 **Estado:** ✅ Todos los sistemas principales implementados y funcionando

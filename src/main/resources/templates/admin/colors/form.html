@@ -91,7 +91,7 @@
                     </div>
                     <div class="card-body">
                         <form th:action="${color.id != null ? '/admin/colors/update/' + color.id : '/admin/colors/create'}" 
-                              th:object="${color}" method="post">
+                              th:object="${color}" method="post" enctype="multipart/form-data">
                             
                             <div class="row">
                                 <div class="col-md-12">
@@ -128,6 +128,42 @@
                                             <span th:errors="*{hexCode}">Error</span>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Opción para subir imagen de patrón -->
+                                    <div class="mb-3">
+                                        <label for="patternImage" class="form-label">
+                                            <i class="bi bi-image me-1"></i>Imagen de Patrón (Alternativa al código de color)
+                                        </label>
+                                        <input type="file" class="form-control" id="patternImage" name="patternImage" 
+                                               accept="image/*" onchange="handleImageUpload(event)">
+                                        <div class="form-text">
+                                            Sube una imagen para patrones como "Animal Print", "Nevado", "Estampado", etc. 
+                                            (Máximo 3MB, formatos: JPG, PNG, GIF, WebP)
+                                        </div>
+                                        <div id="imagePreviewContainer" class="mt-2" style="display: none;">
+                                            <img id="imagePreview" src="" alt="Vista previa" 
+                                                 class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                                            <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeImage()">
+                                                <i class="bi bi-x-circle me-1"></i>Eliminar
+                                            </button>
+                                        </div>
+                                        <!-- Mostrar imagen existente si está editando -->
+                                        <div th:if="${color.imagePath != null and !color.imagePath.isEmpty()}" class="mt-2" id="existingImageContainer">
+                                            <label class="form-label small">Imagen actual:</label>
+                                            <div>
+                                                <img id="existingImage" 
+                                                     th:src="@{'/uploads/' + ${color.imagePath}}" 
+                                                     alt="Imagen actual" 
+                                                     class="img-thumbnail" 
+                                                     style="max-width: 200px; max-height: 200px;"
+                                                     th:attr="data-image-path=${color.imagePath}">
+                                                <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeExistingImage()">
+                                                    <i class="bi bi-trash me-1"></i>Eliminar imagen actual
+                                                </button>
+                                                <input type="hidden" id="removeExistingImage" name="removeExistingImage" value="false">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
@@ -135,7 +171,9 @@
                                         <div class="border rounded p-3 text-center">
                                             <div class="color-preview mx-auto" 
                                                  id="colorPreview"
-                                                 style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #dee2e6; background-color: #ff6b6b;"></div>
+                                                 style="width: 120px; height: 120px; border-radius: 50%; border: 2px solid #dee2e6; background-color: #ff6b6b; background-size: cover; background-position: center; overflow: hidden;">
+                                                <!-- La imagen se mostrará aquí si existe -->
+                                            </div>
                                             <small class="text-muted mt-2 d-block" id="previewName">Nombre del color</small>
                                         </div>
                                     </div>
@@ -261,15 +299,124 @@
             // Actualizar la vista previa
             function updatePreview() {
                 const hexValue = hexCodeText.value || '#ff6b6b';
-                if (hexValue.match(/^#[0-9A-Fa-f]{6}$/)) {
+                const imagePreview = document.getElementById('imagePreview');
+                const existingImage = document.getElementById('existingImage');
+                
+                // Prioridad 1: Si hay una imagen seleccionada nueva, mostrar la imagen
+                if (imagePreview && imagePreview.src && imagePreview.src !== window.location.href && imagePreview.src.startsWith('data:')) {
+                    colorPreview.style.backgroundImage = 'url(' + imagePreview.src + ')';
+                    colorPreview.style.backgroundColor = 'transparent';
+                    return;
+                }
+                
+                // Prioridad 2: Si hay imagen existente en el servidor, mostrarla
+                if (existingImage && existingImage.src) {
+                    const imageUrl = existingImage.src;
+                    // Verificar que la URL sea válida y no sea solo el href de la página
+                    if (imageUrl && imageUrl !== window.location.href && !imageUrl.includes('data:')) {
+                        colorPreview.style.backgroundImage = 'url(' + imageUrl + ')';
+                        colorPreview.style.backgroundColor = 'transparent';
+                        return;
+                    }
+                }
+                
+                // Prioridad 3: Mostrar color sólido si hay código hexadecimal válido
+                if (hexValue && hexValue.match(/^#[0-9A-Fa-f]{6}$/)) {
+                    colorPreview.style.backgroundImage = 'none';
                     colorPreview.style.backgroundColor = hexValue;
+                } else {
+                    // Color por defecto
+                    colorPreview.style.backgroundImage = 'none';
+                    colorPreview.style.backgroundColor = '#ff6b6b';
                 }
             }
             
+            // Manejar subida de imagen
+            window.handleImageUpload = function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    // Validar tamaño (3MB)
+                    if (file.size > 3 * 1024 * 1024) {
+                        alert('El archivo es demasiado grande. Máximo 3MB');
+                        event.target.value = '';
+                        return;
+                    }
+                    
+                    // Validar tipo
+                    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp'];
+                    if (!allowedTypes.includes(file.type)) {
+                        alert('Formato de archivo no permitido. Use: JPG, PNG, GIF, WebP, BMP');
+                        event.target.value = '';
+                        return;
+                    }
+                    
+                    // Mostrar vista previa
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imagePreview = document.getElementById('imagePreview');
+                        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                        
+                        imagePreview.src = e.target.result;
+                        imagePreviewContainer.style.display = 'block';
+                        
+                        // Actualizar vista previa circular
+                        updatePreview();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            
+            // Eliminar imagen seleccionada
+            window.removeImage = function() {
+                const patternImage = document.getElementById('patternImage');
+                const imagePreview = document.getElementById('imagePreview');
+                const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                
+                patternImage.value = '';
+                imagePreview.src = '';
+                imagePreviewContainer.style.display = 'none';
+                
+                // Restaurar vista previa a color sólido
+                updatePreview();
+            };
+            
+            // Eliminar imagen existente
+            window.removeExistingImage = function() {
+                const removeInput = document.getElementById('removeExistingImage');
+                const existingImageDiv = document.querySelector('div[th\\:if]');
+                
+                if (removeInput) {
+                    removeInput.value = 'true';
+                }
+                
+                if (existingImageDiv) {
+                    existingImageDiv.style.display = 'none';
+                }
+                
+                // Limpiar vista previa
+                colorPreview.style.backgroundImage = 'none';
+                updatePreview();
+            };
+            
             // Inicializar vista previa
-            updatePreview();
             if (nameInput && nameInput.value) {
                 previewName.textContent = nameInput.value;
+            }
+            
+            // Cargar imagen existente si hay una al cargar la página
+            const existingImage = document.getElementById('existingImage');
+            if (existingImage) {
+                // Esperar a que la imagen se cargue completamente
+                existingImage.onload = function() {
+                    updatePreview();
+                };
+                // Si la imagen ya está cargada (cached), actualizar inmediatamente
+                if (existingImage.complete) {
+                    updatePreview();
+                }
+            } else {
+                // Si no hay imagen existente, actualizar con color sólido
+                updatePreview();
             }
         });
     </script>

@@ -127,8 +127,15 @@
                                             <span class="badge bg-secondary" th:text="${color.displayOrder}">1</span>
                                         </td>
                                         <td>
+                                            <!-- Color sólido si no hay imagen -->
                                             <div class="color-preview" 
-                                                 th:style="'background-color: ' + ${color.hexCode} + '; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #dee2e6;'"
+                                                 th:if="${color.imagePath == null or color.imagePath.isEmpty()}"
+                                                 th:attr="style=${'background-color: ' + (color.hexCode != null ? color.hexCode : '#6c757d') + '; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #dee2e6;'}"
+                                                 th:title="${color.name}"></div>
+                                            <!-- Imagen de patrón si existe -->
+                                            <div class="color-preview" 
+                                                 th:if="${color.imagePath != null and !color.imagePath.isEmpty()}"
+                                                 th:attr="style=${'background-image: url(/uploads/' + color.imagePath + '); background-size: cover; background-position: center; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #dee2e6;'}"
                                                  th:title="${color.name}"></div>
                                         </td>
                                         <td>

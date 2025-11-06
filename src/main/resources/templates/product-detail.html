@@ -242,7 +242,9 @@
                                     <div th:each="color : ${product.colores}" 
                                          class="color-circle" 
                                          th:title="${color.name}"
-                                         th:style="'background-color: ' + ${color.hexCode} + '; width: 40px; height: 40px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: default; transition: all 0.3s ease; position: relative;'">
+                                         th:attr="style=${(color.imagePath != null and !color.imagePath.isEmpty()) ? 
+                                                          ('background-image: url(/uploads/' + color.imagePath + '); background-size: cover; background-position: center;') : 
+                                                          ('background-color: ' + (color.hexCode != null ? color.hexCode : '#6c757d') + ';')} + 'width: 40px; height: 40px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: default; transition: all 0.3s ease; position: relative;'">
                                     </div>
                                 </div>
                             </div>
@@ -283,7 +285,9 @@
                                                 <div th:each="color : ${product.colores}" 
                                                      class="color-circle" 
                                                      th:title="${color.name}"
-                                                     th:style="'background-color: ' + ${color.hexCode} + '; width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: default; transition: all 0.3s ease;'">
+                                                     th:attr="style=${(color.imagePath != null and !color.imagePath.isEmpty()) ? 
+                                                                      ('background-image: url(/uploads/' + color.imagePath + '); background-size: cover; background-position: center;') : 
+                                                                      ('background-color: ' + (color.hexCode != null ? color.hexCode : '#6c757d') + ';')} + 'width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: default; transition: all 0.3s ease;'">
                                                 </div>
                                             </div>
                                         </div>
