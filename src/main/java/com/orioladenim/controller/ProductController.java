@@ -89,7 +89,7 @@ public class ProductController {
         product.setPId(null); // Asegurar que no tenga ID para detectar como nuevo
         model.addAttribute("product", product);
         model.addAttribute("categories", categoryService.getActiveCategories());
-        model.addAttribute("colors", colorService.getActiveColors());
+        model.addAttribute("colors", colorService.getAllColors());
         model.addAttribute("talles", Talle.values());
         model.addAttribute("generos", Genero.values());
         model.addAttribute("temporadas", Temporada.values());
@@ -107,7 +107,7 @@ public class ProductController {
         if (result.hasErrors()) {
             model.addAttribute("product", product);
             model.addAttribute("categories", categoryService.getActiveCategories());
-            model.addAttribute("colors", colorService.getActiveColors());
+            model.addAttribute("colors", colorService.getAllColors());
             model.addAttribute("talles", Talle.values());
             model.addAttribute("generos", Genero.values());
             model.addAttribute("temporadas", Temporada.values());
@@ -189,7 +189,7 @@ public class ProductController {
             .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
         model.addAttribute("product", product);
         model.addAttribute("categories", categoryService.getActiveCategories());
-        model.addAttribute("colors", colorService.getActiveColors());
+        model.addAttribute("colors", colorService.getAllColors());
         model.addAttribute("talles", Talle.values());
         model.addAttribute("generos", Genero.values());
         model.addAttribute("temporadas", Temporada.values());
@@ -217,7 +217,7 @@ public class ProductController {
         if (result.hasErrors()) {
             model.addAttribute("product", product);
             model.addAttribute("categories", categoryService.getActiveCategories());
-            model.addAttribute("colors", colorService.getActiveColors());
+            model.addAttribute("colors", colorService.getAllColors());
             model.addAttribute("talles", Talle.values());
             model.addAttribute("generos", Genero.values());
             model.addAttribute("temporadas", Temporada.values());

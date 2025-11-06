@@ -31,11 +31,24 @@ public class ColorService {
     }
     
     /**
-     * Obtener todos los colores (activos e inactivos)
+     * Obtener todos los colores (activos e inactivos) ordenados
+     * NOTA: Se usa en formularios de productos para mostrar todos los colores disponibles
      */
     @Transactional(readOnly = true)
     public List<Color> getAllColors() {
-        return colorRepository.findAll();
+        return colorRepository.findAll().stream()
+                .sorted((c1, c2) -> {
+                    // Primero por displayOrder, luego por nombre
+                    int orderCompare = Integer.compare(
+                        c1.getDisplayOrder() != null ? c1.getDisplayOrder() : Integer.MAX_VALUE,
+                        c2.getDisplayOrder() != null ? c2.getDisplayOrder() : Integer.MAX_VALUE
+                    );
+                    if (orderCompare != 0) {
+                        return orderCompare;
+                    }
+                    return c1.getName().compareToIgnoreCase(c2.getName());
+                })
+                .collect(java.util.stream.Collectors.toList());
     }
     
     /**
