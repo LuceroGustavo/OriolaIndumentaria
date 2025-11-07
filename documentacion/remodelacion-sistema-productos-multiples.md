@@ -220,6 +220,15 @@ private List<Product> products = new ArrayList<>();
 - ❌ Validaciones inconsistentes
 - ❌ Referencias a campos eliminados
 
+### **4. Error "Data truncated for column 'talle'" (Noviembre 2025):**
+- **Problema:** Al agregar nuevos talles numéricos (32, 34, 36, etc.) y actualizar un producto, se producía el error:
+  ```
+  Data truncated for column 'talle' at row 1
+  ```
+- **Causa:** La columna `talle` en la tabla `product_talles` fue creada con `VARCHAR(1)` o `VARCHAR(2)` cuando solo había talles de 1-2 caracteres (S, M, L, XL). Con `@Enumerated(EnumType.STRING)`, Hibernate guarda el **nombre del enum** (ej: "T32", "T34", "XXXL") en la base de datos, no el `displayName`, por lo que se necesitaba más espacio.
+- **Solución:** Ejecutar el script SQL `scripts/fix-talle-column.sql` que modifica la columna `talle` a `VARCHAR(10)` para permitir almacenar nombres de enum más largos.
+- **Script:** Ver `scripts/fix-talle-column.sql`
+
 ---
 
 ## 🚧 **Trabajo Pendiente**

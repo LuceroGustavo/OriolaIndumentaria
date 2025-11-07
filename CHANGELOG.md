@@ -38,6 +38,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - **Problemas de centrado del menú desplegable**
 - **Activación del menú por click vs hover**
 - **Bug de bloqueo de login** - Corregido problema donde `mustChangePassword = true` impedía el login después de cambiar contraseña del admin por desarrollador
+- **Error "Data truncated for column 'talle'"** - Corregido problema donde la columna `talle` en la tabla `product_talles` era demasiado pequeña para almacenar nombres de enum como "T32", "T34", "XXXL". Solución: Script SQL `fix-talle-column.sql` para modificar la columna a VARCHAR(10)
 
 ## [1.0.0] - 2025-09-23
 

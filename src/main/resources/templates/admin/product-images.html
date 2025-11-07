@@ -276,9 +276,6 @@
 
         // Mostrar archivos seleccionados
         function displaySelectedFiles() {
-            const preview = document.createElement('div');
-            preview.className = 'row mt-3';
-            
             // Limpiar contenido anterior
             uploadMessages.innerHTML = '';
             
@@ -287,47 +284,32 @@
                 return;
             }
             
-            selectedFiles.forEach((file, index) => {
-                const col = document.createElement('div');
-                col.className = 'col-md-3 col-sm-6 mb-3';
-                
-                // Determinar si es video
-                const isVideo = file.type && file.type.startsWith('video/');
-                
-                if (isVideo) {
-                    // Para videos, crear un elemento video
-                    const videoUrl = URL.createObjectURL(file);
-                    col.innerHTML = `
-                        <div class="card">
-                            <div class="preview-image-container" style="height: 200px; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
-                                <video src="${videoUrl}" class="preview-image" style="max-width: 100%; max-height: 100%; object-fit: contain;" muted></video>
-                            </div>
-                            <div class="card-body p-2">
-                                <small class="text-muted">${file.name}</small>
-                                <br>
-                                <small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
-                                <br>
-                                <i class="bi bi-camera-video text-primary"></i> Video
-                                ${index === 0 ? '<span class="badge bg-warning ms-1">Principal</span>' : ''}
-                                <button class="btn btn-sm btn-outline-danger mt-1" onclick="removeFile(${index})">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    // Para imágenes, usar FileReader
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
+            const preview = document.createElement('div');
+            preview.className = 'row mt-3';
+            
+            // Crear un array de promesas para manejar la lectura asíncrona de archivos
+            const filePromises = selectedFiles.map((file, index) => {
+                return new Promise((resolve) => {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-3 col-sm-6 mb-3';
+                    
+                    // Determinar si es video
+                    const isVideo = file.type && file.type.startsWith('video/');
+                    
+                    if (isVideo) {
+                        // Para videos, crear un elemento video
+                        const videoUrl = URL.createObjectURL(file);
                         col.innerHTML = `
                             <div class="card">
                                 <div class="preview-image-container" style="height: 200px; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
-                                    <img src="${e.target.result}" class="preview-image" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                    <video src="${videoUrl}" class="preview-image" style="max-width: 100%; max-height: 100%; object-fit: contain;" muted></video>
                                 </div>
                                 <div class="card-body p-2">
                                     <small class="text-muted">${file.name}</small>
                                     <br>
                                     <small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                                    <br>
+                                    <i class="bi bi-camera-video text-primary"></i> Video
                                     ${index === 0 ? '<span class="badge bg-warning ms-1">Principal</span>' : ''}
                                     <button class="btn btn-sm btn-outline-danger mt-1" onclick="removeFile(${index})">
                                         <i class="bi bi-trash"></i>
@@ -335,23 +317,71 @@
                                 </div>
                             </div>
                         `;
-                    };
-                    reader.readAsDataURL(file);
-                }
-                preview.appendChild(col);
+                        resolve(col);
+                    } else {
+                        // Para imágenes, usar FileReader y esperar a que termine
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            col.innerHTML = `
+                                <div class="card">
+                                    <div class="preview-image-container" style="height: 200px; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                                        <img src="${e.target.result}" class="preview-image" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <small class="text-muted">${file.name}</small>
+                                        <br>
+                                        <small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                                        ${index === 0 ? '<span class="badge bg-warning ms-1">Principal</span>' : ''}
+                                        <button class="btn btn-sm btn-outline-danger mt-1" onclick="removeFile(${index})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            resolve(col);
+                        };
+                        reader.onerror = function() {
+                            // En caso de error, mostrar un placeholder
+                            col.innerHTML = `
+                                <div class="card">
+                                    <div class="preview-image-container" style="height: 200px; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                                        <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <small class="text-muted">${file.name}</small>
+                                        <br>
+                                        <small class="text-danger">Error al cargar</small>
+                                        <button class="btn btn-sm btn-outline-danger mt-1" onclick="removeFile(${index})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            resolve(col);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
             });
             
-            // Agregar botón para limpiar selección
-            const clearButton = document.createElement('div');
-            clearButton.className = 'col-12 text-center mt-3';
-            clearButton.innerHTML = `
-                <button class="btn btn-outline-secondary" onclick="clearSelection()">
-                    <i class="bi bi-x-circle me-1"></i>Limpiar Selección
-                </button>
-            `;
-            preview.appendChild(clearButton);
-            
-            uploadMessages.appendChild(preview);
+            // Esperar a que todos los archivos se lean antes de agregarlos al DOM
+            Promise.all(filePromises).then(cols => {
+                cols.forEach(col => {
+                    preview.appendChild(col);
+                });
+                
+                // Agregar botón para limpiar selección
+                const clearButton = document.createElement('div');
+                clearButton.className = 'col-12 text-center mt-3';
+                clearButton.innerHTML = `
+                    <button class="btn btn-outline-secondary" onclick="clearSelection()">
+                        <i class="bi bi-x-circle me-1"></i>Limpiar Selección
+                    </button>
+                `;
+                preview.appendChild(clearButton);
+                
+                uploadMessages.appendChild(preview);
+            });
         }
         
         // Función para remover un archivo específico
