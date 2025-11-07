@@ -90,6 +90,12 @@ public class ColorService {
      * Crear nuevo color
      */
     public Color createColor(Color color) {
+        // Normalizar nombre primero (evitar strings vacíos que causan error de constraint único)
+        if (color.getName() == null || color.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del color es obligatorio");
+        }
+        color.setName(color.getName().trim());
+        
         // Limpiar y normalizar el código hexadecimal
         if (color.getHexCode() != null && !color.getHexCode().trim().isEmpty()) {
             String hexCode = color.getHexCode().trim();
@@ -104,6 +110,17 @@ public class ColorService {
                 hexCode = hexCode.substring(0, 7);
             }
             color.setHexCode(hexCode.toUpperCase());
+        } else {
+            // Si hexCode está vacío o es null, establecerlo explícitamente como null
+            // Esto evita problemas con constraints únicos en la base de datos
+            color.setHexCode(null);
+        }
+        
+        // Normalizar description (evitar strings vacíos)
+        if (color.getDescription() != null && color.getDescription().trim().isEmpty()) {
+            color.setDescription(null);
+        } else if (color.getDescription() != null) {
+            color.setDescription(color.getDescription().trim());
         }
         
         // Validar datos
@@ -154,6 +171,12 @@ public class ColorService {
             throw new IllegalStateException("No se puede editar un color predeterminado del sistema");
         }
         
+        // Normalizar nombre primero (evitar strings vacíos que causan error de constraint único)
+        if (colorData.getName() == null || colorData.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del color es obligatorio");
+        }
+        colorData.setName(colorData.getName().trim());
+        
         // Limpiar y normalizar el código hexadecimal
         if (colorData.getHexCode() != null && !colorData.getHexCode().trim().isEmpty()) {
             String hexCode = colorData.getHexCode().trim();
@@ -168,6 +191,17 @@ public class ColorService {
                 hexCode = hexCode.substring(0, 7);
             }
             colorData.setHexCode(hexCode.toUpperCase());
+        } else {
+            // Si hexCode está vacío o es null, establecerlo explícitamente como null
+            // Esto evita problemas con constraints únicos en la base de datos
+            colorData.setHexCode(null);
+        }
+        
+        // Normalizar description (evitar strings vacíos)
+        if (colorData.getDescription() != null && colorData.getDescription().trim().isEmpty()) {
+            colorData.setDescription(null);
+        } else if (colorData.getDescription() != null) {
+            colorData.setDescription(colorData.getDescription().trim());
         }
         
         // Validar datos
@@ -360,9 +394,17 @@ public class ColorService {
      * Validar datos de color
      */
     public void validateColor(Color color) {
+        // Normalizar y validar nombre
         if (color.getName() == null || color.getName().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del color es obligatorio");
         }
+        
+        // Limpiar espacios en blanco del nombre
+        String cleanName = color.getName().trim();
+        if (cleanName.isEmpty()) {
+            throw new IllegalArgumentException("El nombre del color es obligatorio");
+        }
+        color.setName(cleanName);
         
         if (color.getName().length() < 2 || color.getName().length() > 50) {
             throw new IllegalArgumentException("El nombre debe tener entre 2 y 50 caracteres");

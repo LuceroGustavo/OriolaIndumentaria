@@ -117,6 +117,16 @@ public class ColorController {
         }
         
         try {
+            // Normalizar nombre antes de procesar (evitar strings vacíos)
+            if (color.getName() != null) {
+                String cleanName = color.getName().trim();
+                if (cleanName.isEmpty()) {
+                    bindingResult.rejectValue("name", "error.color", "El nombre del color es obligatorio");
+                    return "admin/colors/form";
+                }
+                color.setName(cleanName);
+            }
+            
             // Si se subió una imagen, procesarla y guardarla
             if (patternImage != null && !patternImage.isEmpty()) {
                 String imagePath = colorImageService.saveColorImage(patternImage, null);

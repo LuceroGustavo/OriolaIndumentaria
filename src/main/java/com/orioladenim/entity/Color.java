@@ -33,7 +33,7 @@ public class Color {
     private String description;
     
     @Pattern(regexp = "^$|^#[0-9A-Fa-f]{6}$", message = "El código hexadecimal debe tener formato #RRGGBB o estar vacío")
-    @Column(name = "hex_code", length = 7, nullable = true)
+    @Column(name = "hex_code", length = 7, nullable = true, columnDefinition = "VARCHAR(7) NULL")
     private String hexCode; // Código hexadecimal del color (#ff6b6b) - Opcional para patrones
     
     @Column(name = "image_path", length = 500, nullable = true)
