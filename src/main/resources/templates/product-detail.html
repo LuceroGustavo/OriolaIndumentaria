@@ -356,7 +356,7 @@
                                             <i class="bi bi-person me-2" style="color: #666; font-size: 14px;"></i>
                                             <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Género: </span>
                                             <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" 
-                                                  th:text="${#strings.listJoin(product.generos, ', ')}"></span>
+                                                  th:text="${product.getGenerosComoTexto()}"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -435,7 +435,7 @@
                                         <i class="bi bi-person me-2" style="color: #666; font-size: 14px;"></i>
                                         <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Género: </span>
                                         <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" 
-                                              th:text="${#strings.listJoin(product.generos, ', ')}"></span>
+                                              th:text="${product.getGenerosComoTexto()}"></span>
                                     </div>
                                 </div>
                                 
@@ -445,7 +445,7 @@
                                         <i class="bi bi-calendar me-2" style="color: #666; font-size: 14px;"></i>
                                         <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #666; font-weight: 400;">Temporada: </span>
                                         <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #000;" 
-                                              th:text="${#strings.listJoin(product.temporadas, ', ')}"></span>
+                                              th:text="${product.getTemporadasComoTexto()}"></span>
                                     </div>
                                 </div>
                                 
