@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/oriola-messages.css}">
     <style>
         .carrusel-toggle:disabled {
             opacity: 0.5;
@@ -109,7 +110,7 @@
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <form th:action="@{/admin/categories/update-product-counts}" method="post" class="me-2">
                             <button type="submit" class="btn btn-info" 
-                                    onclick="return confirm('¿Actualizar contadores de productos de todas las categorías?')">
+                                    onclick="event.preventDefault(); handleUpdateCounters(); return false;">
                                 <i class="bi bi-arrow-clockwise me-1"></i>Actualizar Contadores
                             </button>
                         </form>
@@ -120,17 +121,7 @@
                 </div>
 
                 <!-- Alertas -->
-                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle me-2"></i>
-                    <span th:text="${success}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                
-                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    <span th:text="${error}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+                <!-- Mensajes - Se muestran con el sistema Oriola Messages -->
 
                 <!-- Lista de categorías -->
                 <div class="card">
@@ -211,7 +202,7 @@
                                                 </form>
                                                 <form th:action="@{/admin/categories/delete/{id}(id=${category.id})}" 
                                                       method="post" class="d-inline"
-                                                      onsubmit="return confirm('¿Estás seguro de eliminar esta categoría?')">
+                                                      onsubmit="event.preventDefault(); handleDeleteCategory(${category.id}, this); return false;">
                                                     <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
@@ -239,7 +230,21 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/oriola-messages.js}"></script>
     <script>
+        // Mostrar mensajes flash con el sistema Oriola
+        document.addEventListener('DOMContentLoaded', function() {
+            /*[[${success}]]*/ var successMessage = null;
+            /*[[${error}]]*/ var errorMessage = null;
+            
+            if (successMessage) {
+                oriolaMessages.showSuccess(successMessage);
+            }
+            if (errorMessage) {
+                oriolaMessages.showError(errorMessage);
+            }
+        });
+        
         // Actualizar contadores automáticamente al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
             // Solo actualizar si no se actualizó recientemente (evitar bucles)
@@ -279,11 +284,12 @@
             }
         }
         
-        function toggleCarrusel(categoryId, checkbox) {
+        async function toggleCarrusel(categoryId, checkbox) {
             const isChecked = checkbox.checked;
             const action = isChecked ? 'activar' : 'desactivar';
             
-            if (confirm(`¿Estás seguro de que quieres ${action} esta categoría en el carrusel del inicio?`)) {
+            const confirmed = await oriolaMessages.confirm(`¿Estás seguro de que quieres ${action} esta categoría en el carrusel del inicio?`);
+            if (confirmed) {
                 fetch(`/admin/categories/${categoryId}/toggle-carrusel`, {
                     method: 'POST',
                     headers: {
@@ -312,21 +318,25 @@
         }
 
         function showMessage(type, message) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
-            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-            alertDiv.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            
-            document.body.appendChild(alertDiv);
-            
-            setTimeout(() => {
-                if (alertDiv.parentNode) {
-                    alertDiv.parentNode.removeChild(alertDiv);
-                }
-            }, 5000);
+            if (type === 'success') {
+                oriolaMessages.showSuccess(message);
+            } else {
+                oriolaMessages.showError(message);
+            }
+        }
+
+        async function handleUpdateCounters() {
+            const confirmed = await oriolaMessages.confirm('¿Actualizar contadores de productos de todas las categorías?');
+            if (confirmed) {
+                window.location.href = '/admin/categories/update-product-counts';
+            }
+        }
+
+        async function handleDeleteCategory(categoryId, formElement) {
+            const confirmed = await oriolaMessages.confirm('¿Estás seguro de eliminar esta categoría?');
+            if (confirmed) {
+                formElement.submit();
+            }
         }
     </script>
 </body>

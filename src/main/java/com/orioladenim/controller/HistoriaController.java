@@ -95,7 +95,9 @@ public class HistoriaController {
      * Cambia el estado activo/inactivo de una historia
      */
     @PostMapping("/{id}/toggle")
-    public String toggleActiva(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+    @ResponseBody
+    public java.util.Map<String, Object> toggleActiva(@PathVariable Integer id) {
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
         try {
             // Verificar si la historia está actualmente inactiva (se va a activar)
             Historia historiaActual = historiaService.findById(id)
@@ -107,29 +109,48 @@ public class HistoriaController {
             
             if (seVaAActivar) {
                 // Si se activó, informar que se desactivaron las demás
-                redirectAttributes.addFlashAttribute("success", 
-                    "Historia activada exitosamente. Las demás historias han sido desactivadas automáticamente.");
+                response.put("success", true);
+                response.put("message", "Historia activada exitosamente. Las demás historias han sido desactivadas automáticamente.");
             } else {
-                redirectAttributes.addFlashAttribute("success", "Historia " + estado + " exitosamente");
+                response.put("success", true);
+                response.put("message", "Historia " + estado + " exitosamente");
             }
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            response.put("success", false);
+            response.put("message", e.getMessage());
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al cambiar el estado de la historia: " + e.getMessage());
         }
-        return "redirect:/admin/historias";
+        return response;
     }
     
     /**
      * Elimina una historia
      */
     @PostMapping("/{id}/eliminar")
-    public String eliminarHistoria(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+    @ResponseBody
+    public java.util.Map<String, Object> eliminarHistoria(@PathVariable Integer id) {
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
         try {
+            // Verificar que la historia existe
+            Historia historia = historiaService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Historia no encontrada"));
+            
             historiaService.deleteById(id);
-            redirectAttributes.addFlashAttribute("success", "Historia eliminada exitosamente");
+            response.put("success", true);
+            response.put("message", "Historia eliminada exitosamente");
+        } catch (IllegalArgumentException e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            response.put("success", false);
+            response.put("message", "No se puede eliminar la historia porque tiene datos asociados.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al eliminar la historia: " + e.getMessage());
+            response.put("success", false);
+            response.put("message", "Error al eliminar la historia: " + e.getMessage());
         }
-        return "redirect:/admin/historias";
+        return response;
     }
     
     /**

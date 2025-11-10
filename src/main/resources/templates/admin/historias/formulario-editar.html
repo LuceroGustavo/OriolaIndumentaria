@@ -6,6 +6,7 @@
     <title>Editar Historia - Oriola Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/oriola-messages.css}">
     <style>
         .video-preview {
             max-width: 100%;
@@ -80,12 +81,7 @@
                     </div>
                 </div>
 
-                <!-- Alertas -->
-                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    <span th:text="${error}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+                <!-- Mensajes - Se muestran con el sistema Oriola Messages -->
 
                 <!-- Formulario -->
                 <div class="row">
@@ -149,57 +145,6 @@
                                 </div>
                             </div>
 
-                            <div class="card mt-3">
-                                <div class="card-header">
-                                    <h5 class="card-title mb-0">
-                                        <i class="bi bi-arrow-repeat"></i>
-                                        Cambiar Video (Opcional)
-                                    </h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="alert alert-info">
-                                        <i class="bi bi-info-circle"></i>
-                                        <strong>Nota:</strong> Si no seleccionas un nuevo video, se mantendrá el video actual.
-                                    </div>
-
-                                    <div class="upload-area" id="uploadArea">
-                                        <i class="bi bi-cloud-upload fs-1 text-muted"></i>
-                                        <h5 class="mt-2">Arrastra un nuevo video aquí</h5>
-                                        <p class="text-muted">o haz clic para seleccionar</p>
-                                        <input type="file" class="form-control d-none" id="video" name="video" 
-                                               accept="video/mp4,video/webm,video/quicktime,video/x-msvideo">
-                                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('video').click()">
-                                            <i class="bi bi-folder2-open"></i> Seleccionar Nuevo Video
-                                        </button>
-                                    </div>
-
-                                    <!-- Preview del nuevo video -->
-                                    <div id="videoPreview" class="mt-3" style="display: none;">
-                                        <h6>Vista previa del nuevo video:</h6>
-                                        <video id="previewVideo" class="video-preview" controls>
-                                            Tu navegador no soporta la reproducción de video.
-                                        </video>
-                                        <div class="mt-2">
-                                            <small class="text-muted">
-                                                <i class="bi bi-info-circle"></i>
-                                                <span id="videoInfo"></span>
-                                            </small>
-                                        </div>
-                                    </div>
-
-                                    <!-- Especificaciones -->
-                                    <div class="mt-3">
-                                        <h6>Especificaciones del video:</h6>
-                                        <ul class="list-unstyled">
-                                            <li><i class="bi bi-check-circle text-success"></i> Formatos: MP4, WebM, MOV, AVI</li>
-                                            <li><i class="bi bi-check-circle text-success"></i> Duración máxima: 15 segundos</li>
-                                            <li><i class="bi bi-check-circle text-success"></i> Tamaño máximo: 10MB</li>
-                                            <li><i class="bi bi-check-circle text-success"></i> Resolución recomendada: 1080x1920 (vertical)</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div class="mt-4">
                                 <button type="submit" class="btn btn-primary btn-lg">
                                     <i class="bi bi-save"></i> Actualizar Historia
@@ -234,30 +179,50 @@
                         <div class="card mt-3">
                             <div class="card-header">
                                 <h5 class="card-title mb-0">
-                                    <i class="bi bi-gear"></i>
-                                    Acciones Rápidas
+                                    <i class="bi bi-arrow-repeat"></i>
+                                    Cambiar Video (Opcional)
                                 </h5>
                             </div>
                             <div class="card-body">
-                                <div class="d-grid gap-2">
-                                    <form th:action="@{/admin/historias/{id}/toggle(id=${historia.id})}" method="post" class="d-inline">
-                                        <button type="submit" 
-                                                th:class="'btn w-100 ' + (${historia.activa} ? 'btn-warning' : 'btn-success')"
-                                                th:text="${historia.activa ? 'Desactivar Historia' : 'Activar Historia'}">
-                                            <i th:class="${historia.activa} ? 'bi bi-pause' : 'bi bi-play'"></i>
-                                        </button>
-                                    </form>
-                                    
-                                    <a th:href="@{/admin/historias/{id}(id=${historia.id})}" class="btn btn-outline-info">
-                                        <i class="bi bi-eye"></i> Ver Detalles
-                                    </a>
-                                    
-                                    <form th:action="@{/admin/historias/{id}/eliminar(id=${historia.id})}" method="post" class="d-inline"
-                                          onsubmit="return confirm('¿Está seguro de que desea eliminar esta historia?')">
-                                        <button type="submit" class="btn btn-outline-danger w-100">
-                                            <i class="bi bi-trash"></i> Eliminar Historia
-                                        </button>
-                                    </form>
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle"></i>
+                                    <strong>Nota:</strong> Si no seleccionas un nuevo video, se mantendrá el video actual.
+                                </div>
+
+                                <div class="upload-area" id="uploadArea">
+                                    <i class="bi bi-cloud-upload fs-1 text-muted"></i>
+                                    <h5 class="mt-2">Arrastra un nuevo video aquí</h5>
+                                    <p class="text-muted">o haz clic para seleccionar</p>
+                                    <input type="file" class="form-control d-none" id="video" name="video" 
+                                           accept="video/mp4,video/webm,video/quicktime,video/x-msvideo">
+                                    <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('video').click()">
+                                        <i class="bi bi-folder2-open"></i> Seleccionar Nuevo Video
+                                    </button>
+                                </div>
+
+                                <!-- Preview del nuevo video -->
+                                <div id="videoPreview" class="mt-3" style="display: none;">
+                                    <h6>Vista previa del nuevo video:</h6>
+                                    <video id="previewVideo" class="video-preview" controls>
+                                        Tu navegador no soporta la reproducción de video.
+                                    </video>
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <i class="bi bi-info-circle"></i>
+                                            <span id="videoInfo"></span>
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Especificaciones -->
+                                <div class="mt-3">
+                                    <h6>Especificaciones del video:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="bi bi-check-circle text-success"></i> Formatos: MP4, WebM, MOV, AVI</li>
+                                        <li><i class="bi bi-check-circle text-success"></i> Duración máxima: 15 segundos</li>
+                                        <li><i class="bi bi-check-circle text-success"></i> Tamaño máximo: 10MB</li>
+                                        <li><i class="bi bi-check-circle text-success"></i> Resolución recomendada: 1080x1920 (vertical)</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -268,6 +233,17 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/oriola-messages.js}"></script>
+    <script>
+        // Mostrar mensajes flash con el sistema Oriola
+        document.addEventListener('DOMContentLoaded', function() {
+            /*[[${error}]]*/ var errorMessage = null;
+            
+            if (errorMessage) {
+                oriolaMessages.showError(errorMessage);
+            }
+        });
+    </script>
     <script>
         const uploadArea = document.getElementById('uploadArea');
         const videoInput = document.getElementById('video');
@@ -308,7 +284,7 @@
             if (file) {
                 // Validar tamaño (10MB)
                 if (file.size > 10 * 1024 * 1024) {
-                    alert('El video no puede superar los 10MB');
+                    oriolaMessages.showError('El video no puede superar los 10MB');
                     videoInput.value = '';
                     return;
                 }
@@ -316,7 +292,7 @@
                 // Validar tipo
                 const validTypes = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo'];
                 if (!validTypes.includes(file.type)) {
-                    alert('Formato de video no válido. Use MP4, WebM, MOV o AVI.');
+                    oriolaMessages.showError('Formato de video no válido. Use MP4, WebM, MOV o AVI.');
                     videoInput.value = '';
                     return;
                 }
@@ -338,7 +314,7 @@
 
             if (!titulo) {
                 e.preventDefault();
-                alert('El título es obligatorio');
+                oriolaMessages.showError('El título es obligatorio');
                 return;
             }
         });

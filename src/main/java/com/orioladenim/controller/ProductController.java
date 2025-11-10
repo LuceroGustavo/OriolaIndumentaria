@@ -327,10 +327,30 @@ public class ProductController {
         return "redirect:/admin/products";
     }
 
-    @GetMapping("/delete/{pId}")
-    public String deleteProduct(@PathVariable Integer pId) {
-        productRepository.deleteById(pId);
-        return "redirect:/admin/products";
+    @PostMapping("/delete/{pId}")
+    @ResponseBody
+    public java.util.Map<String, Object> deleteProduct(@PathVariable Integer pId) {
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        try {
+            Product product = productRepository.findById(pId)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            
+            // Verificar si tiene relaciones que impidan la eliminación
+            // (esto se manejará automáticamente por la base de datos, pero podemos intentar eliminar)
+            productRepository.deleteById(pId);
+            
+            response.put("success", true);
+            response.put("message", "Producto eliminado correctamente");
+            return response;
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            response.put("success", false);
+            response.put("message", "No se puede eliminar el producto porque tiene datos asociados (vistas, imágenes, etc.). Primero elimina o desasocia estos datos.");
+            return response;
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al eliminar el producto: " + e.getMessage());
+            return response;
+        }
     }
 
     @GetMapping("/{pId}/images")

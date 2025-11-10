@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/oriola-messages.css}">
 </head>
 <body>
     <!-- Navbar -->
@@ -86,18 +87,7 @@
                     </div>
                 </div>
 
-                <!-- Alertas -->
-                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle me-2"></i>
-                    <span th:text="${success}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                
-                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    <span th:text="${error}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+                <!-- Alertas - Se muestran con el sistema Oriola Messages -->
 
                 <!-- Lista de colores -->
                 <div class="card">
@@ -177,7 +167,7 @@
                                                 <form th:if="${!color.isDefault}" 
                                                       th:action="@{/admin/colors/delete/{id}(id=${color.id})}" 
                                                       method="post" class="d-inline"
-                                                      onsubmit="return confirm('¿Estás seguro de eliminar este color?')">
+                                                      onsubmit="event.preventDefault(); handleDeleteColor(${color.id}, this); return false;">
                                                     <button type="submit" 
                                                             class="btn btn-sm btn-outline-danger" 
                                                             title="Eliminar color"
@@ -253,7 +243,21 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/oriola-messages.js}"></script>
     <script>
+        // Mostrar mensajes flash con el sistema Oriola
+        document.addEventListener('DOMContentLoaded', function() {
+            /*[[${success}]]*/ var successMessage = null;
+            /*[[${error}]]*/ var errorMessage = null;
+            
+            if (successMessage) {
+                oriolaMessages.showSuccess(successMessage);
+            }
+            if (errorMessage) {
+                oriolaMessages.showError(errorMessage);
+            }
+        });
+        
         // Inicializar tooltips de Bootstrap
         document.addEventListener('DOMContentLoaded', function() {
             // Inicializar todos los tooltips, incluyendo los deshabilitados
@@ -277,6 +281,13 @@
                 });
             });
         });
+
+        async function handleDeleteColor(colorId, formElement) {
+            const confirmed = await oriolaMessages.confirm('¿Estás seguro de eliminar este color?');
+            if (confirmed) {
+                formElement.submit();
+            }
+        }
     </script>
 </body>
 </html>

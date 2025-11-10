@@ -4,6 +4,7 @@
     <title>Oriola - Panel de Admin</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/oriola-messages.css}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .sidebar {
@@ -347,6 +348,7 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/oriola-messages.js}"></script>
     
     <script>
         let analyticsChart = null;
@@ -428,12 +430,12 @@
             const endDate = document.getElementById('endDate').value;
             
             if (!startDate || !endDate) {
-                alert('Por favor selecciona ambas fechas');
+                oriolaMessages.showError('Por favor selecciona ambas fechas');
                 return;
             }
             
             if (new Date(startDate) > new Date(endDate)) {
-                alert('La fecha de inicio debe ser anterior a la fecha de fin');
+                oriolaMessages.showError('La fecha de inicio debe ser anterior a la fecha de fin');
                 return;
             }
             
@@ -593,8 +595,9 @@
                 });
         }
         
-        function resetAnalytics() {
-            if (confirm('¿Estás seguro de que quieres resetear todas las estadísticas? Esta acción no se puede deshacer.')) {
+        async function resetAnalytics() {
+            const confirmed = await oriolaMessages.confirm('¿Estás seguro de que quieres resetear todas las estadísticas? Esta acción no se puede deshacer.');
+            if (confirmed) {
                 showLoading();
                 
                 // Crear un timeout para evitar requests colgadas
@@ -619,13 +622,13 @@
                     hideLoading();
                     console.log('Reset response:', data);
                     if (data.message) {
-                        alert('✅ ' + data.message);
+                        oriolaMessages.showSuccess(data.message);
                         // Recargar analytics después del reset
                         loadAnalytics('month');
                     } else if (data.error) {
-                        alert('❌ ' + data.error);
+                        oriolaMessages.showError(data.error);
                     } else {
-                        alert('✅ Analytics reseteados exitosamente');
+                        oriolaMessages.showSuccess('Analytics reseteados exitosamente');
                         loadAnalytics('month');
                     }
                 })
@@ -633,13 +636,14 @@
                     clearTimeout(timeoutId);
                     hideLoading();
                     console.error('Error resetting analytics:', error);
-                    alert('❌ Error al resetear analytics: ' + error.message);
+                    oriolaMessages.showError('Error al resetear analytics: ' + error.message);
                 });
             }
         }
 
-        function generateTestData() {
-            if (confirm('¿Generar datos de prueba? Esto creará 50 vistas simuladas para testing.')) {
+        async function generateTestData() {
+            const confirmed = await oriolaMessages.confirm('¿Generar datos de prueba? Esto creará 50 vistas simuladas para testing.');
+            if (confirmed) {
                 showLoading();
                 
                 // Crear un timeout para evitar requests colgadas
@@ -664,13 +668,13 @@
                     hideLoading();
                     console.log('Test data response:', data);
                     if (data.message) {
-                        alert('✅ ' + data.message);
+                        oriolaMessages.showSuccess(data.message);
                         // Recargar analytics después de generar datos
                         loadAnalytics('month');
                     } else if (data.error) {
-                        alert('❌ ' + data.error);
+                        oriolaMessages.showError(data.error);
                     } else {
-                        alert('✅ Datos de prueba generados exitosamente');
+                        oriolaMessages.showSuccess('Datos de prueba generados exitosamente');
                         loadAnalytics('month');
                     }
                 })
@@ -678,7 +682,7 @@
                     clearTimeout(timeoutId);
                     hideLoading();
                     console.error('Error generating test data:', error);
-                    alert('❌ Error al generar datos de prueba: ' + error.message);
+                    oriolaMessages.showError('Error al generar datos de prueba: ' + error.message);
                 });
             }
         }
@@ -707,7 +711,7 @@
         }
         
         function showError(message) {
-            alert('❌ ' + message);
+            oriolaMessages.showError(message);
         }
         
         // Cargar total de vistas del mes al inicio

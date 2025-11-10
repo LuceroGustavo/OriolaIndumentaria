@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/oriola-messages.css}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -507,18 +508,20 @@
                                        title="Editar">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <button th:onclick="'toggleProductStatus(' + ${product.pId} + ', this)'" 
-                                            th:class="'btn action-btn btn-toggle'"
+                                    <button type="button"
+                                            class="btn action-btn btn-toggle"
                                             th:title="${product.activo ? 'Desactivar publicación' : 'Activar publicación'}"
-                                            th:data-product-id="${product.pId}">
+                                            th:data-product-id="${product.pId}"
+                                            onclick="toggleProductStatus(this.getAttribute('data-product-id'), this)">
                                         <i th:class="${product.activo ? 'bi bi-eye-slash' : 'bi bi-eye'}"></i>
                                     </button>
-                                    <a th:href="@{/admin/products/delete/{id}(id=${product.pId})}" 
-                                       class="btn action-btn btn-delete"
-                                       onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?');" 
-                                       title="Eliminar">
+                                    <button type="button"
+                                            class="btn action-btn btn-delete"
+                                            th:data-product-id="${product.pId}"
+                                            onclick="handleDeleteProduct(this.getAttribute('data-product-id'), this)" 
+                                            title="Eliminar">
                                         <i class="bi bi-trash"></i>
-                                    </a>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -539,6 +542,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/oriola-messages.js}"></script>
     <script>
         // Filtrado automático
         document.addEventListener('DOMContentLoaded', function() {
@@ -569,16 +573,22 @@
             document.getElementById('filterForm').submit();
         }
 
-        function toggleProductStatus(productId, button) {
-            if (confirm('¿Estás seguro de que quieres cambiar el estado de publicación de este producto?')) {
-                fetch(`/admin/products/${productId}/toggle-status`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
+        async function toggleProductStatus(productId, button) {
+            try {
+                const confirmed = await oriolaMessages.confirm('¿Estás seguro de que quieres cambiar el estado de publicación de este producto?');
+                if (confirmed) {
+                    // Deshabilitar el botón mientras se procesa
+                    button.disabled = true;
+                    
+                    const response = await fetch(`/admin/products/${productId}/toggle-status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
                     if (data.success) {
                         showMessage('success', data.message);
                         setTimeout(() => {
@@ -586,19 +596,21 @@
                         }, 1000);
                     } else {
                         showMessage('error', data.message || 'Error al cambiar el estado del producto');
+                        button.disabled = false;
                     }
-                })
-                .catch(error => {
-                    showMessage('error', 'Error al cambiar el estado del producto: ' + error.message);
-                });
+                }
+            } catch (error) {
+                showMessage('error', 'Error al cambiar el estado del producto: ' + error.message);
+                button.disabled = false;
             }
         }
 
-        function toggleVistaInicio(productId, checkbox) {
+        async function toggleVistaInicio(productId, checkbox) {
             const isChecked = checkbox.checked;
             const action = isChecked ? 'activar' : 'desactivar';
             
-            if (confirm(`¿Estás seguro de que quieres ${action} la vista en inicio de este producto?`)) {
+            const confirmed = await oriolaMessages.confirm(`¿Estás seguro de que quieres ${action} la vista en inicio de este producto?`);
+            if (confirmed) {
                 fetch(`/admin/products/${productId}/toggle-vista-inicio`, {
                     method: 'POST',
                     headers: {
@@ -627,21 +639,53 @@
         }
 
         function showMessage(type, message) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
-            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-            alertDiv.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            
-            document.body.appendChild(alertDiv);
-            
-            setTimeout(() => {
-                if (alertDiv.parentNode) {
-                    alertDiv.parentNode.removeChild(alertDiv);
+            if (type === 'success') {
+                oriolaMessages.showSuccess(message);
+            } else {
+                oriolaMessages.showError(message);
+            }
+        }
+
+        async function handleDeleteProduct(productId, buttonElement) {
+            try {
+                const confirmed = await oriolaMessages.confirm('¿Estás seguro de que quieres eliminar este producto? Esta acción no se puede deshacer.');
+                if (confirmed) {
+                    // Deshabilitar el botón mientras se procesa
+                    buttonElement.disabled = true;
+                    buttonElement.style.opacity = '0.6';
+                    
+                    try {
+                        const response = await fetch(`/admin/products/delete/${productId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            showMessage('success', data.message);
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            showMessage('error', data.message || 'No se pudo eliminar el producto.');
+                            buttonElement.disabled = false;
+                            buttonElement.style.opacity = '1';
+                        }
+                    } catch (fetchError) {
+                        showMessage('error', 'Error al eliminar el producto: ' + fetchError.message);
+                        buttonElement.disabled = false;
+                        buttonElement.style.opacity = '1';
+                    }
                 }
-            }, 5000);
+            } catch (error) {
+                oriolaMessages.showError('Error al procesar la eliminación: ' + error.message);
+                buttonElement.disabled = false;
+                buttonElement.style.opacity = '1';
+            }
         }
     </script>
 </body>
