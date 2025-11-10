@@ -238,20 +238,27 @@ public class CategoryController {
      * Eliminar categoría (soft delete)
      */
     @PostMapping("/delete/{id}")
-    public String deleteCategory(
-            @PathVariable Long id,
-            RedirectAttributes redirectAttributes) {
-        
+    @ResponseBody
+    public java.util.Map<String, Object> deleteCategory(@PathVariable Long id) {
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
         try {
             categoryService.deleteCategory(id);
-            redirectAttributes.addFlashAttribute("success", "Categoría eliminada exitosamente");
+            response.put("success", true);
+            response.put("message", "Categoría eliminada exitosamente");
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            response.put("success", false);
+            response.put("message", e.getMessage());
         } catch (IllegalStateException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            response.put("success", false);
+            response.put("message", e.getMessage());
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            response.put("success", false);
+            response.put("message", "No se puede eliminar la categoría porque tiene datos asociados (productos, imágenes, etc.).");
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al eliminar la categoría: " + e.getMessage());
         }
-        
-        return "redirect:/admin/categories";
+        return response;
     }
     
     /**

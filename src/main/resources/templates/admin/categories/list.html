@@ -200,13 +200,13 @@
                                                         <i th:class="'bi ' + (${category.isActive} ? 'bi-pause' : 'bi-play')"></i>
                                                     </button>
                                                 </form>
-                                                <form th:action="@{/admin/categories/delete/{id}(id=${category.id})}" 
-                                                      method="post" class="d-inline"
-                                                      onsubmit="event.preventDefault(); handleDeleteCategory(${category.id}, this); return false;">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        th:data-category-id="${category.id}"
+                                                        onclick="handleDeleteCategory(this.getAttribute('data-category-id'), this)"
+                                                        title="Eliminar">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -332,10 +332,45 @@
             }
         }
 
-        async function handleDeleteCategory(categoryId, formElement) {
-            const confirmed = await oriolaMessages.confirm('¿Estás seguro de eliminar esta categoría?');
-            if (confirmed) {
-                formElement.submit();
+        async function handleDeleteCategory(categoryId, buttonElement) {
+            try {
+                const confirmed = await oriolaMessages.confirm('¿Estás seguro de eliminar esta categoría? Esta acción no se puede deshacer.');
+                if (confirmed) {
+                    // Deshabilitar el botón mientras se procesa
+                    buttonElement.disabled = true;
+                    buttonElement.style.opacity = '0.6';
+                    
+                    try {
+                        const response = await fetch(`/admin/categories/delete/${categoryId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            oriolaMessages.showSuccess(data.message);
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            oriolaMessages.showError(data.message || 'No se pudo eliminar la categoría.');
+                            buttonElement.disabled = false;
+                            buttonElement.style.opacity = '1';
+                        }
+                    } catch (fetchError) {
+                        oriolaMessages.showError('Error al eliminar la categoría: ' + fetchError.message);
+                        buttonElement.disabled = false;
+                        buttonElement.style.opacity = '1';
+                    }
+                }
+            } catch (error) {
+                oriolaMessages.showError('Error al procesar la eliminación: ' + error.message);
+                buttonElement.disabled = false;
+                buttonElement.style.opacity = '1';
             }
         }
     </script>
