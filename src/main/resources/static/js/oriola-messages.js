@@ -193,7 +193,7 @@ class OriolaMessages {
                         <span style="font-size: 15px; line-height: 1.5; color: #212529; flex: 1;">${this.escapeHtml(message)}</span>
                     </div>
                     <div style="display: flex; gap: 12px; justify-content: flex-end;">
-                        <button class="oriola-confirm-btn oriola-confirm-cancel" style="
+                        ${cancelText ? `<button class="oriola-confirm-btn oriola-confirm-cancel" style="
                             padding: 10px 20px;
                             border: 1px solid #dee2e6;
                             background: #ffffff;
@@ -203,7 +203,7 @@ class OriolaMessages {
                             font-size: 14px;
                             font-weight: 500;
                             transition: all 0.2s;
-                        ">${this.escapeHtml(cancelText)}</button>
+                        ">${this.escapeHtml(cancelText)}</button>` : ''}
                         <button class="oriola-confirm-btn oriola-confirm-ok" style="
                             padding: 10px 20px;
                             border: 1px solid #ffc107;
@@ -268,11 +268,14 @@ class OriolaMessages {
                 }, 200);
             };
 
-            // Botón cancelar
-            dialog.querySelector('.oriola-confirm-cancel').addEventListener('click', () => {
-                cleanup();
-                resolve(false);
-            });
+            // Botón cancelar (solo si existe)
+            const cancelBtn = dialog.querySelector('.oriola-confirm-cancel');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    cleanup();
+                    resolve(false);
+                });
+            }
 
             // Botón aceptar
             dialog.querySelector('.oriola-confirm-ok').addEventListener('click', () => {

@@ -161,7 +161,6 @@ public class ColorController {
             @Valid @ModelAttribute("color") Color color,
             BindingResult bindingResult,
             @RequestParam(value = "patternImage", required = false) MultipartFile patternImage,
-            @RequestParam(value = "removeExistingImage", defaultValue = "false") String removeExistingImage,
             RedirectAttributes redirectAttributes) {
         
         if (bindingResult.hasErrors()) {
@@ -184,20 +183,23 @@ public class ColorController {
             Color existingColor = existingColorOpt.get();
             String currentImagePath = existingColor.getImagePath();
             
-            // Si se solicita eliminar la imagen existente
-            if ("true".equals(removeExistingImage) && currentImagePath != null && !currentImagePath.isEmpty()) {
-                colorImageService.deleteColorImage(currentImagePath);
-                color.setImagePath(null);
-            }
-            // Si se subió una nueva imagen
-            else if (patternImage != null && !patternImage.isEmpty()) {
+            // Si se subió una nueva imagen, reemplazar la anterior automáticamente
+            if (patternImage != null && !patternImage.isEmpty()) {
                 // Eliminar imagen anterior si existe
                 if (currentImagePath != null && !currentImagePath.isEmpty()) {
-                    colorImageService.deleteColorImage(currentImagePath);
+                    System.out.println("🗑️ Eliminando imagen anterior del color ID " + id + ": " + currentImagePath);
+                    boolean deleted = colorImageService.deleteColorImage(currentImagePath);
+                    if (deleted) {
+                        System.out.println("✅ Imagen anterior eliminada correctamente");
+                    } else {
+                        System.out.println("⚠️ No se pudo eliminar la imagen anterior (puede que no exista): " + currentImagePath);
+                    }
                 }
                 // Guardar nueva imagen
+                System.out.println("💾 Guardando nueva imagen para color ID " + id);
                 String imagePath = colorImageService.saveColorImage(patternImage, id);
                 color.setImagePath(imagePath);
+                System.out.println("✅ Nueva imagen guardada: " + imagePath);
             }
             // Si no se cambió nada, preservar la imagen actual
             else if (currentImagePath != null && !currentImagePath.isEmpty()) {

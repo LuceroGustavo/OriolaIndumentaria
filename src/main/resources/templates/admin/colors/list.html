@@ -164,18 +164,16 @@
                                                         style="cursor: not-allowed; opacity: 0.6; pointer-events: auto;">
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
-                                                <form th:if="${!color.isDefault}" 
-                                                      th:action="@{/admin/colors/delete/{id}(id=${color.id})}" 
-                                                      method="post" class="d-inline"
-                                                      onsubmit="event.preventDefault(); handleDeleteColor(${color.id}, this); return false;">
-                                                    <button type="submit" 
-                                                            class="btn btn-sm btn-outline-danger" 
-                                                            title="Eliminar color"
-                                                            data-bs-toggle="tooltip"
-                                                            data-bs-placement="top">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
+                                                <button th:if="${!color.isDefault}" 
+                                                        type="button"
+                                                        class="btn btn-sm btn-outline-danger" 
+                                                        title="Eliminar color"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="top"
+                                                        th:attr="data-color-id=${color.id}, data-product-count=${color.productCount}, data-color-name=${color.name}"
+                                                        onclick="handleDeleteColorFromButton(this)">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
                                                 <button th:if="${color.isDefault}" 
                                                         type="button"
                                                         class="btn btn-sm btn-outline-secondary" 
@@ -282,10 +280,29 @@
             });
         });
 
-        async function handleDeleteColor(colorId, formElement) {
-            const confirmed = await oriolaMessages.confirm('¿Estás seguro de eliminar este color?');
+        async function handleDeleteColorFromButton(button) {
+            const colorId = button.getAttribute('data-color-id');
+            const productCount = parseInt(button.getAttribute('data-product-count')) || 0;
+            const colorName = button.getAttribute('data-color-name') || 'este color';
+            
+            // Verificar si tiene productos asociados
+            if (productCount > 0) {
+                // Si tiene productos, mostrar mensaje informativo (solo botón "Entendido")
+                const message = `⚠️ ADVERTENCIA: Este color tiene ${productCount} producto(s) asociado(s).\n\nPara poder eliminar este color, primero deberá desasociar todos los productos asociados.`;
+                await oriolaMessages.confirm(message, 'Entendido', null);
+                return; // No continuar con la eliminación
+            }
+            
+            // Si no tiene productos, mostrar confirmación normal
+            const confirmMessage = `¿Estás seguro de eliminar el color "${colorName}"? Esta acción no se puede deshacer.`;
+            const confirmed = await oriolaMessages.confirm(confirmMessage);
             if (confirmed) {
-                formElement.submit();
+                // Crear un formulario temporal para enviar la petición POST
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/admin/colors/delete/${colorId}`;
+                document.body.appendChild(form);
+                form.submit();
             }
         }
     </script>

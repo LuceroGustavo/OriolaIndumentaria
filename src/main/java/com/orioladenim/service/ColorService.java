@@ -224,6 +224,7 @@ public class ColorService {
         existingColor.setName(colorData.getName());
         existingColor.setDescription(colorData.getDescription());
         existingColor.setHexCode(colorData.getHexCode());
+        existingColor.setImagePath(colorData.getImagePath()); // Actualizar ruta de imagen
         existingColor.setIsActive(colorData.getIsActive());
         // NO actualizar displayOrder - mantener el orden original del color
         // El displayOrder solo se asigna al crear, no al editar

@@ -158,10 +158,9 @@
                                                      class="img-thumbnail" 
                                                      style="max-width: 200px; max-height: 200px;"
                                                      th:attr="data-image-path=${color.imagePath}">
-                                                <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeExistingImage()">
-                                                    <i class="bi bi-trash me-1"></i>Eliminar imagen actual
-                                                </button>
-                                                <input type="hidden" id="removeExistingImage" name="removeExistingImage" value="false">
+                                                <p class="text-muted small mt-2 mb-0">
+                                                    <i class="bi bi-info-circle me-1"></i>Para cambiar la imagen, selecciona una nueva arriba y esta reemplazará la actual.
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -357,9 +356,15 @@
                     reader.onload = function(e) {
                         const imagePreview = document.getElementById('imagePreview');
                         const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                        const existingImageContainer = document.getElementById('existingImageContainer');
                         
                         imagePreview.src = e.target.result;
                         imagePreviewContainer.style.display = 'block';
+                        
+                        // Ocultar la imagen actual si existe (será reemplazada por la nueva)
+                        if (existingImageContainer) {
+                            existingImageContainer.style.display = 'none';
+                        }
                         
                         // Actualizar vista previa circular
                         updatePreview();
@@ -373,32 +378,23 @@
                 const patternImage = document.getElementById('patternImage');
                 const imagePreview = document.getElementById('imagePreview');
                 const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                const existingImageContainer = document.getElementById('existingImageContainer');
                 
                 patternImage.value = '';
                 imagePreview.src = '';
                 imagePreviewContainer.style.display = 'none';
                 
-                // Restaurar vista previa a color sólido
+                // Volver a mostrar la imagen actual si existe
+                if (existingImageContainer) {
+                    existingImageContainer.style.display = 'block';
+                }
+                
+                // Restaurar vista previa
                 updatePreview();
             };
             
-            // Eliminar imagen existente
-            window.removeExistingImage = function() {
-                const removeInput = document.getElementById('removeExistingImage');
-                const existingImageDiv = document.querySelector('div[th\\:if]');
-                
-                if (removeInput) {
-                    removeInput.value = 'true';
-                }
-                
-                if (existingImageDiv) {
-                    existingImageDiv.style.display = 'none';
-                }
-                
-                // Limpiar vista previa
-                colorPreview.style.backgroundImage = 'none';
-                updatePreview();
-            };
+            // La función removeExistingImage ya no es necesaria
+            // Al seleccionar una nueva imagen, esta reemplazará automáticamente la anterior
             
             // Inicializar vista previa
             if (nameInput && nameInput.value) {

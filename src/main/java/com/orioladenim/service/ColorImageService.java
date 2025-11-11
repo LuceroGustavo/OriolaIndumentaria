@@ -313,18 +313,26 @@ public class ColorImageService {
     
     /**
      * Elimina una imagen de color del sistema de archivos
+     * Elimina tanto la imagen principal como el thumbnail
      */
     public boolean deleteColorImage(String imagePath) {
         try {
             if (imagePath == null || imagePath.isEmpty()) {
+                System.out.println("⚠️ No se puede eliminar: imagePath es null o vacío");
                 return false;
             }
+            
+            boolean deletedMain = false;
+            boolean deletedThumbnail = false;
             
             // Eliminar imagen principal
             Path mainImagePath = Paths.get(uploadPath, imagePath);
             if (Files.exists(mainImagePath)) {
                 Files.delete(mainImagePath);
+                deletedMain = true;
                 System.out.println("✅ Imagen principal eliminada: " + mainImagePath);
+            } else {
+                System.out.println("⚠️ Imagen principal no encontrada (puede que ya fue eliminada): " + mainImagePath);
             }
             
             // Eliminar thumbnail
@@ -332,12 +340,31 @@ public class ColorImageService {
             Path thumbnailPathFile = Paths.get(thumbnailPath, "colors", filename);
             if (Files.exists(thumbnailPathFile)) {
                 Files.delete(thumbnailPathFile);
+                deletedThumbnail = true;
                 System.out.println("✅ Thumbnail eliminado: " + thumbnailPathFile);
+            } else {
+                System.out.println("⚠️ Thumbnail no encontrado (puede que ya fue eliminado): " + thumbnailPathFile);
             }
             
-            return true;
+            // Retornar true si se eliminó al menos un archivo, o si ambos no existían (ya estaban eliminados)
+            // Si ambos archivos no existían, consideramos la operación exitosa (no hay nada que eliminar)
+            if (!deletedMain && !deletedThumbnail) {
+                // Verificar si realmente no existían (no fueron eliminados porque no existían)
+                boolean mainNotExists = !Files.exists(mainImagePath);
+                boolean thumbnailNotExists = !Files.exists(thumbnailPathFile);
+                if (mainNotExists && thumbnailNotExists) {
+                    System.out.println("ℹ️ Ambos archivos ya no existían, operación considerada exitosa");
+                    return true;
+                }
+            }
+            return deletedMain || deletedThumbnail;
         } catch (IOException e) {
-            System.err.println("Error eliminando imagen de color: " + e.getMessage());
+            System.err.println("❌ Error eliminando imagen de color: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            System.err.println("❌ Error inesperado eliminando imagen de color: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
