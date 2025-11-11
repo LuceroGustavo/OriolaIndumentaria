@@ -278,17 +278,26 @@
                                     
                                     <!-- Colores -->
                                     <div class="mobile-color-section mb-3">
-                                        <div class="d-flex align-items-center mb-2" th:if="${product.colores != null and product.colores.size() > 0}">
-                                            <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; margin-right: 10px;">Color:</span>
-                                            <div class="color-circles d-flex gap-2">
-                                                <!-- Colores del sistema nuevo -->
-                                                <div th:each="color : ${product.colores}" 
-                                                     class="color-circle" 
-                                                     th:title="${color.name}"
-                                                     th:attr="style=${(color.imagePath != null and !color.imagePath.isEmpty()) ? 
-                                                                      ('background-image: url(/uploads/' + color.imagePath + '); background-size: cover; background-position: center;') : 
-                                                                      ('background-color: ' + (color.hexCode != null ? color.hexCode : '#6c757d') + ';')} + 'width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: default; transition: all 0.3s ease;'">
+                                        <div th:if="${product.colores != null and product.colores.size() > 0}">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #000; margin-right: 10px;">Color:</span>
+                                                <div class="color-circles d-flex gap-2">
+                                                    <!-- Colores del sistema nuevo -->
+                                                    <div th:each="color : ${product.colores}" 
+                                                         class="color-circle mobile-color-circle" 
+                                                         th:title="${color.name}"
+                                                         th:attr="data-color-name=${color.name},
+                                                                  style=${(color.imagePath != null and !color.imagePath.isEmpty()) ? 
+                                                                          ('background-image: url(/uploads/' + color.imagePath + '); background-size: cover; background-position: center;') : 
+                                                                          ('background-color: ' + (color.hexCode != null ? color.hexCode : '#6c757d') + ';')} + 'width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e0e0e0; cursor: pointer; transition: all 0.3s ease;'">
+                                                    </div>
                                                 </div>
+                                            </div>
+                                            <!-- Nombre del color seleccionado (solo visible en móvil) -->
+                                            <div class="mobile-color-name-display" 
+                                                 id="mobileColorNameDisplay"
+                                                 style="font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 400; color: #666; margin-top: 8px; min-height: 18px; display: none;">
+                                                <span id="mobileColorNameText"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -1770,6 +1779,52 @@
                 }
             }
         }
+
+        // Mostrar nombre del color al tocar/seleccionar en móvil
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileColorCircles = document.querySelectorAll('.mobile-color-circle');
+            const colorNameDisplay = document.getElementById('mobileColorNameDisplay');
+            const colorNameText = document.getElementById('mobileColorNameText');
+            
+            if (mobileColorCircles.length > 0 && colorNameDisplay && colorNameText) {
+                mobileColorCircles.forEach(function(circle) {
+                    // Manejar click/touch
+                    circle.addEventListener('click', function() {
+                        const colorName = this.getAttribute('data-color-name');
+                        if (colorName) {
+                            colorNameText.textContent = colorName;
+                            colorNameDisplay.style.display = 'block';
+                            
+                            // Remover selección anterior
+                            mobileColorCircles.forEach(function(c) {
+                                c.style.border = '2px solid #e0e0e0';
+                                c.style.transform = 'scale(1)';
+                            });
+                            
+                            // Resaltar el color seleccionado
+                            this.style.border = '2px solid #000';
+                            this.style.transform = 'scale(1.1)';
+                            
+                            // Ocultar después de 3 segundos si no hay otra interacción
+                            clearTimeout(window.colorNameTimeout);
+                            window.colorNameTimeout = setTimeout(function() {
+                                colorNameDisplay.style.display = 'none';
+                            }, 3000);
+                        }
+                    });
+                    
+                    // También mostrar en hover para dispositivos con mouse (tablets)
+                    circle.addEventListener('mouseenter', function() {
+                        const colorName = this.getAttribute('data-color-name');
+                        if (colorName && window.innerWidth <= 991) { // Solo en móvil/tablet
+                            colorNameText.textContent = colorName;
+                            colorNameDisplay.style.display = 'block';
+                            clearTimeout(window.colorNameTimeout);
+                        }
+                    });
+                });
+            }
+        });
     </script>
 </body>
 </html>
