@@ -16,6 +16,13 @@
 - **Base de datos:** MySQL en el servidor
 - **Usuario:** oriola_user / OriolaDB2025!
 
+### 3. **Donweb (Servidor Nuevo)**
+- **Archivo:** `application-donweb.properties`
+- **Uso:** Servidor de producción en Donweb (Argentina, pesos)
+- **Servidor:** [IP_PENDIENTE]
+- **Base de datos:** MySQL en el servidor
+- **Usuario:** oriola_user / OriolaDB2025!
+
 ## 🚀 Cómo Ejecutar
 
 ### Para Desarrollo Local:
@@ -28,6 +35,13 @@ mvn spring-boot:run -Dspring.profiles.active=local
 ### Para Servidor LightNode:
 ```bash
 mvn spring-boot:run -Dspring.profiles.active=lightnode
+```
+
+### Para Servidor Donweb:
+```bash
+mvn spring-boot:run -Dspring.profiles.active=donweb
+# O ejecutar JAR compilado:
+java -jar target/oriola-denim-0.0.1-SNAPSHOT.jar --spring.profiles.active=donweb
 ```
 
 ## ⚙️ Configuración Actual
@@ -45,6 +59,9 @@ spring.profiles.active=local
 
 # Para servidor LightNode
 spring.profiles.active=lightnode
+
+# Para servidor Donweb
+spring.profiles.active=donweb
 ```
 
 ## 📁 Archivos de Configuración
@@ -52,6 +69,7 @@ spring.profiles.active=lightnode
 - `application.properties` - Configuración base común
 - `application-local.properties` - Configuración para desarrollo local
 - `application-lightnode.properties` - Configuración para servidor LightNode
+- `application-donweb.properties` - Configuración para servidor Donweb
 
 ## ⚠️ Notas Importantes
 
