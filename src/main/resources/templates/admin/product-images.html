@@ -73,7 +73,7 @@
                                             <li><strong>Dimensiones óptimas:</strong> 1000px × 1500px</li>
                                             <li><strong>Dimensiones mínimas:</strong> 800px × 1200px</li>
                                             <li><strong>Relación:</strong> 2:3 (vertical/portrait)</li>
-                                            <li><strong>Tamaño archivo:</strong> 500KB - 800KB máximo</li>
+                                            <li><strong>Tamaño archivo:</strong> Hasta 2MB (se comprime automáticamente a WebP)</li>
                                             <li><strong>Formato:</strong> WebP (preferido) o JPG</li>
                                             <li><strong>Fondo:</strong> Blanco/neutro</li>
                                             <li><strong>Composición:</strong> Producto centrado</li>
@@ -209,7 +209,7 @@
         // Validar archivos
         function validateFiles(files) {
             const maxFiles = 5;
-            const maxSizeImage = 800 * 1024; // 800KB para imágenes
+            const maxSizeImage = 2 * 1024 * 1024; // 2MB para imágenes (se comprimen automáticamente)
             const maxSizeVideo = 3 * 1024 * 1024; // 3MB para videos
             const allowedTypes = [
                 'image/jpeg', 'image/jpg', 'image/png', 'image/webp', // Imágenes
@@ -229,7 +229,7 @@
                 const isVideo = file.type.startsWith('video/');
                 const maxSize = isVideo ? maxSizeVideo : maxSizeImage;
                 if (file.size > maxSize) {
-                    showMessage('error', `Archivo muy grande: ${file.name} (máximo ${isVideo ? '3MB' : '800KB'})`);
+                    showMessage('error', `Archivo muy grande: ${file.name} (máximo ${isVideo ? '3MB' : '2MB'})`);
                     return false;
                 }
             }
