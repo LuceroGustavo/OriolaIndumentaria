@@ -100,6 +100,22 @@ sudo ufw enable
 sudo ufw status verbose
 ```
 
+## ⚠️ **PASO 3.5: Configurar Firewall Donweb (CRÍTICO)**
+
+**IMPORTANTE:** El firewall del panel de Donweb es independiente del firewall UFW.
+
+### **Pasos:**
+1. Acceder a: https://micuenta.donweb.com/es-ar/servicios/cloud-iaas/vps/5469468/configurar/firewall
+2. Hacer clic en "Agregar" o "Nueva regla"
+3. Configurar:
+   - **Protocolo:** TCP
+   - **Puerto:** 8080
+   - **IPv4:** `0.0.0.0/0` (permitir cualquier IP)
+   - **IPv6:** `::/0` (permitir cualquier IP)
+4. Guardar la regla
+
+**Sin esta configuración, la aplicación NO será accesible desde Internet aunque UFW esté configurado correctamente.**
+
 ---
 
 ## ☕ **PASO 4: Instalar Java 17**
@@ -251,8 +267,37 @@ mvn clean package -DskipTests
 # Verificar que se creó el JAR
 ls -la target/oriola-denim-0.0.1-SNAPSHOT.jar
 
-# Ejecutar aplicación (prueba - presionar Ctrl+C para detener)
-java -jar target/oriola-denim-0.0.1-SNAPSHOT.jar --spring.profiles.active=donweb
+# Verificar que application-donweb.properties tiene server.address=0.0.0.0
+grep server.address src/main/resources/application-donweb.properties
+
+# Ejecutar aplicación en segundo plano
+nohup java -jar target/oriola-denim-0.0.1-SNAPSHOT.jar --spring.profiles.active=donweb > app.log 2>&1 &
+
+# Ver logs
+tail -f app.log
+
+# Verificar que está escuchando en 0.0.0.0:8080 (no solo :::8080)
+netstat -tlnp | grep 8080
+```
+
+## ⚠️ **PASO 11.5: Verificar Configuración de Red**
+
+### **Problema común:**
+Si la aplicación solo escucha en `:::8080` (IPv6) y no en `0.0.0.0:8080` (todas las interfaces), verificar:
+
+```bash
+# Verificar configuración en application-donweb.properties
+grep server.address src/main/resources/application-donweb.properties
+
+# Debe mostrar: server.address=0.0.0.0
+
+# Si no está, agregarlo:
+echo "server.address=0.0.0.0" >> src/main/resources/application-donweb.properties
+
+# Recompilar y reiniciar
+mvn clean package -DskipTests
+pkill -f oriola-denim
+nohup java -jar target/oriola-denim-0.0.1-SNAPSHOT.jar --spring.profiles.active=donweb > app.log 2>&1 &
 ```
 
 ---
@@ -283,11 +328,28 @@ sudo mysql -u root -p -e "SHOW DATABASES;"
 ## 📝 **NOTAS IMPORTANTES**
 
 - ⚠️ **Puerto SSH:** Siempre usar `-p5638` (no el puerto estándar 22)
-- ⚠️ **Firewall:** Configurar puerto 5638 para SSH, no 22
+- ⚠️ **Firewall UFW:** Configurar puerto 5638 para SSH, no 22
+- ⚠️ **Firewall Donweb:** **CRÍTICO** - Configurar puerto 8080 en el panel de Donweb
+- ⚠️ **server.address:** Debe ser `0.0.0.0` en `application-donweb.properties` para acceso externo
 - ✅ **Sistema actualizado:** Ejecutar `sudo apt update` primero
 - ✅ **Backup:** Hacer backup antes de cambios importantes
 
+## 🐛 **SOLUCIÓN DE PROBLEMAS**
+
+### **Problema: La aplicación no es accesible desde Internet**
+
+**Síntomas:**
+- La aplicación está corriendo
+- El firewall UFW tiene el puerto 8080 abierto
+- Pero no se puede acceder desde fuera del servidor
+
+**Solución:**
+1. Verificar firewall Donweb: https://micuenta.donweb.com/es-ar/servicios/cloud-iaas/vps/5469468/configurar/firewall
+2. Agregar regla TCP para puerto 8080 (IPv4: `0.0.0.0/0`, IPv6: `::/0`)
+3. Verificar que `server.address=0.0.0.0` está en `application-donweb.properties`
+4. Recompilar y reiniciar la aplicación
+
 ---
 
-**Última actualización:** 15 de enero de 2025
+**Última actualización:** 15 de noviembre de 2025
 

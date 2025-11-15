@@ -375,17 +375,32 @@ sudo certbot --nginx -d orioladenim.com.ar -d www.orioladenim.com.ar
 
 ## ✅ **ESTADO DE LA MIGRACIÓN**
 
-**Última actualización:** 15 de enero de 2025  
-**Estado actual:** 🔄 **EN PROCESO - SERVIDOR CREADO**  
-**Próximo paso:** Configurar acceso SSH y firewall
+**Última actualización:** 15 de noviembre de 2025  
+**Estado actual:** ✅ **APLICACIÓN FUNCIONANDO**  
+**URL de acceso:** `http://149.50.144.53:8080`
 
-### **Progreso:**
-- [x] Servidor Donweb creado
-- [x] Sistema Operativo: Ubuntu 24.04 UEFI instalado
-- [x] Git 2.43.0 preinstalado
-- [ ] Configurar acceso SSH
-- [ ] Configurar firewall
-- [ ] Instalar software restante (Java, MySQL, Maven, Nginx)
+### **Progreso Completado:**
+- [x] Servidor Donweb creado ✅
+- [x] Sistema Operativo: Ubuntu 24.04 UEFI instalado ✅
+- [x] Git 2.43.0 preinstalado ✅
+- [x] Configurar acceso SSH (puerto 5638) ✅
+- [x] Configurar firewall UFW ✅
+- [x] **Configurar firewall Donweb (puerto 8080)** ✅ **CRÍTICO**
+- [x] Instalar software (Java 17, MySQL 8.0, Maven, Nginx) ✅
+- [x] Configurar base de datos `orioladenim` ✅
+- [x] Clonar repositorio ✅
+- [x] Crear `application-donweb.properties` ✅
+- [x] Configurar `server.address=0.0.0.0` ✅
+- [x] Compilar aplicación ✅
+- [x] Desplegar aplicación ✅
+- [x] **Aplicación accesible desde Internet** ✅
+
+### **Próximos Pasos:**
+- [ ] Configurar Nginx como proxy reverso
+- [ ] Configurar SSL con Let's Encrypt
+- [ ] Actualizar DNS (orioladenim.com.ar → 149.50.144.53)
+- [ ] Migrar datos desde LightNode (base de datos y archivos)
+- [ ] Pruebas funcionales completas
 
 ---
 

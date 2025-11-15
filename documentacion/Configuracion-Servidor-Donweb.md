@@ -3,7 +3,7 @@
 **Fecha de creación:** 15 de enero de 2025  
 **Servidor:** Donweb - Buenos Aires, Argentina  
 **Propósito:** Servidor de producción para aplicación Spring Boot  
-**Estado:** 🔄 **EN CONFIGURACIÓN**
+**Estado:** ✅ **APLICACIÓN FUNCIONANDO**
 
 ---
 
@@ -34,11 +34,11 @@
 - **Postfix:** 3.8.6 (Servidor de correo)
 - **Python:** 3.12.3
 
-### **Software a Instalar:**
-- [ ] Java 17 (OpenJDK)
-- [ ] MySQL 8.0
-- [ ] Maven 3.8+
-- [ ] Nginx (proxy reverso)
+### **Software Instalado:**
+- [x] Java 17 (OpenJDK) ✅
+- [x] MySQL 8.0 ✅
+- [x] Maven 3.8+ ✅
+- [x] Nginx (proxy reverso) ✅
 
 ---
 
@@ -102,10 +102,26 @@
 ## 🚀 **PRIMEROS PASOS (Según Panel Donweb)**
 
 1. ✅ **Acceder a través de la consola SSH** al Cloud Server
-2. ⏳ **Configurar el Firewall** del Cloud Server (puertos: 22, 80, 443, 8080)
-3. ⏳ **Configurar una red LAN** (opcional, para escalar horizontalmente)
-4. ⏳ **Crear Snapshots** (para backups y pruebas)
-5. ⏳ **Gestionar recursos** (escalar si es necesario)
+2. ✅ **Configurar el Firewall UFW** del servidor (puertos: 5638, 80, 443, 8080)
+3. ✅ **Configurar el Firewall Donweb** en el panel (puerto 8080) ⚠️ **CRÍTICO**
+4. ⏳ **Configurar una red LAN** (opcional, para escalar horizontalmente)
+5. ⏳ **Crear Snapshots** (para backups y pruebas)
+6. ⏳ **Gestionar recursos** (escalar si es necesario)
+
+## ⚠️ **IMPORTANTE: Firewall de Donweb**
+
+**El firewall del panel de Donweb es independiente del firewall UFW del servidor.**
+
+Para que la aplicación sea accesible desde Internet, debes configurar **AMBOS**:
+1. ✅ Firewall UFW en el servidor (ya configurado)
+2. ✅ Firewall Donweb en el panel (ya configurado)
+
+**Configuración del Firewall Donweb:**
+- Acceder a: https://micuenta.donweb.com/es-ar/servicios/cloud-iaas/vps/5469468/configurar/firewall
+- Agregar regla TCP:
+  - Puerto: 8080
+  - IPv4: `0.0.0.0/0`
+  - IPv6: `::/0`
 
 ---
 
@@ -127,13 +143,18 @@
 ### **Perfil activo:**
 - **Comando:** `--spring.profiles.active=donweb`
 
+### **Configuración crítica de red:**
+- **`server.address=0.0.0.0`** en `application-donweb.properties` ✅
+  - Permite que Spring Boot escuche en todas las interfaces de red
+  - Sin esto, la aplicación solo escucha en localhost y no es accesible desde fuera
+
 ---
 
 ## 📊 **COMPARACIÓN CON SERVIDOR ANTERIOR**
 
 | Aspecto | LightNode (Anterior) | Donweb (Nuevo) |
 |--------|---------------------|----------------|
-| **IP Pública** | 149.104.92.116 | [PENDIENTE] |
+| **IP Pública** | 149.104.92.116 | 149.50.144.53 ✅ |
 | **Ubicación** | Buenos Aires, AR | Buenos Aires, AR |
 | **Sistema Operativo** | Ubuntu 22.04.5 LTS | Ubuntu 24.04 UEFI |
 | **CPU** | 1 vCore | 1 vCore |
@@ -160,8 +181,9 @@
 
 ## ✅ **ESTADO ACTUAL**
 
-**Última actualización:** 15 de enero de 2025  
-**Estado:** ✅ **SERVIDOR CREADO - LISTO PARA CONFIGURAR**
+**Última actualización:** 15 de noviembre de 2025  
+**Estado:** ✅ **APLICACIÓN FUNCIONANDO**  
+**URL:** `http://149.50.144.53:8080`
 
 ### **Completado:**
 - [x] Servidor Cloud creado exitosamente en Donweb ✅
@@ -171,24 +193,29 @@
 - [x] Hostname: `vps-5469468-x.dattaweb.com` ✅
 - [x] Puerto SSH: `5638` ✅
 - [x] Git 2.43.0 preinstalado ✅
-
-### **Completado (Verificado):**
 - [x] Conexión SSH exitosa ✅
 - [x] Sistema Ubuntu 24.04.3 LTS confirmado ✅
-- [x] Hostname: `vps-5469468-x` confirmado ✅
-- [x] Recursos del servidor verificados ✅
+- [x] Firewall UFW configurado ✅
+- [x] **Firewall Donweb configurado (puerto 8080)** ✅ **CRÍTICO**
+- [x] Java 17 instalado ✅
+- [x] MySQL 8.0 instalado y configurado ✅
+- [x] Maven instalado ✅
+- [x] Nginx instalado ✅
+- [x] Base de datos `orioladenim` creada ✅
+- [x] Usuario `oriola_user` creado ✅
+- [x] Repositorio clonado ✅
+- [x] `application-donweb.properties` creado ✅
+- [x] `server.address=0.0.0.0` configurado ✅
+- [x] Aplicación compilada ✅
+- [x] Aplicación desplegada y funcionando ✅
+- [x] **Aplicación accesible desde Internet** ✅
 
 ### **Pendiente:**
-- [ ] Actualizar sistema (sudo apt update)
-- [ ] Configurar clave SSH manualmente
-- [ ] Configurar firewall
-- [ ] Instalar Java 17
-- [ ] Instalar MySQL 8.0
-- [ ] Instalar Maven
-- [ ] Instalar Nginx
-- [ ] Configurar base de datos
-- [ ] Migrar datos desde LightNode
-- [ ] Desplegar aplicación
+- [ ] Configurar Nginx como proxy reverso
+- [ ] Configurar SSL con Let's Encrypt
+- [ ] Actualizar DNS (orioladenim.com.ar → 149.50.144.53)
+- [ ] Migrar datos desde LightNode (base de datos y archivos)
+- [ ] Configurar clave SSH (opcional, mejorar seguridad)
 
 ---
 
