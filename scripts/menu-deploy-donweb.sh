@@ -184,6 +184,84 @@ project_info() {
     echo "Perfil: donweb"
 }
 
+# Función para ver espacio en disco
+disk_space() {
+    print_option "🔟 Espacio en disco:"
+    echo ""
+    
+    # Espacio total del sistema
+    echo -e "${CYAN}=== ESPACIO TOTAL DEL SERVIDOR ===${NC}"
+    df -h / | awk 'NR==1 || NR==2 {print}'
+    
+    # Obtener porcentaje de uso
+    USAGE=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
+    AVAILABLE=$(df -h / | tail -1 | awk '{print $4}')
+    USED=$(df -h / | tail -1 | awk '{print $3}')
+    TOTAL=$(df -h / | tail -1 | awk '{print $2}')
+    
+    echo ""
+    echo -e "${BLUE}📊 Resumen:${NC}"
+    echo "  Total: $TOTAL"
+    echo "  Usado: $USED"
+    echo "  Disponible: $AVAILABLE"
+    echo "  Uso: ${USAGE}%"
+    
+    # Advertencias según el uso
+    if [ "$USAGE" -ge 90 ]; then
+        echo ""
+        print_error "⚠️  CRÍTICO: Espacio en disco muy bajo (${USAGE}%)"
+        print_warning "Considera limpiar archivos o aumentar el almacenamiento"
+    elif [ "$USAGE" -ge 80 ]; then
+        echo ""
+        print_warning "⚠️  Advertencia: Espacio en disco bajo (${USAGE}%)"
+        print_warning "Considera hacer limpieza de archivos antiguos"
+    elif [ "$USAGE" -ge 70 ]; then
+        echo ""
+        print_warning "ℹ️  Espacio en disco moderado (${USAGE}%)"
+    else
+        echo ""
+        print_success "✅ Espacio en disco saludable (${USAGE}%)"
+    fi
+    
+    echo ""
+    echo -e "${CYAN}=== ESPACIO POR DIRECTORIO ===${NC}"
+    
+    # Espacio usado por uploads
+    if [ -d "/home/oriola/uploads" ]; then
+        UPLOADS_SIZE=$(du -sh /home/oriola/uploads 2>/dev/null | cut -f1)
+        UPLOADS_FILES=$(find /home/oriola/uploads -type f 2>/dev/null | wc -l)
+        echo "📁 Uploads (/home/oriola/uploads):"
+        echo "   Tamaño: ${UPLOADS_SIZE:-0}"
+        echo "   Archivos: ${UPLOADS_FILES:-0}"
+    else
+        echo "📁 Uploads: Directorio no existe"
+    fi
+    
+    # Espacio usado por backups
+    if [ -d "/home/oriola/backups" ]; then
+        BACKUPS_SIZE=$(du -sh /home/oriola/backups 2>/dev/null | cut -f1)
+        BACKUPS_FILES=$(find /home/oriola/backups -type f 2>/dev/null | wc -l)
+        echo "💾 Backups (/home/oriola/backups):"
+        echo "   Tamaño: ${BACKUPS_SIZE:-0}"
+        echo "   Archivos: ${BACKUPS_FILES:-0}"
+    else
+        echo "💾 Backups: Directorio no existe"
+    fi
+    
+    # Espacio usado por el proyecto
+    if [ -d "/home/oriola/OriolaIndumentaria" ]; then
+        PROJECT_SIZE=$(du -sh /home/oriola/OriolaIndumentaria 2>/dev/null | cut -f1)
+        echo "📦 Proyecto (/home/oriola/OriolaIndumentaria):"
+        echo "   Tamaño: ${PROJECT_SIZE:-0}"
+    else
+        echo "📦 Proyecto: Directorio no existe"
+    fi
+    
+    echo ""
+    echo -e "${CYAN}=== TOP 10 DIRECTORIOS MÁS GRANDES ===${NC}"
+    du -h --max-depth=1 /home/oriola 2>/dev/null | sort -hr | head -10 | awk '{printf "  %-50s %s\n", $2, $1}'
+}
+
 # Menú principal
 while true; do
     clear
@@ -202,9 +280,10 @@ while true; do
     echo "7.  Ver logs de la aplicación"
     echo "8.  Reiniciar aplicación"
     echo "9.  Información del proyecto"
-    echo "10. Salir"
+    echo "10. Ver espacio en disco"
+    echo "11. Salir"
     echo ""
-    read -p "Ingresa tu opción (1-10): " opcion
+    read -p "Ingresa tu opción (1-11): " opcion
     echo ""
     
     case $opcion in
@@ -217,7 +296,8 @@ while true; do
         7) view_logs ;;
         8) restart_app ;;
         9) project_info ;;
-        10) 
+        10) disk_space ;;
+        11) 
             print_success "Saliendo del menú..."
             exit 0 
             ;;
